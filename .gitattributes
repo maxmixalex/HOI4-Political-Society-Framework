@@ -1,0 +1,4 @@
+# Keep supplied game snapshots byte-for-byte, including original whitespace.
+# Their recorded hashes must also survive checkouts with core.autocrlf enabled.
+psf/assets/native_gui/*.gui -text -whitespace
+psf/assets/native_bookmarks/*.txt -text -whitespace

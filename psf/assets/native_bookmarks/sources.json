@@ -1,0 +1,14 @@
+{
+  "origin": "User-supplied Hearts of Iron IV script archive",
+  "copyright": "Paradox Interactive; excluded from the PSF MIT grant",
+  "files": {
+    "the_gathering_storm.txt": {
+      "source": "common/bookmarks/the_gathering_storm.txt",
+      "sha256": "31d22ba3fdd6160be56f198f0ec078c09156d3fdcfadced809f73226f698422f"
+    },
+    "blitzkrieg.txt": {
+      "source": "common/bookmarks/blitzkrieg.txt",
+      "sha256": "54f6f23dec5a066dca37125f69a29b8cc0400b4c0d598ff6e6ba71bd82dcf25d"
+    }
+  }
+}

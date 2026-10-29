@@ -20,6 +20,39 @@ The wrapper also rejects scripts over 2 MiB: the supplied CLI silently skips
 larger files during discovery. The compiler must split complete top-level
 definitions into smaller files so no generated effects escape validation.
 
+## HOI4 loader preflight
+
+Before CWTools runs, the wrapper inspects the original bytes of every shipped
+text file in both mod layers, including the outer launcher `.mod` descriptors.
+It rejects UTF-8 BOMs in scripts, GUI/GFX files and descriptors; requires a BOM
+and matching language header in localisation `.yml`; and rejects damaged UTF-8
+or NUL bytes. GUI files must have the `guiTypes` root, and each of the three
+overridden native interface files must still define its independent engine
+window. A comment or nested window with the same name cannot satisfy that
+check. Descriptor `supported_version` patterns must include all three parts,
+such as `1.17.*`; `1.*` is rejected.
+
+This is a separate check because a tolerant parser is not the game loader.
+The supplied `error(9).log` reports five BOM-prefixed `guiTypes`/`spriteTypes`
+tokens and then `Undefined GUI_TYPE: frontendgamesetupview`, explicitly
+warning that the game will likely crash. A successful CWT run alone did not
+detect that failure. The byte-level regression tests deliberately corrupt an
+otherwise valid compiled build and prove it is rejected **before** invoking
+CWTools. Preflight diagnostics are retained as `engine-preflight.json`.
+
+The relevant format references are the Paradox-hosted
+[Modding guide](https://hoi4.paradoxwikis.com/Modding),
+[Interface modding](https://hoi4.paradoxwikis.com/Interface_modding), and
+[Localisation](https://hoi4.paradoxwikis.com/Localisation). The supplied native
+GUI templates use plain UTF-8; generated translations use UTF-8 with BOM.
+These byte checks do not claim a game launch or rendered UI verification.
+
+For a quick loader-only check:
+
+```sh
+python tools/ci/validate.py --root dist --preflight-only
+```
+
 ## Pinned inputs
 
 `toolchain.lock.json` records SHA-256 hashes of every executable, rule file,
@@ -71,6 +104,13 @@ They establish known imports, not proof of the omitted translation files.
 `psf_*` keys are forbidden in this list. Missing new PSF translations still
 produce actual CWTools diagnostics; there is no `ignore-code`, ignored-error
 baseline, allow-empty flag, or conversion of errors into warnings.
+
+`stock-bookmark-imports.json` similarly records the original bookmark names,
+descriptions and country-history localisation keys, with their source lines
+and source-file hashes. The front-end adapter substitutes a new PSF history
+key that embeds the chart and includes `$original_history_key$`; it never
+copies, replaces or deletes the original game's translated prose. These
+imports are pinned in the same toolchain lock and remain validation-only.
 
 To check against a complete, licensed installation instead:
 

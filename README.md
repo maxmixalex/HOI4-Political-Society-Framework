@@ -4,9 +4,11 @@
 
 框架以经过 JSON Schema 和语义检查的数据文件为源，生成原生 HOI4 脚本、界面、本地化及可复用接口。仓库同时提供适用于原版的政治社会示例内容。
 
-**直接安装：** [下载 PSF 0.1.0 安装包](distributions/psf-0.1.0.zip)。包内包含框架、原版示例、两个启动器描述文件和中英文安装说明；无需先安装 Python。
+**直接安装：** [下载 PSF 0.2.0 安装包](distributions/psf-0.2.0.zip)。包内包含框架、原版示例、两个启动器描述文件和中英文安装说明；无需先安装 Python。
 
-> **验证边界：** 这里提供实际生成的模组和执行真实 Rust CWTools 的 CI，并通过测试执行生成脚本的受支持语义。开发环境未运行 HOI4 游戏客户端，因此不将静态校验、脚本测试或界面结构检查描述为已完成的游戏内实测。原版界面快照具有版本依赖；`supported_version="1.*"` 是启动器描述符，不是所有 1.x 版本的兼容保证。
+> **验证边界：** 这里提供实际生成的模组、HOI4 加载格式检查和执行真实 Rust CWTools 的 CI，并通过测试执行生成脚本的受支持语义。开发环境未运行 HOI4 游戏客户端，因此不将静态校验、脚本测试或界面结构检查描述为已完成的游戏内实测。原版界面快照具有版本依赖；其版本号未随脚本提供，因此默认省略可选的 `supported_version`。作者可用 `--supported-version 1.19.*` 指定自己核实的目标版本。
+
+**0.2.0 修复了 0.1.0 的启动故障：** GUI/GFX 的 UTF-8 BOM 会令引擎拒绝整个文件，进而缺失 `frontendgamesetupview`。现在这些文件使用无 BOM UTF-8，只有本地化 YML 使用 BOM；构建在调用 CWTools 前检查原始字节和必需的原生窗口。请替换原来的同名模组目录与描述符。
 
 ## 已实现的系统
 
@@ -18,12 +20,13 @@
 - **选举与行动：** 合法参选组织按当前支持进行抽象选举，选举联盟合计成员得票；通用决议处理组织活动、协商、支持动员、制度参与、联盟与制度改革。
 - **替代界面：** 政治与外交面板中的原版政党饼图及意识形态/政党信息让位于国家总览、政治团体侧栏、联盟信息与逐维政治光谱。国家选择界面的两条信息路径也处理了旧政治信息。
 - **作者工具：** JSON、YAML、TOML 输入；严格校验；确定性编译与打包；稳定 ID 注册表；生成的 scripted effects、triggers 和双语本地化。
+- **团体属性修正：** 每个团体的支持、影响、满意度和每条光谱维度都有原生 `add`、`factor`、`daily` modifier。可从民族精神、特质和动态修正接入，也可声明具名的永久或限时修正，分别叠加、刷新、撤销。一次性变化与持续加成分别维护基础值与实际值，完整接口见 [MODIFIERS](docs/MODIFIERS.md)。
 
 原版四类意识形态仍存在于游戏引擎中，作为外交、人物、国策和其他硬编码行为的兼容接口。PSF 替代的是政治社会的数据模型、玩法和显示，不声称通过脚本删除引擎底层机制。默认桥接会投影 PSF 政党支持并接收可解释的原版变化；详见[架构与兼容性](docs/ARCHITECTURE.md)。
 
 ## 原版示例内容
 
-示例包含 **125 个政治组织、21 个声明联盟、9 个政治维度、11 个意识形态原型、9 种制度、20 个日期事件和 40 个选项**。编译器另外为每个档案生成可用于选举和政府更替的过渡内阁协议。
+示例包含 **125 个政治组织、21 个声明联盟、9 个政治维度、11 个意识形态原型、9 种制度、30 个日期事件和 60 个选项**，以及 **16 种具名修正、4,500 个按团体及属性生成的原生 modifier**。编译器另外为每个档案生成可用于选举和政府更替的过渡内阁协议。
 
 德国、英国、法国、美国、苏联、意大利、日本、中国、西班牙和波兰有定制的 1936 档案及 1939 开局覆盖。其他国家使用四套通用模板之一，确保它们也拥有可操作的政治组织。所有名称、描述、事件与选项均有英文和简体中文。
 
@@ -74,6 +77,7 @@ python -m psf inspect examples/vanilla/manifest.json --group ger_spd
 | `dist/psf-registry.json` | 稳定 ID、变量、effect 与 trigger 名称 |
 | `dist/build-manifest.json` | 文件 SHA-256、内容计数与构建来源 |
 | `dist/psf_vanilla_example/psf_ui_manifest.json` | 原版 UI 输入哈希、修改路径和结构检查信息 |
+| `dist/psf_vanilla_example/psf_bookmark_manifest.json` | 国家选择预览、日期、原版剧本输入哈希与保留的历史介绍键 |
 
 `pack` 校验构建后的文件哈希；编译后直接修改了产物时需要重新编译再打包。生成目录由编译器管理，长期修改应放在源 manifest 或独立的手写集成模组里。
 
@@ -119,6 +123,8 @@ python tools/ci/validate.py --root dist \
 
 同时覆盖这些文件的模组需要专门的兼容补丁；不能仅通过调整加载顺序保证双方界面完整。KR、TNO、PB 的脚本用于理解可行实现，不代表本版本已成为这些总转换模组的即插即用补丁。
 
+十个定制国家的开局预览还通过 `common/bookmarks/the_gathering_storm.txt` 与 `blitzkrieg.txt` 的原生 `history` 引用接入，保留原有描述及 DLC 条件。修改相同剧本文件的模组也需要合并这些引用。主要国家选择页的预览与地图右侧的硬编码信息栏是不同的控件；具体范围见 [BOOKMARKS](docs/BOOKMARKS.md)。
+
 每个播放集使用一个编译后的 PSF 内容注册表。要组合多份政治内容，应在源数据层合并档案并重新编译，避免多个生成注册表争用同名运行时接口。
 
 | 文档 | 内容 |
@@ -126,8 +132,11 @@ python tools/ci/validate.py --root dist \
 | [ARCHITECTURE](docs/ARCHITECTURE.md) | 数据模型、计算公式、更新周期、原版桥接与验证边界 |
 | [AUTHORING](docs/AUTHORING.md) | Schema、完整 JSON/YAML/TOML 示例、定义组织与事件、图标与迁移规则 |
 | [API](docs/API.md) | 实际生成的 effects、triggers、变量与本地化示例 |
+| [MODIFIERS](docs/MODIFIERS.md) | 民族精神/特质接入、限时与永久修正、日变化、叠加与撤销 |
+| [原生接入示例](examples/native_modifiers/README.md) | 经真实 CWTools 验证的民族精神、人物特质与动态修正文件 |
 | [EXAMPLE](docs/EXAMPLE.md) | 国家覆盖、场景、设计解释和历史资料 |
 | [UI](docs/UI.md) | 政治/外交侧栏、原版控件保留、作用域与分辨率 |
+| [BOOKMARKS](docs/BOOKMARKS.md) | 国家选择页的剧本快照、原描述保留及前端覆盖范围 |
 | [CWTools](tools/ci/README.md) | 真正校验、固定工具链、负面对照与原版依赖 |
 
 ## License
@@ -138,4 +147,4 @@ python tools/ci/validate.py --root dist \
 
 PSF models political organizations independently of HOI4's native ideology slots. Declarative JSON, YAML or TOML manifests compile into a reusable framework mod and one dependent content mod, including generated effects, triggers, bilingual localization and native scripted UI. Organizations have multidimensional positions, independent support and influence, government satisfaction, legal status and multiple alliance memberships. Actual institutions remain separate from the governing coalition's political preferences.
 
-The vanilla example supplies ten authored country profiles, four generic fallback templates, 125 organizations and twenty alternative-choice scenarios. The repository includes real pinned Rust CWTools validation and semantic negative controls. Native ideology categories remain as a compatibility projection; the game executable has not been run in the development environment, so static validation is not represented as an in-game rendering or playtest result.
+The vanilla example supplies ten authored country profiles, four generic fallback templates, 125 organizations, thirty alternative-choice scenarios, sixteen named modifier sources and 4,500 native organization modifier keys. The repository includes loader-byte/root-window checks, real pinned Rust CWTools validation and semantic negative controls. Native ideology categories remain as a compatibility projection; the game executable has not been run in the development environment, so static validation is not represented as an in-game rendering or playtest result.

@@ -1,0 +1,8 @@
+# Attach this optional country-leader/advisor trait through your own characters.
+leader_traits = {
+    psf_example_labor_negotiator = {
+        random = no
+        psf_eng_tuc_influence_factor = 0.05
+        psf_eng_labour_satisfaction_add = 4
+    }
+}

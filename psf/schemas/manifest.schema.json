@@ -70,6 +70,13 @@
     },
     "notes": {
       "$ref": "#/$defs/loc"
+    },
+    "modifiers": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/organization_modifier"
+      },
+      "minItems": 0
     }
   },
   "required": [
@@ -569,7 +576,9 @@
             "regime",
             "legitimacy",
             "position",
-            "cohesion"
+            "cohesion",
+            "add_modifier",
+            "remove_modifier"
           ]
         },
         "group": {
@@ -588,6 +597,9 @@
           "type": "number",
           "minimum": -200,
           "maximum": 200
+        },
+        "modifier": {
+          "$ref": "#/$defs/id"
         }
       },
       "required": [
@@ -732,6 +744,111 @@
         }
       },
       "required": [],
+      "additionalProperties": false
+    },
+    "modifier_values": {
+      "type": "object",
+      "properties": {
+        "add": {
+          "type": "number",
+          "minimum": -200,
+          "maximum": 200
+        },
+        "factor": {
+          "type": "number",
+          "minimum": -1,
+          "maximum": 10
+        },
+        "daily": {
+          "type": "number",
+          "minimum": -200,
+          "maximum": 200
+        }
+      },
+      "minProperties": 1,
+      "additionalProperties": false
+    },
+    "organization_modifier": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "numeric_id": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 999999
+        },
+        "name": {
+          "$ref": "#/$defs/loc"
+        },
+        "description": {
+          "$ref": "#/$defs/loc"
+        },
+        "duration_days": {
+          "oneOf": [
+            {
+              "const": -1
+            },
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 36500
+            }
+          ]
+        },
+        "groups": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "attributes": {
+          "type": "object",
+          "properties": {
+            "support": {
+              "$ref": "#/$defs/modifier_values"
+            },
+            "influence": {
+              "$ref": "#/$defs/modifier_values"
+            },
+            "satisfaction": {
+              "$ref": "#/$defs/modifier_values"
+            }
+          },
+          "minProperties": 1,
+          "additionalProperties": false
+        },
+        "positions": {
+          "type": "object",
+          "propertyNames": {
+            "$ref": "#/$defs/id"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/modifier_values"
+          },
+          "minProperties": 1
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "description"
+      ],
+      "anyOf": [
+        {
+          "required": [
+            "attributes"
+          ]
+        },
+        {
+          "required": [
+            "positions"
+          ]
+        }
+      ],
       "additionalProperties": false
     }
   }

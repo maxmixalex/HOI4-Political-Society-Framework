@@ -19,12 +19,17 @@ import subprocess
 import sys
 import tempfile
 
+try:
+    from .engine_safety import MAX_SCRIPT_BYTES, inspect_build
+except ImportError:  # Direct `python tools/ci/validate.py` invocation.
+    from engine_safety import MAX_SCRIPT_BYTES, inspect_build
+
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parent.parent
 VENDOR = HERE / "vendor"
 LOCK = HERE / "toolchain.lock.json"
-# Measured on the supplied CLI: 2,097,152 bytes are discovered, +1 is skipped.
-MAX_SCRIPT_BYTES = 2 * 1024 * 1024
+# MAX_SCRIPT_BYTES is measured on the supplied CLI: 2,097,152 bytes are
+# discovered, +1 is skipped. The same boundary is used by both gates.
 
 
 class ValidationFailure(RuntimeError):
@@ -100,11 +105,17 @@ def add_declared_stock_imports(staged: Path) -> int:
     in a mod.  The manifest records the source of every key.  It cannot declare
     new psf_* names, so missing PSF localisation remains a real CWTools error.
     """
-    manifest_path = HERE / "stock-ui-imports.json"
-    if not manifest_path.is_file():
+    imports: dict[str, list] = {}
+    for filename in ("stock-ui-imports.json", "stock-bookmark-imports.json"):
+        manifest_path = HERE / filename
+        if manifest_path.is_file():
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            for key, sources in manifest["localisation_keys"].items():
+                if not sources:
+                    raise ValidationFailure(f"Missing source evidence for external localisation declaration: {key}")
+                imports.setdefault(key, []).extend(sources)
+    if not imports:
         return 0
-    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-    imports = manifest["localisation_keys"]
     for key, sources in imports.items():
         if key.lower().startswith("psf_") or not sources:
             raise ValidationFailure(f"Invalid external localisation declaration: {key}")
@@ -217,9 +228,25 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--vanilla", type=Path, help="Optional full licensed installation; replaces bundled script-symbol cache")
     parser.add_argument("--self-test", action="store_true", help="Also prove semantic and syntax failures are rejected")
     parser.add_argument("--self-test-only", action="store_true")
+    parser.add_argument("--preflight-only", action="store_true", help="Check raw encodings, launcher versions and required native windows without invoking CWTools")
     args = parser.parse_args(argv)
     args.reports.mkdir(parents=True, exist_ok=True)
+    # A failed rerun must not leave an older successful report beside it.
+    if not args.self_test_only:
+        for filename in ("summary.json", "cwtools.json", "engine-preflight.json"):
+            (args.reports / filename).unlink(missing_ok=True)
     try:
+        preflight = None
+        if not args.self_test_only:
+            preflight = inspect_build(args.root.resolve(), mod_names(args.root))
+            (args.reports / "engine-preflight.json").write_text(json.dumps(preflight, indent=2) + "\n", encoding="utf-8")
+            for diagnostic in preflight["diagnostics"]:
+                print(f"{diagnostic['file']}:1: error: {diagnostic['code']}: {diagnostic['message']}", file=sys.stderr)
+            if preflight["errors"]:
+                raise ValidationFailure(f"HOI4 engine preflight rejected {preflight['errors']} loader hazard(s); see engine-preflight.json")
+            print(f"HOI4 engine preflight passed: {preflight['checked_files']} text files, {preflight['native_gui_files']} native GUI files.")
+            if args.preflight_only:
+                return 0
         binary = verify_toolchain()
         if args.self_test or args.self_test_only:
             self_test(binary, args.reports)
@@ -238,6 +265,7 @@ def main(argv: list[str] | None = None) -> int:
                 "engine": "cwtools 2.3.0", "generated_files": count,
                 "declared_stock_localisation_imports": imports,
                 "errors": errors, "warnings": warnings, "exit_code": result,
+                "engine_preflight": {key: preflight[key] for key in ("checked_files", "native_gui_files", "errors")},
                 "runtime_launch_tested": False,
             }
             (args.reports / "summary.json").write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
@@ -246,6 +274,10 @@ def main(argv: list[str] | None = None) -> int:
                 return result if result != 0 else 1
         return 0
     except (OSError, KeyError, ValueError, subprocess.SubprocessError, ValidationFailure) as exc:
+        (args.reports / "summary.json").write_text(json.dumps({
+            "status": "failed", "exit_code": 2, "message": str(exc),
+            "runtime_launch_tested": False,
+        }, indent=2) + "\n", encoding="utf-8")
         print(f"PSF CWTools validation failed: {exc}", file=sys.stderr)
         return 2
 

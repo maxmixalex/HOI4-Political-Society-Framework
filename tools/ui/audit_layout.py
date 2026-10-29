@@ -28,7 +28,7 @@ def point(node: Node) -> tuple[int, int]:
 
 def size(node: Node) -> tuple[int, int]:
     p = property_block(node, "size")
-    return int(p.get("width", "0")), int(p.get("height", "0"))
+    return int(p.get("width", p.get("x", "0"))), int(p.get("height", p.get("y", "0")))
 
 
 def named(nodes: list[Node], name: str, ancestor: str | None = None) -> Node:
@@ -38,10 +38,15 @@ def named(nodes: list[Node], name: str, ancestor: str | None = None) -> Node:
     return items[0]
 
 
+def society_nodes(mod: Path) -> list[Node]:
+    return [node for path in sorted((mod / "interface").glob("psf_society*.gui"))
+            for node in gui_nodes(path.read_text(encoding="utf-8"))]
+
+
 def audit(mod: Path) -> dict:
     politics = gui_nodes((mod / "interface/countrypoliticsview.gui").read_text(encoding="utf-8-sig"))
     diplomacy = gui_nodes((mod / "interface/countrydiplomacyview.gui").read_text(encoding="utf-8-sig"))
-    society = gui_nodes((mod / "interface/psf_society.gui").read_text(encoding="utf-8-sig"))
+    society = society_nodes(mod)
     pol_mount = named(politics, "psf_political_summary_mount")
     pol_summary = named(society, "psf_political_summary")
     pol_bottom = point(pol_mount)[1] + size(pol_summary)[1]
@@ -65,11 +70,15 @@ def audit(mod: Path) -> dict:
                 h = int(child.properties["maxheight"][2])
                 checks[child.name + "_in_summary"] = 0 <= x and 0 <= y and x + w <= width and y + h <= height
             elif child.kind.lower() == "buttontype":
-                checks[mode + child.name + "_in_summary"] = x + 123 <= width and y + 34 <= height
+                w, h = size(child) if any(n.kind.lower() == "size" for n in child.children) else (123, 34)
+                checks[mode + child.name + "_in_summary"] = x + w <= width and y + h <= height
+            elif child.kind.lower() == "containerwindowtype":
+                w, h = size(child)
+                checks[child.name + "_in_summary"] = 0 <= x and 0 <= y and x + w <= width and y + h <= height
     sidebar = named(society, "psf_society_side")
     sw, sh = size(sidebar)
     for page in ("psf_groups_page", "psf_detail_page", "psf_spectrum_page", "psf_alliances_page"):
-        node = named(society, page)
+        node = named(society, page, "psf_society_side")
         x, y = point(node)
         w, h = size(node)
         checks[page + "_viewport_inside_sidebar"] = x + w <= sw and y + h <= sh
@@ -90,7 +99,7 @@ def audit(mod: Path) -> dict:
 
 
 def projection(mod: Path, destination: Path) -> None:
-    society = gui_nodes((mod / "interface/psf_society.gui").read_text(encoding="utf-8-sig"))
+    society = society_nodes(mod)
     parts = ['<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="1410" viewBox="0 0 1040 1410">',
              '<style>text{font-family:Arial,sans-serif;font-size:14px;fill:#e8e8e0}.small{font-size:11px;fill:#b8c5c5}.title{font-size:20px;font-weight:bold}</style>',
              '<rect width="1040" height="1410" fill="#171e22"/>',
@@ -132,19 +141,20 @@ def projection(mod: Path, destination: Path) -> None:
             elif child.kind.lower() == "buttontype":
                 rect(ox+sx+x, oy+sy+y, 123, 34, "#5b5b43", "Groups" if child.name.endswith("groups") else "Spectrum")
         mx, my = point(named(native, f"psf_{mode}_side_mount"))
-        side = named(society, "psf_society_side")
+        side_name = "psf_society_side" if mode == "political" else "psf_society_side_diplomatic"
+        side = named(society, side_name)
         sw, sh = size(side)
         rect(ox+mx, oy+my, sw, sh, "#273331", "Optional sidebar; opens on request")
         for name in ("psf_tab_groups", "psf_tab_spectrum", "psf_tab_alliances"):
-            n=named(society,name);x,y=point(n)
+            n=named(society,name,side_name);x,y=point(n)
             rect(ox+mx+x,oy+my+y,123,34,"#5b5b43",name.removeprefix("psf_tab_").title())
-        page=named(society,"psf_groups_page");px,py=point(page);pw,ph=size(page)
+        page=named(society,"psf_groups_page",side_name);px,py=point(page);pw,ph=size(page)
         rect(ox+mx+px,oy+my+py,pw,ph,"#202b29","Native scroll viewport; one page visible")
         rect(ox+mx+px+pw-15,oy+my+py+24,10,ph-30,"#44524a","")
         rect(ox+mx+px+pw-15,oy+my+py+24,10,115,"#b4b29a","")
-        for idx in range(7):
-            y=oy+my+py+28+idx*60
-            rect(ox+mx+px+8,y,370,56,"#354138",f"Group {idx+1}: name, support / influence / satisfaction")
+        for idx in range(9):
+            y=oy+my+py+28+idx*46
+            rect(ox+mx+px+8,y,370,44,"#354138",f"Group {idx+1}: name, support / influence / satisfaction")
     parts.append('</svg>')
     destination.parent.mkdir(parents=True, exist_ok=True)
     destination.write_text("\n".join(parts), encoding="utf-8")

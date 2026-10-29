@@ -1,0 +1,30 @@
+# Country scope. The enable effect deliberately leaves character traits alone.
+psf_example_enable_native_modifiers = {
+    if = {
+        limit = { has_country_flag = psf_profile_eng }
+        # Consume pending native popularity before changing its PSF projection.
+        psf_import_popularity = yes
+        add_ideas = psf_example_union_forum
+        add_dynamic_modifier = {
+            modifier = psf_example_temporary_assurances
+            days = 30
+        }
+        psf_refresh = yes
+        psf_export_popularity = yes
+    }
+}
+
+psf_example_disable_native_modifiers = {
+    if = {
+        limit = { has_country_flag = psf_profile_eng }
+        # Consume pending native popularity before changing its PSF projection.
+        psf_import_popularity = yes
+        remove_ideas = psf_example_union_forum
+        if = {
+            limit = { has_dynamic_modifier = { modifier = psf_example_temporary_assurances } }
+            remove_dynamic_modifier = { modifier = psf_example_temporary_assurances }
+        }
+        psf_refresh = yes
+        psf_export_popularity = yes
+    }
+}

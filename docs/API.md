@@ -41,6 +41,7 @@ Set an input immediately before the call; nested effects may reuse temporary nam
 | `psf_commit_transaction` | Clear the batch flag and perform a full refresh |
 | `psf_hold_election` | Invoke the current profile's election when its institution permits elections |
 | `psf_monthly` | Execute a monthly model update; intended for lifecycle integration and controlled tests |
+| `psf_daily_modifiers` | Apply exactly one day of organization drift, expire timed sources, refresh and synchronize native support; already called by the supplied country-scoped `on_daily` |
 
 Initialization is idempotent. It does not reapply starting scores to an existing save. Directly calling a specific `psf_init_<profile>` is available in the generated registry but should be reserved for deliberate integrations; it still refuses a country already initialized.
 
@@ -102,6 +103,34 @@ psf_add_ger_spd_satisfaction = yes
 ```
 
 Influence setters affect baseline institutional resources. The runtime derives effective influence from activity status. Writing an effective-influence variable directly is temporary and will be overwritten at refresh.
+
+### Native and named organization modifiers
+
+Every group/attribute pair has native `add`, `factor` and `daily` modifier keys. For the vanilla SPD example, these can be placed inside a normal idea or dynamic modifier:
+
+```text
+modifier = {
+    psf_ger_spd_support_add = 5
+    psf_ger_spd_influence_factor = 0.10
+    psf_ger_spd_satisfaction_daily = 0.05
+    psf_ger_spd_position_economy_add = -8
+}
+```
+
+These are generated `common/modifier_definitions` entries consumed through the engine's `modifier@` accessor. No new engine-built-in political stat is assumed. The owning country is the recipient of the idea or trait. Native modifier changes are observed at the next refresh, at most the next daily pulse; an integration can call `psf_refresh = yes` explicitly for an immediate update.
+
+Named sources declared by the content manifest can be applied or removed with one call:
+
+```text
+ENG = {
+    psf_add_eng_tuc_modifier_labor_compact = yes
+}
+
+# Later, in the same country's scope:
+psf_remove_eng_tuc_modifier_labor_compact = yes
+```
+
+The vanilla source lasts 90 daily pulses, adds 12 effective satisfaction, and accumulates 0.02 base influence per active day. Its satisfaction bonus disappears when removed or expired; accumulated influence remains. Reapplying the same source refreshes its duration, while distinct sources stack. See [MODIFIERS](MODIFIERS.md) for the exact formula, timed overrides, triggers, registry and native examples.
 
 ### Spectrum position
 

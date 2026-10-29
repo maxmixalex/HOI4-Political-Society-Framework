@@ -1,0 +1,1020 @@
+{
+  "format_version": 1,
+  "localisation_keys": {
+    "AFA_GATHERING_STORM_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 789
+      }
+    ],
+    "AFG_BLITZKRIEG_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 799
+      }
+    ],
+    "AFG_GATHERING_STORM_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 1106
+      }
+    ],
+    "ARG_BLITZKRIEG_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 748
+      }
+    ],
+    "ARG_GATHERING_STORM_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 951
+      }
+    ],
+    "AST_BLITZKRIEG_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 144
+      }
+    ],
+    "AST_BLITZKRIEG_TAOG_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 160
+      }
+    ],
+    "AST_GATHERING_STORM_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 260
+      },
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 276
+      }
+    ],
+    "AUS_GATHERING_STORM_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 999
+      }
+    ],
+    "BEL_GATHERING_STORM_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 833
+      },
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 855
+      },
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 1033
+      },
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 1055
+      }
+    ],
+    "BLITZKRIEG_DESC": [
+      {
+        "field": "desc",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 4
+      }
+    ],
+    "BLITZKRIEG_NAME": [
+      {
+        "field": "name",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 3
+      }
+    ],
+    "BRA_BLITZKRIEG_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 714
+      }
+    ],
+    "BRA_GATHERING_STORM_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 914
+      }
+    ],
+    "BUL_BLITZKRIEG_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 483
+      }
+    ],
+    "BUL_GATHERING_STORM_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 657
+      }
+    ],
+    "CAN_BLITZKRIEG_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 129
+      }
+    ],
+    "CAN_GATHERING_STORM_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 245
+      }
+    ],
+    "CHI_BLITZKRIEG_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 296
+      },
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 941
+      }
+    ],
+    "CHI_GATHERING_STORM_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 446
+      },
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 1158
+      }
+    ],
+    "CHL_BLITZKRIEG_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 731
+      }
+    ],
+    "CHL_GATHERING_STORM_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 934
+      }
+    ],
+    "COG_BLITZKRIEG_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 872
+      }
+    ],
+    "COG_GATHERING_STORM_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 1072
+      }
+    ],
+    "CZE_GATHERING_STORM_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 360
+      },
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 379
+      }
+    ],
+    "DEN_BLITZKRIEG_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 663
+      },
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 680
+      }
+    ],
+    "DEN_GATHERING_STORM_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 882
+      }
+    ],
+    "ENG_BLITZKRIEG_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 43
+      }
+    ],
+    "ENG_GATHERING_STORM_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 71
+      },
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 87
+      }
+    ],
+    "EST_BLITZKRIEG_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 567
+      }
+    ],
+    "EST_GATHERING_STORM_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 741
+      }
+    ],
+    "ETH_GATHERING_STORM_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 772
+      }
+    ],
+    "FIN_BLITZKRIEG_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 613
+      }
+    ],
+    "FIN_GATHERING_STORM_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 819
+      },
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 834
+      }
+    ],
+    "FRA_BLITZKRIEG_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 11
+      }
+    ],
+    "FRA_GATHERING_STORM_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 24
+      },
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 40
+      }
+    ],
+    "GATHERING_STORM_DESC": [
+      {
+        "field": "desc",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 4
+      }
+    ],
+    "GATHERING_STORM_NAME": [
+      {
+        "field": "name",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 3
+      }
+    ],
+    "GER_BLITZKRIEG_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 61
+      }
+    ],
+    "GER_GATHERING_STORM_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 104
+      },
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 121
+      }
+    ],
+    "GRE_BLITZKRIEG_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 500
+      }
+    ],
+    "GRE_GATHERING_STORM_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 674
+      }
+    ],
+    "HUN_BLITZKRIEG_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 244
+      },
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 816
+      }
+    ],
+    "HUN_GATHERING_STORM_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 396
+      },
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 1016
+      }
+    ],
+    "ICE_BLITZKRIEG_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 697
+      }
+    ],
+    "ICE_GATHERING_STORM_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 898
+      }
+    ],
+    "INS_BLITZKRIEG_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 1125
+      }
+    ],
+    "INS_GATHERING_STORM_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 1447
+      }
+    ],
+    "IRQ_BLITZKRIEG_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 889
+      }
+    ],
+    "IRQ_GATHERING_STORM_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 1123
+      }
+    ],
+    "ITA_BLITZKRIEG_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 76
+      }
+    ],
+    "ITA_GATHERING_STORM_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 138
+      },
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 154
+      }
+    ],
+    "JAP_BLITZKRIEG_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 91
+      }
+    ],
+    "JAP_GATHERING_STORM_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 170
+      },
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 188
+      }
+    ],
+    "LAT_BLITZKRIEG_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 550
+      }
+    ],
+    "LAT_GATHERING_STORM_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 725
+      }
+    ],
+    "LIT_BLITZKRIEG_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 533
+      }
+    ],
+    "LIT_GATHERING_STORM_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 709
+      }
+    ],
+    "MAN_BLITZKRIEG_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 332
+      }
+    ],
+    "MAN_GATHERING_STORM_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 482
+      }
+    ],
+    "MAN_TSR_BLITZKRIEG_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 976
+      }
+    ],
+    "MAN_TSR_GATHERING_STORM_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 1192
+      }
+    ],
+    "MEXICO_BLITZKRIEG_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 416
+      }
+    ],
+    "MEXICO_GATHERING_STORM_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 590
+      }
+    ],
+    "NETHERLANDS_BLITZKRIEG_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 434
+      }
+    ],
+    "NETHERLANDS_GATHERING_STORM_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 607
+      }
+    ],
+    "NOR_BLITZKRIEG_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 646
+      }
+    ],
+    "NOR_GATHERING_STORM_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 866
+      }
+    ],
+    "NZL_BLITZKRIEG_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 178
+      }
+    ],
+    "NZL_GATHERING_STORM_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 294
+      }
+    ],
+    "OTHER_BLITZKRIEG_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 123
+      }
+    ],
+    "OTHER_GATHERING_STORM_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 238
+      }
+    ],
+    "PAR_BLITZKRIEG_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 765
+      }
+    ],
+    "PAR_GATHERING_STORM_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 968
+      }
+    ],
+    "PER_BLITZKRIEG_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 906
+      }
+    ],
+    "PER_GATHERING_STORM_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 1089
+      }
+    ],
+    "PHI_BLITZKRIEG_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 923
+      }
+    ],
+    "PHI_GATHERING_STORM_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 1141
+      }
+    ],
+    "POL_BLITZKRIEG_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 583
+      }
+    ],
+    "POL_GATHERING_STORM_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 756
+      }
+    ],
+    "PORTUGAL_BLITZKRIEG_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 467
+      }
+    ],
+    "PORTUGAL_GATHERING_STORM_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 641
+      }
+    ],
+    "PRC_BLITZKRIEG_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 314
+      },
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 958
+      }
+    ],
+    "PRC_GATHERING_STORM_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 464
+      },
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 1175
+      }
+    ],
+    "RAJ_BLITZKRIEG_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 209
+      },
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 226
+      }
+    ],
+    "RAJ_GATHERING_STORM_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 325
+      },
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 342
+      }
+    ],
+    "ROM_BLITZKRIEG_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 262
+      }
+    ],
+    "ROM_GATHERING_STORM_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 413
+      }
+    ],
+    "SAF_BLITZKRIEG_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 193
+      }
+    ],
+    "SAF_GATHERING_STORM_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 309
+      }
+    ],
+    "SIA_BLITZKRIEG_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 1106
+      }
+    ],
+    "SIA_GATHERING_STORM_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 1430
+      }
+    ],
+    "SOV_BLITZKRIEG_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 107
+      }
+    ],
+    "SOV_GATHERING_STORM_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 205
+      },
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 221
+      }
+    ],
+    "SPAIN_BLITZKRIEG_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 451
+      }
+    ],
+    "SPAIN_GATHERING_STORM_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 624
+      }
+    ],
+    "SWE_BLITZKRIEG_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 629
+      }
+    ],
+    "SWE_GATHERING_STORM_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 849
+      }
+    ],
+    "SWI_BLITZKRIEG_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 597
+      }
+    ],
+    "SWI_GATHERING_STORM_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 804
+      }
+    ],
+    "TUR_BLITZKRIEG_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 517
+      }
+    ],
+    "TUR_GATHERING_STORM_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 691
+      }
+    ],
+    "URG_BLITZKRIEG_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 782
+      }
+    ],
+    "URG_GATHERING_STORM_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 984
+      }
+    ],
+    "USA_BLITZKRIEG_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 26
+      }
+    ],
+    "USA_GATHERING_STORM_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 56
+      }
+    ],
+    "WARLORDS_BLITZKRIEG_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 351
+      },
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 367
+      },
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 383
+      },
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 399
+      },
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 993
+      },
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 1009
+      },
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 1025
+      },
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 1041
+      },
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 1057
+      },
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 1073
+      },
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 1089
+      }
+    ],
+    "WARLORDS_GATHERING_STORM_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 501
+      },
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 519
+      },
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 537
+      },
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 555
+      },
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 573
+      },
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 1210
+      },
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 1227
+      },
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 1244
+      },
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 1261
+      },
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 1278
+      },
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 1295
+      },
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 1312
+      },
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 1329
+      },
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 1346
+      },
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 1363
+      },
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 1380
+      },
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 1397
+      },
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 1414
+      }
+    ],
+    "YUG_BLITZKRIEG_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/blitzkrieg.txt",
+        "line": 279
+      }
+    ],
+    "YUG_GATHERING_STORM_DESC": [
+      {
+        "field": "history",
+        "file": "common/bookmarks/the_gathering_storm.txt",
+        "line": 429
+      }
+    ]
+  },
+  "purpose": "Exact original bookmark localisation references from the user-supplied script archive; used only for CWTools when original translations are unavailable. Never shipped as game translations.",
+  "source_files": {
+    "common/bookmarks/blitzkrieg.txt": "54f6f23dec5a066dca37125f69a29b8cc0400b4c0d598ff6e6ba71bd82dcf25d",
+    "common/bookmarks/the_gathering_storm.txt": "31d22ba3fdd6160be56f198f0ec078c09156d3fdcfadced809f73226f698422f"
+  }
+}

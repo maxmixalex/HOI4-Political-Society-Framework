@@ -41,13 +41,13 @@ jobs:
           diff -qr dist/psf build/reproducible/psf
           diff -qr dist/psf_vanilla_example build/reproducible/psf_vanilla_example
 
-      - name: Real semantic CWTools validation and negative controls
+      - name: HOI4 loader safety and real semantic CWTools validation
         run: python tools/ci/validate.py --root dist --self-test
 
       - name: Verify downloadable package matches this source
         run: |
-          python -m psf pack --root dist --output build/psf-0.1.0.zip
-          cmp distributions/psf-0.1.0.zip build/psf-0.1.0.zip
+          python -m psf pack --root dist --output build/psf-0.2.0.zip
+          cmp distributions/psf-0.2.0.zip build/psf-0.2.0.zip
 
       - name: Validate custom pack and equivalent JSON, TOML and YAML inputs
         run: |
@@ -64,6 +64,21 @@ jobs:
         with:
           name: cwtools-diagnostics
           path: build/validation/
+          if-no-files-found: error
+
+      - name: Validate native ideas, traits and dynamic modifier examples
+        run: |
+          python -m psf compile examples/vanilla/manifest.json --output build/native-integration
+          cp -R examples/native_modifiers/common build/native-integration/psf_vanilla_example/
+          cp -R examples/native_modifiers/localisation build/native-integration/psf_vanilla_example/
+          python tools/ci/validate.py --root build/native-integration --reports build/native-integration-validation
+
+      - name: Publish native modifier integration diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-modifier-integration-diagnostics
+          path: build/native-integration-validation/
           if-no-files-found: error
 
       - name: Publish installable framework and vanilla example

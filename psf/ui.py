@@ -15,6 +15,8 @@ import struct
 from dataclasses import dataclass, field
 from typing import Any
 
+from . import charts
+
 
 ASSETS = Path(__file__).resolve().parent / "assets" / "native_gui"
 LANGUAGES = ("english", "simp_chinese")
@@ -119,9 +121,11 @@ def _icon(name: str, sprite: str, x: int, y: int, *, tip: str | None = None,
 
 
 def _button(name: str, label: str, x: int, y: int, *, tip: str | None = None,
-            sprite: str = "GFX_button_123x34", scale: float | None = None) -> str:
+            sprite: str = "GFX_button_123x34", scale: float | None = None,
+            size: tuple[int, int] | None = None) -> str:
     extra = f' pdx_tooltip = "{tip}"' if tip else ""
     extra += f" scale = {scale:g}" if scale is not None else ""
+    extra += f" size = {{ x = {size[0]} y = {size[1]} }}" if size else ""
     return (f'buttonType = {{ name = "{name}" position = {{ x = {x} y = {y} }} '
             f'quadTextureSprite = "{sprite}" buttonText = "{label}" buttonFont = "hoi_16mbs" '
             f'clicksound = click_default{extra} }}\n')
@@ -198,6 +202,14 @@ def patch_native(source: Path, output: Path) -> dict[str, Any]:
             add(pick("info", "gamesetup_interesting_countries_window"),
                 _text("psf_interesting_pregame_explanation", "psf_ui_pregame_description", 0, 35, 225, 160,
                       font="hoi4_typewriter16", tip="psf_ui_pregame_tooltip", transparent=False))
+            # The native bookmark history binding supplies the selected
+            # country/date.  It can display compiled text-icon charts without
+            # attaching a campaign-only scripted GUI to the frontend.
+            history = pick("history", "gamesetup_interesting_countries_window")
+            height = history.properties["maxheight"]
+            changes.append((height[0], height[1], "maxHeight = 160"))
+            changes.append((history.end - 1, history.end - 1,
+                            '\nmultiline = yes\nscrollbartype = "standardtext_slider"\n'))
         for start, end, replacement in sorted(changes, reverse=True):
             data = data[:start] + replacement + data[end:]
         # Assert every engine-owned name and original ancestry is retained.
@@ -207,7 +219,9 @@ def patch_native(source: Path, output: Path) -> dict[str, Any]:
             raise AssertionError(f"Native widget identity changed in {filename}")
         path = output / "interface" / filename
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(data, encoding="utf-8-sig")
+        # The GUI reader treats a UTF-8 BOM as part of guiTypes.  Unlike YML
+        # localization, interface files MUST NOT receive the BOM prefix.
+        path.write_text(data, encoding="utf-8")
         patches[filename] = {"source_sha256": hashlib.sha256((source / filename).read_bytes()).hexdigest(),
                              "preserved_named_widgets": len(original_identity), "hidden_nodes": moved}
     return patches
@@ -234,18 +248,13 @@ def _artwork(output: Path, groups: list[dict[str, Any]]) -> str:
         effect = ' effectFile = "gfx/FX/buttonstate.lua"' if button else ""
         sprites.append(f'spriteType = {{ name = "{name}" texturefile = "{path}" noOfFrames = 1{effect} }}')
 
-    def row(x: int, y: int) -> tuple[int, int, int, int]:
-        if x in (0, 369) or y in (0, 55):
-            return 105, 103, 83, 255
-        return (47, 53, 48, 255) if y < 28 else (40, 46, 42, 255)
-
-    sprite("GFX_psf_group_row", "group_row", 370, 56, row, True)
+    # Rows use the original game's cornered tile/button-state shader, rather
+    # than imitating native list chrome with a flat generated rectangle.
     sprite("GFX_psf_axis_track", "axis_track", 202, 6,
            lambda x, y: (166, 157, 120, 255) if y in (2, 3) else ((210, 199, 152, 255) if x in (0, 100, 200) else (0, 0, 0, 0)))
     for group in groups:
         gid = group["id"]
-        digest = hashlib.sha256(gid.encode()).digest()
-        color = tuple(86 + b % 140 for b in digest[:3])
+        color = charts.color(gid)
         kind = group.get("icon", group.get("kind", "party"))
         for size, suffix in ((24, "small"), (64, "large")):
             def badge(x: int, y: int, size: int = size, color: tuple[int, ...] = color, kind: str = kind) -> tuple[int, int, int, int]:
@@ -275,12 +284,22 @@ def _artwork(output: Path, groups: list[dict[str, Any]]) -> str:
                     mark = abs(xx) + abs(yy) < .26 and abs(xx) + abs(yy) > .12
                 return (245, 241, 217, 255) if mark else (*color, 255)
             sprite(f"GFX_psf_group_{gid}_{suffix}", f"{gid}_{suffix}", size, size, badge)
+    sprites.extend(charts.artwork(output, groups))
     return "spriteTypes = {\n" + "\n".join(sprites) + "\n}\n"
 
 
 def _defined(name: str, choices: list[tuple[str, str]], fallback: str = "psf_ui_none") -> str:
     body = "".join(f"text = {{ trigger = {{ {trigger} }} localization_key = {key} }}\n" for trigger, key in choices)
     return f"defined_text = {{ name = {name}\n{body}text = {{ localization_key = {fallback} }}\n}}\n"
+
+
+def _exact_comparisons(content: str) -> str:
+    """Normalize before byte budgeting as well as writing; this is idempotent."""
+    return re.sub(
+        r"check_variable\s*=\s*\{\s*([A-Za-z0-9_.]+)\s*=\s*([A-Za-z0-9_.-]+)\s*\}",
+        lambda match: f"check_variable = {{ var = {match[1]} value = {match[2]} compare = equals }}",
+        content,
+    )
 
 
 def _flag(profile: dict[str, Any]) -> str:
@@ -312,6 +331,8 @@ def generate_ui(manifest: dict[str, Any], output: Path, vanilla_path: Path | Non
         "title": ("Political society", "政治社会"),
         "title_short": ("PSF", "PSF"),
         "groups": ("Organizations", "政治团体"),
+        "support": ("Support", "支持率"),
+        "influence": ("Influence", "影响力"),
         "spectrum": ("Spectrum", "政治光谱"),
         "alliances": ("Alliances", "政治联盟"),
         "none": ("None", "无"),
@@ -334,6 +355,10 @@ def generate_ui(manifest: dict[str, Any], output: Path, vanilla_path: Path | Non
         "legalize_tip": ("Restore this organization's legal status for 25 political power, restoring legal access to institutions. Popular support remains independently recorded. Available only in your own country.", "花费 25 政治点恢复该团体的合法地位及制度资源。民众支持率仍单独记录。只能操作本国团体。"),
         "activate_tip": ("Start this organization's political activity for 25 political power. Available only in your own country.", "花费 25 政治点，使该团体开始政治活动。只能操作本国团体。"),
         "support_tip": ("Support measures popular backing for an organization. Nonparty organizations can overlap in their supporters; their values are not extra slices of an election vote.", "支持率表示民众对团体的支持。非政党团体的支持者可能互相重叠，其数值不是额外的选票份额。"),
+        "support_chart_tip": ("§YPopular support§!\\n[PSFUIPieSupport]\\n\\nActive electoral organizations, normalized to 100%. Civil organizations' overlapping approval is listed separately in their details.", "§Y民众支持率§!\\n[PSFUIPieSupport]\\n\\n活动中的参选团体按支持权重归一化为 100%。非参选社会团体的重叠支持单独列于详情。"),
+        "influence_chart_tip": ("§YPolitical influence§!\\n[PSFUIPieInfluence]\\n\\nEach organization's effective influence after modifiers and legal-status restrictions, normalized to 100%.", "§Y政治影响力§!\\n[PSFUIPieInfluence]\\n\\n各团体施加修正与活动状态限制后的有效影响力，归一化为 100%。"),
+        "no_support": ("No active electoral support", "暂无活动中的参选团体支持"),
+        "no_influence": ("No effective political influence", "暂无有效政治影响力"),
         "influence_tip": ("Effective influence measures current access to political power and institutions. Bans and underground status suppress institutional influence. A small elite can wield high influence with little popular support.", "有效影响力表示团体当前掌握政治力量和制度资源的程度。查禁和地下活动会压制制度影响力。寡头团体即使民众支持率不高，也可能具有很高的影响力。"),
         "satisfaction_tip": ("Satisfaction measures this organization's approval of the current government. Low satisfaction can weaken an alliance and encourage withdrawal.", "满意度表示该团体对当前政府的认可程度。低满意度会削弱联盟，并可能促使团体退出。"),
         "legitimacy_tip": ("Legitimacy: [?psf_legitimacy|1]/100\\nInstitutional mismatch: [?psf_alignment_gap|1]\\nGovernment support: [?psf_government_support|1]\\nGovernment influence: [?psf_government_influence|1]\\n\\nThe government has a political program; the actual institutions remain a separate property. A mismatch reduces legitimacy, while political actions can compensate.", "合法性：[?psf_legitimacy|1]/100\\n制度偏离：[?psf_alignment_gap|1]\\n政府支持：[?psf_government_support|1]\\n政府影响力：[?psf_government_influence|1]\\n\\n执政团体的政治主张与国家的实际制度分别记录。两者偏离会降低合法性，而政治行动可以弥补这种损失。"),
@@ -349,7 +374,7 @@ def generate_ui(manifest: dict[str, Any], output: Path, vanilla_path: Path | Non
         "axis_zero": ("0", "0"),
         "pregame_short": ("Political society", "政治社会"),
         "pregame_description": ("Organizations and alliances replace the vanilla party wheel.\\nPolitical institutions and issue positions are tracked separately.\\nOpen the politics view after starting to inspect this country.", "政治团体与政治联盟取代原版政党饼图。\\n国家制度与各议题立场分别记录。\\n开始游戏后，在政治界面查看该国的完整总览。"),
-        "pregame_tooltip": ("The vanilla ideology wheel is disabled. PSF initializes its country data when the game starts; the lobby does not display uninitialized runtime values.", "原版意识形态饼图已移除。PSF 在开始游戏时初始化国家数据；开局选国界面不显示尚未初始化的运行时数值。"),
+        "pregame_tooltip": ("The country-selection history shows support and influence for the selected starting date. The politics view shows live organization details after the campaign starts.", "国家选择页的历史栏展示所选开局日期的支持率与影响力。开始战役后，在政治界面查看实时团体详情。"),
     }
     for key, values in strings.items():
         add_loc(f"psf_ui_{key}", *values)
@@ -364,26 +389,69 @@ def generate_ui(manifest: dict[str, Any], output: Path, vanilla_path: Path | Non
         definitions.append(_defined(f"PSFUIStatus_{gid}", [(f"check_variable = {{ psf_g_{gid}_status = 2 }} check_variable = {{ psf_g_{gid}_prohibited = 1 }}", "psf_ui_underground_prohibited")] + [(f"check_variable = {{ psf_g_{gid}_status = {n} }}", f"psf_ui_{label}") for n, label in enumerate(("inactive", "legal", "underground", "banned"))]))
         definitions.append(_defined(f"PSFUIIdeology_{gid}", [(f"check_variable = {{ psf_g_{gid}_ideology = {ideology.get('_index', i+1)} }}", f"psf_ideology_{ideology['id']}_name") for i, ideology in enumerate(manifest.get("ideologies", []))]))
         add_loc(f"psf_ui_row_{gid}",
-                f"[?psf_g_{gid}_support|0] / [?psf_g_{gid}_effective_influence|0] / [?psf_g_{gid}_satisfaction|0]    [PSFUIStatus_{gid}]")
+                f"[?psf_g_{gid}_modified_support|0] / [?psf_g_{gid}_effective_influence|0] / [?psf_g_{gid}_modified_satisfaction|0]    [PSFUIStatus_{gid}]")
         add_loc(f"psf_ui_detail_metrics_{gid}",
-                f"Support [?psf_g_{gid}_support|1]    Influence [?psf_g_{gid}_effective_influence|1]    Satisfaction [?psf_g_{gid}_satisfaction|1]",
-                f"支持率 [?psf_g_{gid}_support|1]    影响力 [?psf_g_{gid}_effective_influence|1]    满意度 [?psf_g_{gid}_satisfaction|1]")
+                f"Support [?psf_g_{gid}_modified_support|1]    Influence [?psf_g_{gid}_effective_influence|1]    Satisfaction [?psf_g_{gid}_modified_satisfaction|1]",
+                f"支持率 [?psf_g_{gid}_modified_support|1]    影响力 [?psf_g_{gid}_effective_influence|1]    满意度 [?psf_g_{gid}_modified_satisfaction|1]")
         add_loc(f"psf_ui_detail_status_{gid}", f"[PSFUIStatus_{gid}]    [PSFUIIdeology_{gid}]")
         kinds = {"party": ("Political party", "政党"), "trade_union": ("Trade union", "工会"), "union": ("Trade union", "工会"), "business": ("Business association", "工商团体"), "industrial_association": ("Industrial association", "产业联合会"), "corporation": ("Corporation", "法团"), "military": ("Military organization", "军人团体"), "military_clique": ("Military organization", "军人团体"), "religious": ("Religious organization", "宗教团体"), "church": ("Religious organization", "宗教团体"), "movement": ("Political movement", "政治运动"), "professional": ("Professional association", "职业团体"), "employers_association": ("Employers' association", "雇主协会"), "civic": ("Civic organization", "公民团体"), "faction": ("Political faction", "政治派系")}
         kind_en, kind_zh = kinds.get(group.get("kind", "party"), (group.get("kind", "Organization").replace("_", " "), "政治团体"))
         add_loc(f"psf_ui_kind_{gid}", kind_en, kind_zh)
         add_loc(f"psf_ui_group_tooltip_{gid}",
-                f"§Y$psf_group_{gid}_name$§!\\n$psf_ui_kind_{gid}$ — [PSFUIStatus_{gid}]\\n[PSFUIIdeology_{gid}]\\n\\n$psf_ui_detail_metrics_{gid}$\\nInstitutional capacity before suppression: [?psf_g_{gid}_influence|1]\\n\\n$psf_group_{gid}_desc$",
-                f"§Y$psf_group_{gid}_name$§!\\n$psf_ui_kind_{gid}$　[PSFUIStatus_{gid}]\\n[PSFUIIdeology_{gid}]\\n\\n$psf_ui_detail_metrics_{gid}$\\n查禁前的制度影响力：[?psf_g_{gid}_influence|1]\\n\\n$psf_group_{gid}_desc$")
+                f"§Y$psf_group_{gid}_name$§!\\n$psf_ui_kind_{gid}$ — [PSFUIStatus_{gid}]\\n[PSFUIIdeology_{gid}]\\n\\n$psf_ui_detail_metrics_{gid}$\\nBase support / influence / satisfaction: [?psf_g_{gid}_support|1] / [?psf_g_{gid}_influence|1] / [?psf_g_{gid}_satisfaction|1]\\nInfluence after modifiers: [?psf_g_{gid}_modified_influence|1]\\n\\nActive modifier sources ([?psf_g_{gid}_modifier_count|0]):\\n[PSFUIModifiers_{gid}]\\n\\n$psf_group_{gid}_desc$",
+                f"§Y$psf_group_{gid}_name$§!\\n$psf_ui_kind_{gid}$　[PSFUIStatus_{gid}]\\n[PSFUIIdeology_{gid}]\\n\\n$psf_ui_detail_metrics_{gid}$\\n基础支持率 / 影响力 / 满意度：[?psf_g_{gid}_support|1] / [?psf_g_{gid}_influence|1] / [?psf_g_{gid}_satisfaction|1]\\n施加修正后的影响力：[?psf_g_{gid}_modified_influence|1]\\n\\n活动修正来源（[?psf_g_{gid}_modifier_count|0]）：\\n[PSFUIModifiers_{gid}]\\n\\n$psf_group_{gid}_desc$")
+        source_names = []
+        for modifier in manifest.get("modifiers", []):
+            if "groups" in modifier and gid not in modifier["groups"]:
+                continue
+            mid = modifier["id"]
+            active = f"psf_m_{gid}_{mid}_active"
+            days = f"psf_m_{gid}_{mid}_days"
+            stem = f"psf_ui_source_{gid}_{mid}"
+            name = f"PSFUISource_{gid}_{mid}"
+            add_loc(stem + "_timed", f"$psf_modifier_{mid}_name$: [?{days}|0] days remaining\\n",
+                    f"$psf_modifier_{mid}_name$：剩余 [?{days}|0] 天\\n")
+            add_loc(stem + "_permanent", f"$psf_modifier_{mid}_name$: until removed\\n",
+                    f"$psf_modifier_{mid}_name$：持续至被移除\\n")
+            definitions.append(_defined(name, [
+                (f"check_variable = {{ {active} = 1 }} check_variable = {{ {days} > 0 }}", stem + "_timed"),
+                (f"check_variable = {{ {active} = 1 }}", stem + "_permanent")
+            ], "psf_ui_empty"))
+            source_names.append(f"[{name}]")
+        source_key = f"psf_ui_modifier_sources_{gid}"
+        add_loc(source_key, "".join(source_names))
+        definitions.append(_defined(f"PSFUIModifiers_{gid}", [
+            (f"check_variable = {{ psf_g_{gid}_modifier_count > 0 }}", source_key)
+        ]))
         position_en, position_zh = [], []
         for axis in axes:
             aid = axis["id"]
-            position_en.append(f"$psf_axis_{aid}_name$: [?psf_g_{gid}_position_{aid}|0]")
-            position_zh.append(f"$psf_axis_{aid}_name$：[?psf_g_{gid}_position_{aid}|0]")
+            position_en.append(f"$psf_axis_{aid}_name$: [?psf_g_{gid}_modified_position_{aid}|0]")
+            position_zh.append(f"$psf_axis_{aid}_name$：[?psf_g_{gid}_modified_position_{aid}|0]")
             add_loc(f"psf_ui_marker_{gid}_{aid}",
-                    f"§Y$psf_group_{gid}_name$§!\\n$psf_axis_{aid}_name$: [?psf_g_{gid}_position_{aid}|0]\\n$psf_axis_{aid}_left$ (-100) — $psf_axis_{aid}_right$ (+100)\\n\\n$psf_axis_{aid}_desc$\\n\\nClick to inspect this organization.",
-                    f"§Y$psf_group_{gid}_name$§!\\n$psf_axis_{aid}_name$：[?psf_g_{gid}_position_{aid}|0]\\n$psf_axis_{aid}_left$（-100）— $psf_axis_{aid}_right$（+100）\\n\\n$psf_axis_{aid}_desc$\\n\\n点击查看该团体。")
+                    f"§Y$psf_group_{gid}_name$§!\\n$psf_axis_{aid}_name$: [?psf_g_{gid}_modified_position_{aid}|0]\\nBase position: [?psf_g_{gid}_position_{aid}|0]\\n$psf_axis_{aid}_left$ (-100) — $psf_axis_{aid}_right$ (+100)\\n\\n$psf_axis_{aid}_desc$\\n\\nClick to inspect this organization.",
+                    f"§Y$psf_group_{gid}_name$§!\\n$psf_axis_{aid}_name$：[?psf_g_{gid}_modified_position_{aid}|0]\\n基础立场：[?psf_g_{gid}_position_{aid}|0]\\n$psf_axis_{aid}_left$（-100）— $psf_axis_{aid}_right$（+100）\\n\\n$psf_axis_{aid}_desc$\\n\\n点击查看该团体。")
         add_loc(f"psf_ui_positions_{gid}", "\\n".join(position_en), "\\n".join(position_zh))
+
+    for metric in ("support", "influence"):
+        choices = []
+        for profile in profiles:
+            lines = []
+            for group in profile.get("groups", []):
+                gid = group["id"]
+                if metric == "support" and not group.get("electoral", group.get("kind", "party") == "party"):
+                    continue
+                key = f"psf_ui_pie_{metric}_{gid}"
+                name = f"PSFUIPie_{metric}_{gid}"
+                add_loc(key, f"$psf_group_{gid}_short_name$: [?psf_g_{gid}_{metric}_share|1]%\\n")
+                definitions.append(_defined(name, [
+                    (f"check_variable = {{ psf_g_{gid}_{metric}_share > 0 }}", key)
+                ], "psf_ui_empty"))
+                lines.append(f"[{name}]")
+            key = f"psf_ui_pie_{metric}_profile_{profile['id']}"
+            add_loc(key, "".join(lines))
+            choices.append((f"{_flag(profile)} check_variable = {{ psf_pie_{metric}_total > 0 }}", key))
+        definitions.append(_defined("PSFUIPie" + metric.title(), choices, "psf_ui_no_" + metric))
 
     triggers: list[str] = []
     effects: list[str] = []
@@ -411,11 +479,12 @@ def generate_ui(manifest: dict[str, Any], output: Path, vanilla_path: Path | Non
         for row, group in enumerate(profile.get("groups", [])):
             gid = group["id"]
             index = group_indices[gid]
-            row_content = _button(f"psf_select_{gid}", "", 0, 0, tip=f"psf_ui_group_tooltip_{gid}", sprite="GFX_psf_group_row")
-            row_content += _icon(f"psf_row_icon_{gid}", group.get("small_icon", f"GFX_psf_group_{gid}_small"), 10, 16)
-            row_content += _text(f"psf_row_name_{gid}", f"psf_group_{gid}_short_name", 44, 5, 318, font="hoi_18mbs")
-            row_content += _text(f"psf_row_values_{gid}", f"psf_ui_row_{gid}", 44, 31, 318)
-            rows += _container(f"psf_row_{gid}", 0, row * 60, 370, 56, row_content)
+            row_content = _button(f"psf_select_{gid}", "", 0, 0, tip=f"psf_ui_group_tooltip_{gid}",
+                                  sprite="GFX_tiled_button", size=(370, 44))
+            row_content += _icon(f"psf_row_icon_{gid}", group.get("small_icon", f"GFX_psf_group_{gid}_small"), 10, 10)
+            row_content += _text(f"psf_row_name_{gid}", f"psf_group_{gid}_short_name", 44, 2, 318, font="hoi_18mbs")
+            row_content += _text(f"psf_row_values_{gid}", f"psf_ui_row_{gid}", 44, 23, 318, 20)
+            rows += _container(f"psf_row_{gid}", 0, row * 46, 370, 44, row_content)
             select = f"set_variable = {{ ROOT.psf_ui_group = {index} }} set_variable = {{ ROOT.psf_ui_page = 1 }}"
             add_effect(f"psf_select_{gid}", select)
             # Authorization is enforced again in effects, not just disabled appearance.
@@ -441,7 +510,7 @@ def generate_ui(manifest: dict[str, Any], output: Path, vanilla_path: Path | Non
                                   tip=f"psf_ui_{action}_tip", sprite="GFX_button_238x38")
             detail_page += _container(f"psf_detail_{gid}", 8, 0, 370, action_y + 50, detail)
             add_trigger(f"psf_detail_{gid}_visible", f"{_flag(profile)} check_variable = {{ ROOT.psf_ui_group = {index} }}")
-        group_page += _container(f"psf_profile_rows_{pid}", 8, 28, 370, max(60, len(profile.get("groups", [])) * 60), rows)
+        group_page += _container(f"psf_profile_rows_{pid}", 8, 28, 370, max(46, len(profile.get("groups", [])) * 46), rows)
         add_trigger(f"psf_profile_rows_{pid}_visible", _flag(profile))
         alliance_rows = ""
         ay = 0
@@ -485,7 +554,7 @@ def generate_ui(manifest: dict[str, Any], output: Path, vanilla_path: Path | Non
                 name = f"psf_axis_marker_{gid}_{aid}"
                 markers += _icon(f"psf_axis_track_{gid}_{aid}", "GFX_psf_axis_track", -93, gi * 18 + 5)
                 markers += _button(name, "", 0, gi * 18, tip=f"psf_ui_marker_{gid}_{aid}", sprite=group.get("small_icon", f"GFX_psf_group_{gid}_small"), scale=0.666667)
-                properties.append(f"{name} = {{ x = psf_g_{gid}_position_{aid} }}")
+                properties.append(f"{name} = {{ x = psf_g_{gid}_modified_position_{aid} }}")
                 add_trigger(f"{name}_visible", f"check_variable = {{ psf_g_{gid}_status > 0 }}")
                 add_effect(name, f"set_variable = {{ ROOT.psf_ui_group = {group_indices[gid]} }} set_variable = {{ ROOT.psf_ui_page = 1 }}")
             marker_parent = f"psf_axis_profile_{pid}_{aid}"
@@ -501,36 +570,69 @@ def generate_ui(manifest: dict[str, Any], output: Path, vanilla_path: Path | Non
     side_body += _container("psf_detail_page", 8, 100, 396, 478, detail_page, scroll=True)
     side_body += _container("psf_spectrum_page", 8, 100, 396, 478, spectrum, scroll=True)
     side_body += _container("psf_alliances_page", 8, 100, 396, 478, alliance_page, scroll=True)
-    gui = [_container("psf_society_side", 0, 0, 414, 590, side_body, background=True)]
+    # A scripted GUI owns its top-level window.  Two contexts must not compete
+    # for the same window_name when politics and diplomacy switch visibility.
+    gui = [_container("psf_society_side", 0, 0, 414, 590, side_body, background=True),
+           _container("psf_society_side_diplomatic", 0, 0, 414, 590, side_body, background=True)]
 
     # Two compact summary layouts share data and effects, but honor different
     # available rectangles. They do not cover leaders, focuses, laws or advisors.
-    for mode, width, button_x in (("political", 512, 382), ("diplomatic", 376, 248)):
-        summary = _text(f"psf_{mode}_regime", "psf_ui_regime_line", 0, 0, button_x - 6, 20, font="hoi_18mbs", tip="psf_ui_regime_tip", transparent=False)
-        summary += _text(f"psf_{mode}_government", "psf_ui_government_line", 0, 20 if mode == "political" else 22, button_x - 6, 20, tip="psf_ui_government_tip", transparent=False)
-        summary += _text(f"psf_{mode}_metrics", "psf_ui_summary_metrics", 0, 40 if mode == "political" else 43, button_x - 6, 20, tip="psf_ui_influence_tip", transparent=False)
-        summary += _text(f"psf_{mode}_legitimacy", "psf_ui_summary_legitimacy", 0, 60 if mode == "political" else 65, button_x - 6, 19, tip="psf_ui_legitimacy_tip", transparent=False)
-        summary += _button("psf_open_groups", "psf_ui_groups", button_x, 0)
-        summary += _button("psf_open_spectrum", "psf_ui_spectrum", button_x, 36)
+    pie_properties: list[str] = []
+    for mode, width in (("political", 512), ("diplomatic", 376)):
+        summary = ""
+        for metric, x in (("support", 0), ("influence", 74)):
+            summary += _text(f"psf_{mode}_{metric}_label", f"psf_ui_{metric}", x, 0, 72, 17,
+                             tip=f"psf_ui_{metric}_chart_tip", transparent=False)
+            pie = ""
+            for index, (left, top, _, _) in enumerate(charts.geometry()):
+                name = f"psf_pie_{metric}_{index:03}"
+                pie += _icon(name, f"GFX_psf_pie_sector_{index:03}", left, top)
+                if mode == "political":
+                    pie_properties.append(f"{name} = {{ frame = psf_pie_{metric}_frames^{index} }}")
+            # Native mask/highlight and native tooltip behavior; no global
+            # replacement of GFX_political_chart affects unrelated game pies.
+            pie += _button(f"psf_open_{metric}", "", 0, 0,
+                           sprite="GFX_pol_piechart_overlay_63x63", tip=f"psf_ui_{metric}_chart_tip")
+            summary += _container(f"psf_{mode}_{metric}_pie", x, 17, charts.SIZE, charts.SIZE, pie)
+        text_x = 150 if mode == "political" else 146
+        text_width = 226 if mode == "political" else 228
+        summary += _text(f"psf_{mode}_regime", "psf_ui_regime_line", text_x, 0, text_width, 20, font="hoi_18mbs", tip="psf_ui_regime_tip", transparent=False)
+        summary += _text(f"psf_{mode}_government", "psf_ui_government_line", text_x, 20 if mode == "political" else 23, text_width, 20, tip="psf_ui_government_tip", transparent=False)
+        if mode == "political":
+            summary += _text(f"psf_{mode}_metrics", "psf_ui_summary_metrics", text_x, 40, text_width, 20, tip="psf_ui_influence_tip", transparent=False)
+            summary += _text(f"psf_{mode}_legitimacy", "psf_ui_summary_legitimacy", text_x, 60, text_width, 19, tip="psf_ui_legitimacy_tip", transparent=False)
+            summary += _button("psf_open_groups", "psf_ui_groups", 382, 0)
+            summary += _button("psf_open_spectrum", "psf_ui_spectrum", 382, 36)
+        else:
+            summary += _button("psf_open_groups", "psf_ui_groups", 146, 50,
+                               sprite="GFX_tiled_button", size=(110, 30))
+            summary += _button("psf_open_spectrum", "psf_ui_spectrum", 262, 50,
+                               sprite="GFX_tiled_button", size=(110, 30))
         gui.append(_container(f"psf_{mode}_summary", 0, 0, width, 80 if mode == "political" else 86, summary))
 
     scripted: list[str] = []
     for mode, context in (("political", "player_context"), ("diplomatic", "selected_country_context")):
         scripted.append(f'''psf_{mode}_summary_gui = {{
 context_type = {context}
-parent_window_name = psf_{mode}_summary_mount
+parent_window_name = psf_{mode}_summary_mount_instance
 window_name = psf_{mode}_summary
+dirty = psf_ui_revision
 visible = {{ has_country_flag = psf_initialized }}
 ai_enabled = {{ always = no }}
 effects = {{
 psf_open_groups_click = {{ set_variable = {{ ROOT.psf_ui_open = 1 }} set_variable = {{ ROOT.psf_ui_page = 0 }} }}
 psf_open_spectrum_click = {{ set_variable = {{ ROOT.psf_ui_open = 1 }} set_variable = {{ ROOT.psf_ui_page = 2 }} }}
+psf_open_support_click = {{ set_variable = {{ ROOT.psf_ui_open = 1 }} set_variable = {{ ROOT.psf_ui_page = 0 }} }}
+psf_open_influence_click = {{ set_variable = {{ ROOT.psf_ui_open = 1 }} set_variable = {{ ROOT.psf_ui_page = 0 }} }}
+}}
+properties = {{
+{chr(10).join(pie_properties)}
 }}
 }}''')
         scripted.append(f'''psf_{mode}_society_gui = {{
 context_type = {context}
-parent_window_name = psf_{mode}_side_mount
-window_name = psf_society_side
+parent_window_name = psf_{mode}_side_mount_instance
+window_name = {"psf_society_side" if mode == "political" else "psf_society_side_diplomatic"}
 visible = {{ has_country_flag = psf_initialized check_variable = {{ ROOT.psf_ui_open = 1 }} }}
 ai_enabled = {{ always = no }}
 triggers = {{
@@ -550,32 +652,67 @@ properties = {{
         if relative.endswith(".txt"):
             # check_variable defaults to >= in the engine.  UI identities need
             # explicit equality, especially with stable hashed numeric IDs.
-            content = re.sub(
-                r"check_variable\s*=\s*\{\s*([A-Za-z0-9_.]+)\s*=\s*([A-Za-z0-9_.-]+)\s*\}",
-                lambda m: f"check_variable = {{ var = {m[1]} value = {m[2]} compare = equals }}",
-                content,
-            )
+            content = _exact_comparisons(content)
+        if relative in ("interface/psf_society_political.gui", "interface/psf_society_diplomatic.gui"):
+            # Keep readable node lines, but remove syntactically redundant
+            # padding outside quoted strings so full country registries remain
+            # below the validation discovery budget without dropping controls.
+            content = re.sub(r'"(?:\\.|[^"\\])*"|[ \t]*([={}])[ \t]*',
+                             lambda match: match[0] if match[1] is None else match[1], content)
         path.write_text(content, encoding="utf-8-sig" if bom else "utf-8")
 
     write("common/scripted_triggers/psf_ui.txt", f"psf_ui_selection_is_current = {{ {selection_condition} }}\n")
-    write("interface/psf_society.gui", "guiTypes = {\n" + "\n".join(gui) + "\n}\n", True)
-    write("interface/psf_society.gfx", _artwork(output, groups), True)
-    write("common/scripted_guis/psf_society.txt", "scripted_gui = {\n" + "\n".join(scripted) + "\n}\n")
-    write("common/scripted_localisation/psf_ui.txt", "\n".join(definitions))
+    write("interface/psf_society.gui", "guiTypes = {\n" + "\n".join(gui[2:]) + "\n}\n")
+    write("interface/psf_society_political.gui", "guiTypes = {\n" + gui[0] + "\n}\n")
+    write("interface/psf_society_diplomatic.gui", "guiTypes = {\n" + gui[1] + "\n}\n")
+    write("interface/psf_society.gfx", _artwork(output, groups))
+    write("common/scripted_guis/psf_society.txt", "scripted_gui = {\n" + "\n".join(scripted[::2]) + "\n}\n")
+    write("common/scripted_guis/psf_society_political.txt", "scripted_gui = {\n" + scripted[1] + "\n}\n")
+    write("common/scripted_guis/psf_society_diplomatic.txt", "scripted_gui = {\n" + scripted[3] + "\n}\n")
+    definition_chunk = ""
+    definition_index = 0
+    definition_bytes = 0
+    for definition in definitions:
+        definition = _exact_comparisons(definition)
+        size = len(definition.encode("utf-8"))
+        if size > 900_000:
+            raise ValueError("One scripted localization definition exceeds 900000 bytes")
+        if definition_bytes + size > 900_000:
+            suffix = "" if definition_index == 0 else f"_{definition_index:03}"
+            write(f"common/scripted_localisation/psf_ui{suffix}.txt", definition_chunk)
+            definition_chunk = ""
+            definition_index += 1
+            definition_bytes = 0
+        definition_chunk += definition
+        definition_bytes += size
+    suffix = "" if definition_index == 0 else f"_{definition_index:03}"
+    write(f"common/scripted_localisation/psf_ui{suffix}.txt", definition_chunk)
     for lang, keys in loc.items():
         # Literal backslash-n is intentional HOI4 localization syntax.
-        lines = [f"l_{lang}:"]
+        header = f"l_{lang}:\n"
+        chunk = header
+        index = 0
         for key, value in sorted(keys.items()):
-            lines.append(f' {key}:0 "{value.replace(chr(34), chr(92)+chr(34))}"')
-        write(f"localisation/{lang}/psf_ui_l_{lang}.yml", "\n".join(lines) + "\n", True)
+            line = f' {key}:0 "{value.replace(chr(34), chr(92)+chr(34))}"\n'
+            if len((chunk + line).encode("utf-8-sig")) > 900_000:
+                suffix = "" if index == 0 else f"_{index:03}"
+                write(f"localisation/{lang}/psf_ui{suffix}_l_{lang}.yml", chunk, True)
+                chunk = header
+                index += 1
+            chunk += line
+        suffix = "" if index == 0 else f"_{index:03}"
+        write(f"localisation/{lang}/psf_ui{suffix}_l_{lang}.yml", chunk, True)
     source = Path(vanilla_path) if vanilla_path else ASSETS
     if (source / "interface").is_dir():
         source = source / "interface"
     patches = patch_native(source, output)
     metadata = {"native_patches": patches, "organizations": len(groups), "axes": len(axes),
                 "sidebar": {"width": 414, "height": 590, "offset_from_native_left": 552},
+                "charts": {"sectors": charts.SECTORS, "diameter": charts.SIZE, "neutral_frame": 1,
+                           "support": "Active electoral organizations, normalized modified support",
+                           "influence": "All active organizations, normalized effective influence"},
                 "localization_keys_per_language": len(loc["english"]),
                 "scope_policy": "THIS supplies target data; ROOT owns UI state; mutation requires tag = ROOT",
-                "pregame": "Static notice only; runtime values initialize at game start"}
+                "pregame": "Native bookmark history supports compiled country/date chart text icons; map-side details retain a notice"}
     write("psf_ui_manifest.json", json.dumps(metadata, ensure_ascii=False, indent=2) + "\n")
     return metadata

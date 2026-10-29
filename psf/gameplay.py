@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from .model import ENGINE_IDEOLOGIES, profiles, stable_id
-from .runtime import active, av, flag, gv, legal
+from .runtime import active, av, ev, flag, gv, legal
 from .script import Block, addv, block, check, clamp, conditional, emit, setv, subv
 
 
@@ -12,6 +12,9 @@ def op_effect(op: dict) -> list[Block | str]:
         return [f"psf_{name}_{op['group']} = yes"]
     if name in ("support", "influence", "satisfaction"):
         return [setv("psf_amount", op["value"], True), f"psf_add_{op['group']}_{name} = yes"]
+    if name in ("add_modifier", "remove_modifier"):
+        action = "add" if name == "add_modifier" else "remove"
+        return [f"psf_{action}_{op['group']}_modifier_{op['modifier']} = yes"]
     if name in ("join", "leave"):
         return [f"psf_{name}_{op['alliance']}_{op['group']} = yes"]
     if name in ("govern", "dissolve"):
@@ -64,7 +67,10 @@ def on_actions(manifest: dict) -> str:
                                   "set_country_flag = psf_scenario_" + scenario["id"], f"country_event = {{ id = psf_content.{stable_id(scenario['id'])} }}"))
     changed = [conditional(["has_country_flag = psf_initialized", "NOT = { has_country_flag = psf_bridge_busy }"],
                            "psf_import_government = yes", "psf_capture_engine_government = yes")]
+    # on_daily already runs in country scope: wrapping every_country here would
+    # apply N days of drift per day in a world containing N countries.
     out = [block("on_startup", block("effect", block("every_country", "psf_initialize = yes"))),
+           block("on_daily", block("effect", "psf_initialize = yes", "psf_daily_modifiers = yes")),
            block("on_weekly", block("effect", weekly)),
            block("on_monthly", block("effect", "psf_initialize = yes", "psf_monthly = yes", "psf_ai_governance = yes")),
            block("on_release_as_free", block("effect", "psf_initialize = yes")),
@@ -83,8 +89,8 @@ def ai_effects(manifest: dict) -> str:
         ]
         recover: list[Block | str] = [setv("psf_candidate_weight", -1, True), setv("psf_winning_group", 0)]
         for g in p["groups"]:
-            recover.append(conditional([legal(g), check(gv(g["id"], "influence"), "psf_candidate_weight", "greater_than")],
-                                       setv("psf_candidate_weight", gv(g["id"], "influence"), True), setv("psf_winning_group", g["_index"])))
+            recover.append(conditional([legal(g), check(gv(g["id"], "effective_influence"), "psf_candidate_weight", "greater_than")],
+                                       setv("psf_candidate_weight", gv(g["id"], "effective_influence"), True), setv("psf_winning_group", g["_index"])))
         recover.append("psf_form_cabinet_" + p["id"] + " = yes")
         nodes.append(conditional([check("psf_caretaker", 1)], recover))
         for a in p["alliances"]:
@@ -129,7 +135,7 @@ def decisions(manifest: dict) -> str:
                 ("ban", [f"psf_{gid}_can_be_banned = yes"], [f"psf_ban_{gid} = yes"], 50, 60),
                 ("legalize", [check(gv(gid, "status"), 1, "greater_than")], [f"psf_legalize_{gid} = yes"], 25, 30),
                 ("activate", [check(gv(gid, "status"), 0)], [f"psf_activate_{gid} = yes"], 25, 30),
-                ("negotiate", [active(g), check(gv(gid, "satisfaction"), 95, "less_than")], [setv("psf_amount", 10, True), f"psf_add_{gid}_satisfaction = yes"], 35, 60),
+                ("negotiate", [active(g), check(ev(gid, "satisfaction"), 95, "less_than"), check(gv(gid, "satisfaction"), 100, "less_than")], [setv("psf_amount", 10, True), f"psf_add_{gid}_satisfaction = yes"], 35, 60),
                 ("campaign", [legal(g)], [setv("psf_amount", 4, True), f"psf_add_{gid}_support = yes"], 40, 60),
                 ("empower", [legal(g)], [setv("psf_amount", 4, True), f"psf_add_{gid}_influence = yes"], 45, 90),
             ]
@@ -139,7 +145,7 @@ def decisions(manifest: dict) -> str:
             aid = a["id"]
             a_visible = [flag(p)]
             alliances += [decision("psf_policy_govern_" + aid, a_visible,
-                                   ["NOT = { " + check("psf_governing_alliance", a["_index"]) + " }", block("OR", [block("AND", legal(g), check(av(aid, "g_" + g["id"]), 1), check(gv(g["id"], "influence"), 0, "greater_than")) for g in p["groups"]])],
+                                   ["NOT = { " + check("psf_governing_alliance", a["_index"]) + " }", block("OR", [block("AND", legal(g), check(av(aid, "g_" + g["id"]), 1), check(gv(g["id"], "effective_influence"), 0, "greater_than")) for g in p["groups"]])],
                                    ["psf_govern_" + aid + " = yes"], 100, 90),
                           decision("psf_policy_dissolve_" + aid, a_visible, [check(av(aid, "active"), 1)], ["psf_dissolve_" + aid + " = yes"], 25, 60),
                           decision("psf_policy_mediate_" + aid, a_visible, [check(av(aid, "active"), 1), check(av(aid, "cohesion"), 95, "less_than")],

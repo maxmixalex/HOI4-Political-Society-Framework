@@ -23,7 +23,7 @@ The vanilla example is a complete declarative content pack for PSF. Its source i
 | Generic communist | 7 | 1 | Soviet party-state | Overlapping public support and party-state institutions |
 | Generic non-aligned | 7 | 1 | Authoritarian republic | Institutional bargaining outside competitive party government |
 
-There are **125 declared organizations, 21 declared alliances, nine axes, 11 ideology prototypes, nine regime definitions, and 20 dated scenarios with 40 choices**. Compiler-generated working cabinets and framework actions are additional to these content counts.
+There are **125 declared organizations, 21 declared alliances, nine axes, 11 ideology prototypes, nine regime definitions, and 30 dated scenarios with 60 choices**. The pack also declares **16 named modifier sources** and generates **4,500 native group/attribute modifier keys**. Compiler-generated working cabinets and framework actions are additional to these content counts.
 
 Every country outside the ten authored profiles receives an abstract fallback selected from its initial native ideological compatibility state. The four generic profiles are reusable templates, not four extra countries. They provide playable political organizations for minor countries, releasable nations and new countries initialized by the framework. They do not claim to identify every minor country's historical parties or exact constitutional structure.
 
@@ -89,7 +89,7 @@ The initial January snapshots are compact political models, rather than a day-by
 
 ## Dated scenarios and alternatives
 
-Each authored profile contains two one-time scenarios. Their dates provide the earliest eligibility for a 1936 campaign; delivery occurs on the first weekly framework pulse after that date. Some coincide with a historical electoral or organizational milestone; others are explicitly authored opportunities for bargaining. Their choices are not scripts claiming that every offered action historically occurred.
+Each authored profile contains three one-time scenarios. Their dates provide the earliest eligibility for a 1936 campaign; delivery occurs on the first weekly framework pulse after that date. Some coincide with a historical electoral or organizational milestone; others are explicitly authored opportunities for bargaining. Their choices are not scripts claiming that every offered action historically occurred.
 
 | Country | Date | Scenario | Mechanics exercised |
 | --- | --- | --- | --- |
@@ -113,6 +113,27 @@ Each authored profile contains two one-time scenarios. Their dates provide the e
 | Spain | 1936-04-01 | Union autonomy | Improve satisfaction without forced membership |
 | Poland | 1936-10-01 | Opposition negotiations | Negotiate with distinct opposition groups |
 | Poland | 1937-02-21 | Camp of National Unity | A new organization begins activity and joins government |
+
+### Added negotiation scenarios and modifiers (0.2.0)
+
+The third scenario for each authored country is an explicitly fictional negotiation opportunity in September 1937. These dates are gameplay scheduling, not historical assertions. Each choice applies a real named source to a specific organization; its immediate effects and daily changes feed the same support, influence, satisfaction and spectrum calculations used by the interface and government model.
+
+| Country / group | First agreement | Alternative | Eligible date |
+| --- | --- | --- | --- |
+| Germany / industrial employers | Employers' roundtable | Negotiation breakdown | 1937-09-01 |
+| Britain / TUC | Ninety-day labor compact | Negotiation breakdown | 1937-09-02 |
+| France / CGT | Permanent independent charter | Sixty-day public campaign | 1937-09-03 |
+| United States / NAM | Employers' roundtable | Negotiation breakdown | 1937-09-04 |
+| Soviet Union / army | Professional review | Temporary assurances | 1937-09-05 |
+| Italy / Catholic associations | Permanent organizing network | Civic outreach | 1937-09-06 |
+| Japan / navy | Diplomatic consultation | Professional review | 1937-09-07 |
+| China / rural associations | Equal membership charter | Civic outreach | 1937-09-08 |
+| Spain / UGT | Labor compact | Civil guarantees | 1937-09-09 |
+| Poland / presidential circle | Shared authority pledge | Institutional compromise | 1937-09-10 |
+
+The sixteen source definitions include temporary score offsets, proportional bonuses, accumulated daily growth, daily decline, all nine spectrum axes, permanent organizational agreements and time-limited policy positions. `public_campaign` accumulates 0.05 support per active day for 60 pulses; its gains remain when the campaign ends. `labor_compact` grants 12 temporary satisfaction and accumulates 0.02 institutional influence per active day for 90 pulses. `independent_organization` remains until removed by the author's explicit scripted effect. Changing legality does not erase a source; inactive organizations stop daily drift, while the calendar duration continues to expire.
+
+新增的十场协商均为明确的架空玩法机会，不将日期与选项冒充史实。具名修正直接参与实际数值计算：临时加成到期撤销，每日变化写入基础值，常设协议直到明确撤销才结束。所有十六项修正都可由作者在 manifest 中调整，或通过其生成的 effect 在自己的事件、国策和决议中调用；框架不自动替换这些内容。
 
 Historical examples can be disabled through the framework's example-events game rule. Framework decisions remain available. Dates before a campaign's initial bookmark are excluded, so the 1939 bookmark does not immediately replay the 1936–1938 sequence.
 

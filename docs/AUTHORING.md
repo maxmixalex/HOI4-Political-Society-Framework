@@ -46,6 +46,7 @@ The named group in the inspection command must exist in your own manifest. For t
 | `ideologies` | Coordinate prototypes and native compatibility mappings |
 | `regimes` | Actual institutional templates, each using a subset of axes |
 | `profiles` | Country-specific political registries selected by `tag` |
+| `modifiers` | Optional named permanent/timed attribute sources, with add/factor/daily changes and optional eligible group IDs |
 | `fallback_profiles` | Exactly one template for each native compatibility category |
 | `scenarios` | Optional dated, one-time events with declared operations |
 | `settings` | Optional balance, cadence and bridge overrides |
@@ -230,7 +231,7 @@ The scenario schema deliberately does not accept arbitrary HOI4 code. For condit
 
 ## Hand-written integrations and composition
 
-The generated interface uses standard `effect_name = yes` calls. Inputs use temporary variables, not imagined parameter blocks. This country-scoped integration grants a small concession once after an author-controlled flag is set:
+The generated interface uses standard `effect_name = yes` calls. Inputs use temporary variables. Named modifier sources provide reusable one-line apply/remove calls, while generated native modifier keys can be placed directly in ideas, country traits and dynamic modifiers; see [MODIFIERS](MODIFIERS.md) and the [validated native integration examples](../examples/native_modifiers/README.md). This country-scoped integration grants a small concession once after an author-controlled flag is set:
 
 ```text
 my_story_apply_labor_concession = {

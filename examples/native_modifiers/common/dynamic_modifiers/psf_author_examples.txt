@@ -1,0 +1,6 @@
+psf_example_temporary_assurances = {
+    enable = { has_country_flag = psf_profile_eng }
+    psf_eng_labour_satisfaction_add = 10
+    psf_eng_labour_position_economy_daily = -0.02
+    psf_eng_labour_position_liberties_add = 5
+}

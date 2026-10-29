@@ -9,11 +9,35 @@ from .script import block, check, emit, quoted
 LANGUAGES = ("english", "simp_chinese")
 
 
-def write_localization(output: Path, stem: str, content: dict[str, dict[str, str]]) -> None:
+def write_localization(output: Path, stem: str, content: dict[str, dict[str, str]], *,
+                       max_bytes: int = 900_000) -> None:
     for language, entries in content.items():
-        path = output / "localisation" / language / f"{stem}_l_{language}.yml"
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text("l_" + language + ":\n" + "\n".join(" " + key + ":0 " + quoted(value) for key, value in sorted(entries.items())) + "\n", encoding="utf-8-sig")
+        directory = output / "localisation" / language
+        directory.mkdir(parents=True, exist_ok=True)
+        header = "l_" + language + ":\n"
+        minimum_size = len(header.encode("utf-8-sig"))
+        size = minimum_size
+        lines = [header]
+        index = 0
+
+        def flush() -> None:
+            suffix = "" if index == 0 else f"_{index:03}"
+            path = directory / f"{stem}{suffix}_l_{language}.yml"
+            path.write_text("".join(lines), encoding="utf-8-sig", newline="\n")
+
+        for key, value in sorted(entries.items()):
+            line = " " + key + ":0 " + quoted(value) + "\n"
+            line_size = len(line.encode("utf-8"))
+            if minimum_size + line_size > max_bytes:
+                raise ValueError(f"One localisation entry exceeds the safe file size: {key}")
+            if size + line_size > max_bytes:
+                flush()
+                index += 1
+                lines = [header]
+                size = minimum_size
+            lines.append(line)
+            size += line_size
+        flush()
 
 
 def core_localization() -> dict[str, dict[str, str]]:

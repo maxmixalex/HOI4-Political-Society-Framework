@@ -120,6 +120,7 @@ class State:
     flags: set[str] = field(default_factory=set)
     global_flags: set[str] = field(default_factory=set)
     dynamic_modifiers: set[str] = field(default_factory=set)
+    modifier_values: dict[str, float] = field(default_factory=dict)
     popularities: dict[str, float] = field(default_factory=lambda: {
         "democratic": 0.0, "fascism": 0.0, "communism": 0.0, "neutrality": 100.0,
     })
@@ -147,6 +148,8 @@ class Interpreter:
         self.stack: list[str] = []
         self.executed = 0
         self.max_steps = 2_000_000
+        # Supplied vanilla common/defines/00_defines.lua: MAX_EFFECT_ITERATION.
+        self.max_loop_iterations = 1000
 
     def load(self, roots: Iterable[Path]) -> "Interpreter":
         for root in roots:
@@ -169,6 +172,8 @@ class Interpreter:
             name = name.split(".", 1)[1]
         if "^" in name:
             array, index = name.split("^", 1)
+            if index == "num":
+                return name
             return f"{array}^{int(self.number(index))}"
         return name
 
@@ -181,6 +186,14 @@ class Interpreter:
             result = float(value)
         except ValueError:
             name = self.resolve_name(value)
+            if name.startswith("modifier@"):
+                modifier = name.removeprefix("modifier@")
+                if not re.fullmatch(r"[A-Za-z_][\w]*", modifier):
+                    raise ScriptError(f"Invalid modifier reference {name!r}")
+                amount = float(self.state.modifier_values.get(modifier, 0.0))
+                if not math.isfinite(amount):
+                    raise ScriptError(f"Non-finite modifier value {name!r}")
+                return amount
             if name.startswith(("party_popularity@", "party_popularity_100@")):
                 kind, ideology = name.split("@", 1)
                 if ideology == "ruling_party":
@@ -189,6 +202,8 @@ class Interpreter:
             if "^" in name:
                 array, index = name.split("^", 1)
                 items = self.state.arrays.get(array, [])
+                if index == "num":
+                    return float(len(items))
                 i = int(index)
                 return items[i] if 0 <= i < len(items) else 0.0
             if name in self.state.temporary:
@@ -211,6 +226,8 @@ class Interpreter:
             raise ScriptError(f"Non-finite assignment to {name}")
         if "^" in name:
             array, raw_index = name.split("^", 1)
+            if raw_index == "num":
+                raise ScriptError(f"Array length is read-only: {name}")
             index = int(raw_index)
             if index < 0:
                 raise ScriptError(f"Negative array index: {name}")
@@ -355,6 +372,45 @@ class Interpreter:
                 raise ScriptError(f"{key} must be a block")
             self.execute(value)
             return
+        if key == "for_loop_effect":
+            # effects_documentation.md:4312: scalar bounds, default < and +1;
+            # the counter and optional break flag are temporary variables.
+            if not isinstance(value, tuple):
+                raise ScriptError("for_loop_effect must be a block")
+            parameter_names = {"start", "end", "compare", "add", "value", "break"}
+            parameters: dict[str, str | Body] = {}
+            effects: list[Entry] = []
+            for child in entries(value):
+                if child.key in parameter_names:
+                    if child.key in parameters or child.operator != "=":
+                        raise ScriptError(f"Invalid for_loop_effect parameter: {child.key}")
+                    parameters[child.key] = child.value
+                else:
+                    effects.append(child)
+            current = self.number(parameters.get("start", "0"))
+            end = self.number(parameters.get("end", "0"))
+            increment = self.number(parameters.get("add", "1"))
+            comparison = scalar(parameters.get("compare", "less_than"))
+            counter = scalar(parameters.get("value", "v"))
+            break_name = scalar(parameters.get("break", "break"))
+            if "^" in counter or "^" in break_name:
+                raise ScriptError("for_loop_effect counters must be scalar temp variables")
+            self.put(break_name, 0.0, temporary=True)
+            iterations = 0
+            while self.compare(current, end, comparison):
+                if iterations >= self.max_loop_iterations:
+                    raise ScriptError("for_loop_effect exceeded HOI4 MAX_EFFECT_ITERATION")
+                iterations += 1
+                # Account for empty loops as well as all executed body effects.
+                self.executed += 1
+                if self.executed > self.max_steps:
+                    raise ScriptError("Exceeded execution budget; possible script loop")
+                self.put(counter, current, temporary=True)
+                self.execute(tuple(effects))
+                if self.number(break_name) != 0:
+                    break
+                current += increment
+            return
         operations = {
             "set_variable": "set", "set_temp_variable": "set",
             "add_to_variable": "add", "add_to_temp_variable": "add",
@@ -408,6 +464,36 @@ class Interpreter:
             return
         if key == "clear_array":
             self.state.arrays[self.resolve_name(scalar(value))] = []
+            return
+        if key == "resize_array":
+            # effects_documentation.md:6397: preserve existing entries; only
+            # append the fill value when growing, and truncate when shrinking.
+            data = mapping(value)
+            if len(entries(value)) != len(data):  # type: ignore[arg-type]
+                raise ScriptError("resize_array has duplicate parameters")
+            if "array" in data:
+                if "size" not in data or set(data) - {"array", "size", "value"}:
+                    raise ScriptError(f"Unsupported resize_array form: {node}")
+                name = scalar(data["array"])
+                size = self.number(data["size"])
+            else:
+                sizes = {name: amount for name, amount in data.items() if name != "value"}
+                if len(sizes) != 1:
+                    raise ScriptError(f"Unsupported resize_array form: {node}")
+                name, raw = next(iter(sizes.items()))
+                size = self.number(raw)
+            if not size.is_integer() or size < 0 or size > self.max_steps:
+                raise ScriptError(f"Invalid or excessive resize_array size: {size}")
+            name = self.resolve_name(name)
+            if "^" in name:
+                raise ScriptError("resize_array requires an array name, not an element")
+            fill = self.number(data.get("value", "0"))
+            values = self.state.arrays.setdefault(name, [])
+            target = int(size)
+            if target > len(values):
+                values.extend([fill] * (target - len(values)))
+            else:
+                del values[target:]
             return
         if key in {"add_to_array", "remove_from_array"}:
             data = mapping(value)

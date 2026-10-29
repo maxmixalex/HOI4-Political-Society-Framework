@@ -111,7 +111,40 @@ def validate(data: dict) -> None:
     profile_ids = _ids(all_profiles, "profiles", errors)
     all_groups = [g for p in all_profiles for g in p["groups"]]
     all_alliances = [a for p in all_profiles for a in p["alliances"]]
-    _ids(all_groups, "groups (global)", errors)
+    group_ids = _ids(all_groups, "groups (global)", errors)
+    _ids(data.get("modifiers", []), "modifiers", errors)
+    modifier_map = {m["id"]: m for m in data.get("modifiers", [])}
+    modifier_indices = {}
+    for modifier in data.get("modifiers", []):
+        index = modifier.get("numeric_id", stable_id(modifier["id"]))
+        if index in modifier_indices:
+            errors.append(f"modifiers: numeric id collision between {modifier_indices[index]} and {modifier['id']}")
+        modifier_indices[index] = modifier["id"]
+        if set(modifier.get("groups", [])) - group_ids:
+            errors.append(f"modifier {modifier['id']}: unknown target groups")
+        if set(modifier.get("positions", {})) - axis_ids:
+            errors.append(f"modifier {modifier['id']}: unknown position axes")
+    # Concatenated author IDs must not produce the same engine token. The
+    # registry uses human-readable keys, so ambiguous joins are rejected rather
+    # than silently making two organizations share a saved modifier source.
+    generated_symbols = {}
+    def claim_symbol(symbol: str, owner: tuple[str, ...]) -> None:
+        previous = generated_symbols.get(symbol)
+        if previous is not None and previous != owner:
+            errors.append(f"Generated modifier symbol collision {symbol}: {previous} / {owner}; rename one id")
+        generated_symbols[symbol] = owner
+    for group in all_groups:
+        gid = group["id"]
+        for field in ("support", "influence", "satisfaction", *("position_" + a for a in axis_ids)):
+            for kind in ("add", "factor", "daily"):
+                claim_symbol(f"psf_{gid}_{field}_{kind}", (gid, field, kind))
+        for modifier in data.get("modifiers", []):
+            if "groups" in modifier and gid not in modifier["groups"]:
+                continue
+            mid = modifier["id"]
+            claim_symbol(f"psf_m_{gid}_{mid}_active", (gid, mid, "source"))
+            for action in ("add", "add_timed", "remove"):
+                claim_symbol(f"psf_{action}_{gid}_modifier_{mid}", (gid, mid, action))
     _ids(all_alliances, "alliances (global)", errors)
     for kind, items in (("groups", all_groups), ("alliances", all_alliances), ("regimes", data["regimes"]), ("ideologies", data["ideologies"])):
         indices = {}
@@ -206,12 +239,19 @@ def validate(data: dict) -> None:
                     "dissolve": {"alliance"}, "regime": {"regime"},
                     "legitimacy": {"value"}, "position": {"group", "axis", "value"},
                     "cohesion": {"alliance", "value"},
+                    "add_modifier": {"group", "modifier"}, "remove_modifier": {"group", "modifier"},
                 }[op["op"]]
                 if set(op) != needed | {"op"}:
                     errors.append(f"{scenario['id']}/{option['id']}: {op['op']} requires only {sorted(needed)}")
                 for key, allowed in (("group", gids), ("alliance", aids), ("regime", regime_ids), ("axis", axis_ids)):
                     if key in op and op[key] not in allowed:
                         errors.append(f"{scenario['id']}: unknown or cross-country {key}: {op[key]}")
+                if "modifier" in op:
+                    modifier = modifier_map.get(op["modifier"])
+                    if modifier is None:
+                        errors.append(f"{scenario['id']}: unknown modifier {op['modifier']}")
+                    elif "groups" in modifier and op.get("group") not in modifier["groups"]:
+                        errors.append(f"{scenario['id']}: modifier {op['modifier']} does not target {op.get('group')}")
                 if op["op"] == "position" and "value" in op and not -100 <= op["value"] <= 100:
                     errors.append(f"{scenario['id']}: position must be between -100 and 100")
     def finite(value, path=""):
@@ -232,6 +272,10 @@ def normalize(data: dict) -> dict:
     data = copy.deepcopy(data)
     data["settings"] = {**DEFAULTS, **data.get("settings", {})}
     data.setdefault("scenarios", [])
+    data.setdefault("modifiers", [])
+    for modifier in data["modifiers"]:
+        modifier.setdefault("duration_days", -1)
+        modifier["_index"] = modifier.get("numeric_id", stable_id(modifier["id"]))
     for p in profiles(data):
         identifier = p["id"] + "_transition_cabinet"
         if any(a["id"] == identifier for a in p["alliances"]):

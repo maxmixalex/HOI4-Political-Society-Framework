@@ -7135,6 +7135,941 @@
           ]
         }
       ]
+    },
+    {
+      "id": "ger_modifier_agreement",
+      "profile": "ger",
+      "date": "1937.9.1",
+      "title": {
+        "english": "Industrial consultation",
+        "simp_chinese": "产业协商"
+      },
+      "description": {
+        "english": "Employers seek a regular hearing for industrial concerns. A standing forum would temporarily increase their access to government.",
+        "simp_chinese": "雇主要求建立常态渠道反映产业诉求。固定协商机制会暂时提高其接触政府的能力。"
+      },
+      "options": [
+        {
+          "id": "agreement",
+          "label": {
+            "english": "Employers' roundtable",
+            "simp_chinese": "雇主圆桌会议"
+          },
+          "ai_chance": 65,
+          "effects": [
+            {
+              "op": "add_modifier",
+              "group": "ger_industry",
+              "modifier": "employers_roundtable"
+            }
+          ]
+        },
+        {
+          "id": "alternative",
+          "label": {
+            "english": "Negotiation breakdown",
+            "simp_chinese": "谈判破裂"
+          },
+          "ai_chance": 35,
+          "effects": [
+            {
+              "op": "add_modifier",
+              "group": "ger_industry",
+              "modifier": "negotiation_breakdown"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "eng_modifier_agreement",
+      "profile": "eng",
+      "date": "1937.9.2",
+      "title": {
+        "english": "A workplace compact",
+        "simp_chinese": "劳动协商协议"
+      },
+      "description": {
+        "english": "Trade union delegates propose a ninety-day consultation compact. Its immediate reassurance is separate from the institutional access developed over time.",
+        "simp_chinese": "工会代表提出为期九十日的协商协议。即时的信任改善与逐步形成的制度渠道分别发挥作用。"
+      },
+      "options": [
+        {
+          "id": "agreement",
+          "label": {
+            "english": "Workplace consultation compact",
+            "simp_chinese": "劳动协商协议"
+          },
+          "ai_chance": 65,
+          "effects": [
+            {
+              "op": "add_modifier",
+              "group": "eng_tuc",
+              "modifier": "labor_compact"
+            }
+          ]
+        },
+        {
+          "id": "alternative",
+          "label": {
+            "english": "Negotiation breakdown",
+            "simp_chinese": "谈判破裂"
+          },
+          "ai_chance": 35,
+          "effects": [
+            {
+              "op": "add_modifier",
+              "group": "eng_tuc",
+              "modifier": "negotiation_breakdown"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fra_modifier_agreement",
+      "profile": "fra",
+      "date": "1937.9.3",
+      "title": {
+        "english": "A charter for independent organization",
+        "simp_chinese": "独立组织章程"
+      },
+      "description": {
+        "english": "The union asks for a standing institutional foothold. The agreement would remain in effect until explicitly withdrawn.",
+        "simp_chinese": "工会要求获得稳定的制度地位。协议将持续生效，直到被明确撤销。"
+      },
+      "options": [
+        {
+          "id": "agreement",
+          "label": {
+            "english": "Independent organizational charter",
+            "simp_chinese": "组织独立章程"
+          },
+          "ai_chance": 65,
+          "effects": [
+            {
+              "op": "add_modifier",
+              "group": "fra_cgt",
+              "modifier": "independent_organization"
+            }
+          ]
+        },
+        {
+          "id": "alternative",
+          "label": {
+            "english": "Public organizing campaign",
+            "simp_chinese": "公众组织运动"
+          },
+          "ai_chance": 35,
+          "effects": [
+            {
+              "op": "add_modifier",
+              "group": "fra_cgt",
+              "modifier": "public_campaign"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "usa_modifier_agreement",
+      "profile": "usa",
+      "date": "1937.9.4",
+      "title": {
+        "english": "The employers' forum",
+        "simp_chinese": "雇主协商论坛"
+      },
+      "description": {
+        "english": "Business representatives request regular access to policy discussions. Their influence can change without automatically increasing popular support.",
+        "simp_chinese": "企业代表要求定期参与政策讨论。制度影响力可以变化，而不必同时增加民众支持。"
+      },
+      "options": [
+        {
+          "id": "agreement",
+          "label": {
+            "english": "Employers' roundtable",
+            "simp_chinese": "雇主圆桌会议"
+          },
+          "ai_chance": 65,
+          "effects": [
+            {
+              "op": "add_modifier",
+              "group": "usa_nam",
+              "modifier": "employers_roundtable"
+            }
+          ]
+        },
+        {
+          "id": "alternative",
+          "label": {
+            "english": "Negotiation breakdown",
+            "simp_chinese": "谈判破裂"
+          },
+          "ai_chance": 35,
+          "effects": [
+            {
+              "op": "add_modifier",
+              "group": "usa_nam",
+              "modifier": "negotiation_breakdown"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sov_modifier_agreement",
+      "profile": "sov",
+      "date": "1937.9.5",
+      "title": {
+        "english": "Professional consultation",
+        "simp_chinese": "专业机构协商"
+      },
+      "description": {
+        "english": "Army representatives request an institutional review. The review would gradually change preferences about concentrated authority.",
+        "simp_chinese": "军方代表要求开展制度审议。审议将逐步改变其对权力集中程度的偏好。"
+      },
+      "options": [
+        {
+          "id": "agreement",
+          "label": {
+            "english": "Professional institutional review",
+            "simp_chinese": "专业机构审议"
+          },
+          "ai_chance": 65,
+          "effects": [
+            {
+              "op": "add_modifier",
+              "group": "sov_army",
+              "modifier": "professional_review"
+            }
+          ]
+        },
+        {
+          "id": "alternative",
+          "label": {
+            "english": "Coalition assurances",
+            "simp_chinese": "联盟保证"
+          },
+          "ai_chance": 35,
+          "effects": [
+            {
+              "op": "add_modifier",
+              "group": "sov_army",
+              "modifier": "coalition_assurances"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ita_modifier_agreement",
+      "profile": "ita",
+      "date": "1937.9.6",
+      "title": {
+        "english": "An autonomous civic network",
+        "simp_chinese": "自主社会网络"
+      },
+      "description": {
+        "english": "Religious associations seek a durable network of local activity. They can retain a distinct identity without joining the governing party.",
+        "simp_chinese": "宗教社团寻求建立持久的地方活动网络，无须加入执政党也能维持独立身份。"
+      },
+      "options": [
+        {
+          "id": "agreement",
+          "label": {
+            "english": "Standing organizing network",
+            "simp_chinese": "常设组织网络"
+          },
+          "ai_chance": 65,
+          "effects": [
+            {
+              "op": "add_modifier",
+              "group": "ita_catholic",
+              "modifier": "organizing_network"
+            }
+          ]
+        },
+        {
+          "id": "alternative",
+          "label": {
+            "english": "Civic outreach agreement",
+            "simp_chinese": "社会联络协定"
+          },
+          "ai_chance": 35,
+          "effects": [
+            {
+              "op": "add_modifier",
+              "group": "ita_catholic",
+              "modifier": "civic_outreach"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "jap_modifier_agreement",
+      "profile": "jap",
+      "date": "1937.9.7",
+      "title": {
+        "english": "Foreign-policy consultation",
+        "simp_chinese": "外交政策协商"
+      },
+      "description": {
+        "english": "Naval representatives enter a policy review. A temporary diplomatic agreement would affect their preferred approach to external conflict.",
+        "simp_chinese": "海军代表参加政策审议。临时外交协议会影响其对外部冲突的政策偏好。"
+      },
+      "options": [
+        {
+          "id": "agreement",
+          "label": {
+            "english": "Diplomatic consultation",
+            "simp_chinese": "外交政策协商"
+          },
+          "ai_chance": 65,
+          "effects": [
+            {
+              "op": "add_modifier",
+              "group": "jap_navy",
+              "modifier": "diplomatic_consultation"
+            }
+          ]
+        },
+        {
+          "id": "alternative",
+          "label": {
+            "english": "Professional institutional review",
+            "simp_chinese": "专业机构审议"
+          },
+          "ai_chance": 35,
+          "effects": [
+            {
+              "op": "add_modifier",
+              "group": "jap_navy",
+              "modifier": "professional_review"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chi_modifier_agreement",
+      "profile": "chi",
+      "date": "1937.9.8",
+      "title": {
+        "english": "A charter of civic inclusion",
+        "simp_chinese": "公民共同体宪章"
+      },
+      "description": {
+        "english": "Local associations debate a common charter. Equal membership would temporarily alter their social and national positions.",
+        "simp_chinese": "地方社团讨论共同章程。平等成员原则会暂时改变其社会结构与民族国家立场。"
+      },
+      "options": [
+        {
+          "id": "agreement",
+          "label": {
+            "english": "Equal membership charter",
+            "simp_chinese": "平等成员宪章"
+          },
+          "ai_chance": 65,
+          "effects": [
+            {
+              "op": "add_modifier",
+              "group": "chi_rural",
+              "modifier": "equal_membership"
+            }
+          ]
+        },
+        {
+          "id": "alternative",
+          "label": {
+            "english": "Civic outreach agreement",
+            "simp_chinese": "社会联络协定"
+          },
+          "ai_chance": 35,
+          "effects": [
+            {
+              "op": "add_modifier",
+              "group": "chi_rural",
+              "modifier": "civic_outreach"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "spr_modifier_agreement",
+      "profile": "spr",
+      "date": "1937.9.9",
+      "title": {
+        "english": "Consultation and civil guarantees",
+        "simp_chinese": "协商与公民保障"
+      },
+      "description": {
+        "english": "Union delegates propose either an institutional consultation compact or an agreement centered on civil guarantees.",
+        "simp_chinese": "工会代表提出两种方案：建立制度协商协议，或订立以公民权利保障为核心的协议。"
+      },
+      "options": [
+        {
+          "id": "agreement",
+          "label": {
+            "english": "Workplace consultation compact",
+            "simp_chinese": "劳动协商协议"
+          },
+          "ai_chance": 65,
+          "effects": [
+            {
+              "op": "add_modifier",
+              "group": "spr_ugt",
+              "modifier": "labor_compact"
+            }
+          ]
+        },
+        {
+          "id": "alternative",
+          "label": {
+            "english": "Civil guarantees",
+            "simp_chinese": "公民权利保障"
+          },
+          "ai_chance": 35,
+          "effects": [
+            {
+              "op": "add_modifier",
+              "group": "spr_ugt",
+              "modifier": "civil_guarantees"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pol_modifier_agreement",
+      "profile": "pol",
+      "date": "1937.9.10",
+      "title": {
+        "english": "A pledge to share authority",
+        "simp_chinese": "权力共享承诺"
+      },
+      "description": {
+        "english": "The governing circle debates a time-limited commitment to shared authority and a broader institutional compromise.",
+        "simp_chinese": "执政集团讨论限期共享权力的承诺，以及更广泛的制度妥协。"
+      },
+      "options": [
+        {
+          "id": "agreement",
+          "label": {
+            "english": "Shared authority pledge",
+            "simp_chinese": "权力共享承诺"
+          },
+          "ai_chance": 65,
+          "effects": [
+            {
+              "op": "add_modifier",
+              "group": "pol_castle",
+              "modifier": "shared_authority"
+            }
+          ]
+        },
+        {
+          "id": "alternative",
+          "label": {
+            "english": "Institutional compromise",
+            "simp_chinese": "制度妥协"
+          },
+          "ai_chance": 35,
+          "effects": [
+            {
+              "op": "add_modifier",
+              "group": "pol_castle",
+              "modifier": "institutional_compromise"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "modifiers": [
+    {
+      "id": "labor_compact",
+      "name": {
+        "english": "Workplace consultation compact",
+        "simp_chinese": "劳动协商协议"
+      },
+      "description": {
+        "english": "Regular consultations improve acceptance of government and slowly expand the organization's institutional access.",
+        "simp_chinese": "定期协商提高对政府的认可，并逐步扩展该组织的制度渠道。"
+      },
+      "duration_days": 90,
+      "groups": [
+        "ger_daf",
+        "ger_free_unions",
+        "eng_tuc",
+        "fra_cgt",
+        "usa_afl",
+        "usa_cio",
+        "sov_unions",
+        "ita_syndicates",
+        "spr_cnt",
+        "spr_ugt",
+        "pol_unions",
+        "generic_democratic_labor",
+        "generic_fascism_labor",
+        "generic_communism_labor",
+        "generic_neutrality_labor"
+      ],
+      "attributes": {
+        "satisfaction": {
+          "add": 12
+        },
+        "influence": {
+          "daily": 0.02
+        }
+      }
+    },
+    {
+      "id": "public_campaign",
+      "name": {
+        "english": "Public organizing campaign",
+        "simp_chinese": "公众组织运动"
+      },
+      "description": {
+        "english": "A time-limited recruitment effort creates lasting additions to the organization's public support.",
+        "simp_chinese": "限期招募活动逐步增加组织的民众支持，活动结束后保留已获得的支持。"
+      },
+      "duration_days": 60,
+      "attributes": {
+        "support": {
+          "daily": 0.05
+        }
+      }
+    },
+    {
+      "id": "employers_roundtable",
+      "name": {
+        "english": "Employers' roundtable",
+        "simp_chinese": "雇主圆桌会议"
+      },
+      "description": {
+        "english": "Formal access to consultations temporarily strengthens business organizations' institutional influence.",
+        "simp_chinese": "正式协商渠道暂时提高工商组织的制度影响力。"
+      },
+      "duration_days": 120,
+      "groups": [
+        "ger_industry",
+        "eng_fbi",
+        "fra_cgpf",
+        "usa_nam",
+        "ita_industry",
+        "jap_business",
+        "chi_business",
+        "pol_industry",
+        "generic_democratic_business",
+        "generic_fascism_business",
+        "generic_communism_business",
+        "generic_neutrality_business"
+      ],
+      "attributes": {
+        "influence": {
+          "add": 6,
+          "factor": 0.1
+        }
+      }
+    },
+    {
+      "id": "coalition_assurances",
+      "name": {
+        "english": "Coalition assurances",
+        "simp_chinese": "联盟保证"
+      },
+      "description": {
+        "english": "An explicit agreement temporarily raises confidence without changing the group's underlying political preferences.",
+        "simp_chinese": "明确的协议暂时提高信任，不改变组织原有政治倾向。"
+      },
+      "duration_days": 60,
+      "attributes": {
+        "satisfaction": {
+          "add": 10
+        }
+      }
+    },
+    {
+      "id": "professional_review",
+      "name": {
+        "english": "Professional institutional review",
+        "simp_chinese": "专业机构审议"
+      },
+      "description": {
+        "english": "Internal review slowly shifts the group toward shared authority while opening a temporary margin for civil guarantees.",
+        "simp_chinese": "内部审议逐步推动权力共享，并暂时扩大对公民保障的接受空间。"
+      },
+      "duration_days": 90,
+      "groups": [
+        "ger_officers",
+        "usa_progressives",
+        "sov_left",
+        "sov_right",
+        "sov_army",
+        "sov_security",
+        "sov_managers",
+        "ita_crown",
+        "ita_army",
+        "jap_court",
+        "jap_toseiha",
+        "jap_kodoha",
+        "jap_navy",
+        "chi_cc",
+        "chi_reorganization",
+        "chi_officers",
+        "chi_regional",
+        "spr_centre",
+        "spr_army",
+        "pol_castle",
+        "pol_military",
+        "generic_democratic_military",
+        "generic_fascism_military",
+        "generic_communism_military",
+        "generic_neutrality_military"
+      ],
+      "positions": {
+        "authority": {
+          "daily": -0.03
+        },
+        "liberties": {
+          "add": 8
+        }
+      }
+    },
+    {
+      "id": "civic_outreach",
+      "name": {
+        "english": "Civic outreach agreement",
+        "simp_chinese": "社会联络协定"
+      },
+      "description": {
+        "english": "Public cooperation temporarily improves visibility and encourages a more reform-minded cultural stance.",
+        "simp_chinese": "公共合作暂时提高组织的社会可见度，并使其文化取向更倾向改革。"
+      },
+      "duration_days": 90,
+      "groups": [
+        "ger_confessing",
+        "fra_croix",
+        "fra_af",
+        "usa_silver",
+        "usa_farm",
+        "sov_cooperatives",
+        "ita_catholic",
+        "chi_rural",
+        "spr_carlists",
+        "generic_democratic_civic",
+        "generic_fascism_civic",
+        "generic_communism_civic",
+        "generic_neutrality_civic"
+      ],
+      "attributes": {
+        "support": {
+          "add": 4
+        }
+      },
+      "positions": {
+        "culture": {
+          "add": -8
+        }
+      }
+    },
+    {
+      "id": "economic_dialogue",
+      "name": {
+        "english": "Economic dialogue",
+        "simp_chinese": "经济政策对话"
+      },
+      "description": {
+        "english": "A temporary policy agreement shifts the organization's economic position toward collective provision.",
+        "simp_chinese": "临时政策协议使组织的经济立场向共同供给方向移动。"
+      },
+      "duration_days": 120,
+      "positions": {
+        "economy": {
+          "add": -10
+        }
+      }
+    },
+    {
+      "id": "equal_membership",
+      "name": {
+        "english": "Equal membership charter",
+        "simp_chinese": "平等成员宪章"
+      },
+      "description": {
+        "english": "The charter temporarily favors social equality and civic inclusion.",
+        "simp_chinese": "宪章暂时推动社会平等与公民共同体认同。"
+      },
+      "duration_days": 120,
+      "positions": {
+        "society": {
+          "add": -10
+        },
+        "nation": {
+          "add": -8
+        }
+      }
+    },
+    {
+      "id": "religious_consultation",
+      "name": {
+        "english": "Religious consultation",
+        "simp_chinese": "宗教事务协商"
+      },
+      "description": {
+        "english": "An accommodation gives religious institutions a temporary place in the group's preferred public arrangements.",
+        "simp_chinese": "协商安排暂时提高宗教机构在组织所主张公共制度中的地位。"
+      },
+      "duration_days": 90,
+      "groups": [
+        "ger_nsdap",
+        "ger_spd",
+        "ger_kpd",
+        "ger_zentrum",
+        "ger_dnvp",
+        "ger_confessing",
+        "eng_conservative",
+        "eng_labour",
+        "eng_liberal",
+        "eng_liberal_national",
+        "eng_national_labour",
+        "eng_buf",
+        "eng_cpgb",
+        "fra_radical",
+        "fra_sfio",
+        "fra_pcf",
+        "fra_ad",
+        "fra_fr",
+        "fra_psf",
+        "usa_democratic",
+        "usa_republican",
+        "usa_socialist",
+        "usa_cpusa",
+        "sov_party",
+        "ita_pnf",
+        "ita_catholic",
+        "ita_socialist",
+        "ita_communist",
+        "ita_liberal",
+        "jap_minseito",
+        "jap_seiyukai",
+        "jap_social_mass",
+        "jap_jcp",
+        "chi_kmt",
+        "chi_ccp",
+        "chi_youth",
+        "chi_democratic",
+        "spr_ir",
+        "spr_ur",
+        "spr_psoe",
+        "spr_pce",
+        "spr_ceda",
+        "spr_falange",
+        "spr_unification",
+        "pol_national",
+        "pol_pps",
+        "pol_peasant",
+        "pol_christian",
+        "pol_kpp",
+        "pol_ozon",
+        "generic_democratic_government",
+        "generic_democratic_reform",
+        "generic_democratic_traditional",
+        "generic_fascism_government",
+        "generic_fascism_reform",
+        "generic_fascism_traditional",
+        "generic_communism_government",
+        "generic_communism_reform",
+        "generic_communism_traditional",
+        "generic_neutrality_government",
+        "generic_neutrality_reform",
+        "generic_neutrality_traditional"
+      ],
+      "positions": {
+        "religion": {
+          "add": 10
+        }
+      }
+    },
+    {
+      "id": "diplomatic_consultation",
+      "name": {
+        "english": "Diplomatic consultation",
+        "simp_chinese": "外交政策协商"
+      },
+      "description": {
+        "english": "Consultations temporarily move the organization toward restraint in external conflict.",
+        "simp_chinese": "协商暂时推动组织在对外冲突中采取克制立场。"
+      },
+      "duration_days": 180,
+      "positions": {
+        "foreign_policy": {
+          "add": -12
+        }
+      }
+    },
+    {
+      "id": "civil_guarantees",
+      "name": {
+        "english": "Civil guarantees",
+        "simp_chinese": "公民权利保障"
+      },
+      "description": {
+        "english": "Public guarantees temporarily raise acceptance of civil liberties.",
+        "simp_chinese": "公共保障暂时提高对公民自由的认可。"
+      },
+      "duration_days": 120,
+      "positions": {
+        "liberties": {
+          "add": 12
+        }
+      }
+    },
+    {
+      "id": "institutional_compromise",
+      "name": {
+        "english": "Institutional compromise",
+        "simp_chinese": "制度妥协"
+      },
+      "description": {
+        "english": "An agreement temporarily moderates preferences about the head of state and disperses political authority.",
+        "simp_chinese": "协议暂时缓和国家元首形式上的立场，并推动政治权力分散。"
+      },
+      "duration_days": 180,
+      "positions": {
+        "head_of_state": {
+          "factor": -0.1
+        },
+        "authority": {
+          "add": -8
+        }
+      }
+    },
+    {
+      "id": "organizing_network",
+      "name": {
+        "english": "Standing organizing network",
+        "simp_chinese": "常设组织网络"
+      },
+      "description": {
+        "english": "A standing network increases public reach and institutional access until its agreement is explicitly withdrawn.",
+        "simp_chinese": "常设网络提高社会覆盖与制度渠道，直到相关协议被明确撤销。"
+      },
+      "duration_days": -1,
+      "attributes": {
+        "support": {
+          "factor": 0.08
+        },
+        "influence": {
+          "add": 3
+        }
+      }
+    },
+    {
+      "id": "negotiation_breakdown",
+      "name": {
+        "english": "Negotiation breakdown",
+        "simp_chinese": "谈判破裂"
+      },
+      "description": {
+        "english": "A breakdown temporarily depresses acceptance while accumulated organizational losses remain after talks resume.",
+        "simp_chinese": "谈判破裂暂时降低认可度；协商恢复后，期间已经发生的组织损失仍然存在。"
+      },
+      "duration_days": 30,
+      "attributes": {
+        "satisfaction": {
+          "add": -8
+        },
+        "support": {
+          "daily": -0.02
+        }
+      }
+    },
+    {
+      "id": "shared_authority",
+      "name": {
+        "english": "Shared authority pledge",
+        "simp_chinese": "权力共享承诺"
+      },
+      "description": {
+        "english": "A time-limited pledge supports more distributed authority and improves confidence in the government.",
+        "simp_chinese": "限期承诺推动权力分散，并提高对政府的信任。"
+      },
+      "duration_days": 60,
+      "attributes": {
+        "satisfaction": {
+          "add": 5
+        }
+      },
+      "positions": {
+        "authority": {
+          "add": -12
+        }
+      }
+    },
+    {
+      "id": "independent_organization",
+      "name": {
+        "english": "Independent organizational charter",
+        "simp_chinese": "组织独立章程"
+      },
+      "description": {
+        "english": "The charter provides a persistent institutional foothold without obliging the group to join government.",
+        "simp_chinese": "章程提供持续的制度立足点，不要求该组织加入执政联盟。"
+      },
+      "duration_days": -1,
+      "groups": [
+        "ger_daf",
+        "ger_industry",
+        "ger_confessing",
+        "ger_free_unions",
+        "eng_tuc",
+        "eng_fbi",
+        "fra_cgt",
+        "fra_cgpf",
+        "fra_croix",
+        "fra_af",
+        "usa_silver",
+        "usa_afl",
+        "usa_cio",
+        "usa_nam",
+        "usa_farm",
+        "sov_unions",
+        "sov_cooperatives",
+        "ita_industry",
+        "ita_syndicates",
+        "ita_catholic",
+        "jap_business",
+        "chi_business",
+        "chi_rural",
+        "spr_carlists",
+        "spr_cnt",
+        "spr_ugt",
+        "pol_industry",
+        "pol_unions",
+        "generic_democratic_labor",
+        "generic_democratic_business",
+        "generic_democratic_civic",
+        "generic_fascism_labor",
+        "generic_fascism_business",
+        "generic_fascism_civic",
+        "generic_communism_labor",
+        "generic_communism_business",
+        "generic_communism_civic",
+        "generic_neutrality_labor",
+        "generic_neutrality_business",
+        "generic_neutrality_civic"
+      ],
+      "attributes": {
+        "influence": {
+          "add": 5
+        },
+        "satisfaction": {
+          "add": 4
+        }
+      }
     }
   ]
 }

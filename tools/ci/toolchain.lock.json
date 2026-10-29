@@ -163,6 +163,7 @@
     "cwtools.toml": "5fd413da82668672ba9c6f98519efd2608036c6de8198c7d86fddee13509d1b5",
     "patches/sprite-types-in-bitmapfonts.patch": "a6fc0a55c29d2eca426d23f6f2a3f9897b1a098d331033073377b2a781a76604",
     "patches/scripted-localisation-path.patch": "08db914f12ee687d030d6707455b2d64fa9223cc3fa336afabeb43be8c32b75d",
-    "patches/explicit-equipment-category-trigger-aliases.patch": "f67f96b3f698c931978f59bf37cba154c78f55409c9da7a02a875a12a0520e2f"
+    "patches/explicit-equipment-category-trigger-aliases.patch": "f67f96b3f698c931978f59bf37cba154c78f55409c9da7a02a875a12a0520e2f",
+    "stock-bookmark-imports.json": "008f801539a31aafdb9c3f6033ccf26949dfc8a3c386ea93c59969250e0a20c6"
   }
 }

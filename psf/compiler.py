@@ -10,7 +10,7 @@ import tempfile
 import zipfile
 
 from . import __version__
-from . import gameplay, localization, runtime
+from . import bookmarks, gameplay, localization, modifiers, runtime
 from .model import load, profiles
 from .script import quoted
 
@@ -23,8 +23,9 @@ def write(root: Path, name: str, content: str) -> None:
     path.write_text(content, encoding="utf-8", newline="\n")
 
 
-def write_effect_chunks(root: Path, text: str, max_bytes: int = 900_000) -> None:
-    """Keep whole effects together, below the engine/tool discovery size limit."""
+def write_effect_chunks(root: Path, text: str, max_bytes: int = 900_000, *,
+                        directory: str = "common/scripted_effects", prefix: str = "10_psf_registry") -> None:
+    """Keep complete PSF definitions together, below the tool discovery limit."""
     matches = list(re.finditer(r"^psf_[a-zA-Z0-9_]+ = \{$", text, re.M))
     starts = [m.start() for m in matches] + [len(text)]
     chunk = text[:starts[0]] if matches else text
@@ -32,18 +33,26 @@ def write_effect_chunks(root: Path, text: str, max_bytes: int = 900_000) -> None
     for begin, end in zip(starts, starts[1:]):
         effect = text[begin:end]
         if len(effect.encode()) > max_bytes:
-            raise ValueError("One scripted effect exceeds the safe file size; split the profile into smaller declarations")
+            raise ValueError("One script definition exceeds the safe file size; split the profile into smaller declarations")
         if chunk and len((chunk + effect).encode()) > max_bytes:
-            write(root, f"common/scripted_effects/10_psf_registry_{index:03}.txt", chunk)
+            write(root, f"{directory}/{prefix}_{index:03}.txt", chunk)
             chunk = ""
             index += 1
         chunk += effect
     if chunk:
-        write(root, f"common/scripted_effects/10_psf_registry_{index:03}.txt", chunk)
+        write(root, f"{directory}/{prefix}_{index:03}.txt", chunk)
 
 
-def descriptor(name: str, *, dependency: bool = False, launcher_path: str | None = None) -> str:
-    lines = [f"version={quoted(__version__)}", 'tags={ "Gameplay" "Alternative History" }', f"name={quoted(name)}", 'supported_version="1.*"']
+def descriptor(name: str, *, dependency: bool = False, launcher_path: str | None = None,
+               supported_version: str | None = None) -> str:
+    lines = [f"version={quoted(__version__)}", 'tags={ "Gameplay" "Alternative History" }', f"name={quoted(name)}"]
+    # This optional launcher hint is not an engine compatibility guarantee. The
+    # supplied script snapshot has no version manifest, so do not invent one.
+    # In particular, the engine rejects the previously emitted `1.*`.
+    if supported_version is not None:
+        if not re.fullmatch(r"[0-9]+\.[0-9]+\.(?:[0-9]+(?:\.[0-9]+)?|\*)", supported_version):
+            raise ValueError("supported_version must be major.minor.patch, major.minor.patch.build, or major.minor.*")
+        lines.append("supported_version=" + quoted(supported_version))
     if dependency:
         lines.append("dependencies={ " + quoted(FRAMEWORK_NAME) + " }")
     if launcher_path:
@@ -51,7 +60,8 @@ def descriptor(name: str, *, dependency: bool = False, launcher_path: str | None
     return "\n".join(lines) + "\n"
 
 
-def compile_manifest(manifest_path: str | Path, output: str | Path, *, vanilla: str | Path | None = None) -> dict:
+def compile_manifest(manifest_path: str | Path, output: str | Path, *, vanilla: str | Path | None = None,
+                     supported_version: str | None = None) -> dict:
     manifest_path, output = Path(manifest_path), Path(output)
     manifest = load(manifest_path)
     for name in ("psf", manifest["id"]):
@@ -68,8 +78,8 @@ def compile_manifest(manifest_path: str | Path, output: str | Path, *, vanilla: 
         for mod in (framework, content):
             for notice in ("LICENSE", "THIRD_PARTY_NOTICES.md"):
                 write(mod, notice, (Path(__file__).parent / "assets" / notice).read_text(encoding="utf-8"))
-        write(framework, "descriptor.mod", descriptor(FRAMEWORK_NAME))
-        write(staging, "psf.mod", descriptor(FRAMEWORK_NAME, launcher_path="mod/psf"))
+        write(framework, "descriptor.mod", descriptor(FRAMEWORK_NAME, supported_version=supported_version))
+        write(staging, "psf.mod", descriptor(FRAMEWORK_NAME, launcher_path="mod/psf", supported_version=supported_version))
         write(framework, "common/scripted_effects/00_psf_core.txt", runtime.core_effects())
         write(framework, "common/scripted_triggers/00_psf_core.txt", runtime.core_triggers())
         write(framework, "common/dynamic_modifiers/00_psf_legitimacy.txt", """psf_political_legitimacy = {
@@ -79,8 +89,8 @@ def compile_manifest(manifest_path: str | Path, output: str | Path, *, vanilla: 
 }
 """)
         localization.write_localization(framework, "psf_core", localization.core_localization())
-        write(content, "descriptor.mod", descriptor(manifest["name"]["english"], dependency=True))
-        write(staging, manifest["id"] + ".mod", descriptor(manifest["name"]["english"], dependency=True, launcher_path="mod/" + manifest["id"]))
+        write(content, "descriptor.mod", descriptor(manifest["name"]["english"], dependency=True, supported_version=supported_version))
+        write(staging, manifest["id"] + ".mod", descriptor(manifest["name"]["english"], dependency=True, launcher_path="mod/" + manifest["id"], supported_version=supported_version))
         write(staging, "INSTALL.md", f"""# Political Society Framework {__version__}
 
 ## 安装
@@ -94,7 +104,7 @@ def compile_manifest(manifest_path: str | Path, output: str | Path, *, vanilla: 
 在启动器的同一游玩集中同时启用 **{FRAMEWORK_NAME}** 和 **{manifest['name']['english']}**。本版本请开始新战役。
 打开本国政治面板或其他国家的外交面板，即可查看国家总览、政治团体、政治光谱与联盟。选中本国团体后，决议面板提供对应政治行动。
 
-此包按提供的原版界面脚本构建。会同时替换政治、外交或选国界面文件的其他模组需要合并适配。`supported_version=1.*` 是启动器匹配范围，并不代表所有旧版本均已验证。
+此包按提供的原版界面脚本构建。会同时替换政治、外交或选国界面文件的其他模组需要合并适配。原版脚本快照没有提供可核实的游戏版本号；默认省略可选的 `supported_version`，作者可在编译时显式指定本机目标版本。
 已完成 Schema、行为回归、界面结构和真实 cwtools 校验；尚未在实际 HOI4 引擎中运行验收。
 
 ## Installation
@@ -111,7 +121,9 @@ Source and authoring documentation: https://github.com/maxmixalex/HOI4-Political
         triggers = runtime.triggers(manifest)
         write_effect_chunks(content, effects)
         write(content, "common/scripted_effects/11_psf_ai.txt", gameplay.ai_effects(manifest))
-        write(content, "common/scripted_triggers/10_psf_registry.txt", triggers)
+        write_effect_chunks(content, triggers, directory="common/scripted_triggers")
+        write_effect_chunks(content, modifiers.definitions(manifest),
+                            directory="common/modifier_definitions", prefix="psf_organization_modifiers")
         write(content, "common/on_actions/psf_on_actions.txt", gameplay.on_actions(manifest))
         write(content, "common/decisions/categories/psf_categories.txt", gameplay.categories())
         write(content, "common/decisions/psf_society_decisions.txt", gameplay.decisions(manifest))
@@ -119,8 +131,11 @@ Source and authoring documentation: https://github.com/maxmixalex/HOI4-Political
         write(content, "events/psf_events.txt", gameplay.events(manifest))
         write(content, "common/scripted_localisation/psf_events.txt", localization.dynamic_localization(manifest))
         localization.write_localization(content, "psf_content", localization.content_localization(manifest))
+        localization.write_localization(content, "psf_modifiers", modifiers.localizations(manifest))
         from .ui import generate_ui
         ui = generate_ui(manifest, content, Path(vanilla) if vanilla else None)
+        bookmark_report = bookmarks.generate_bookmark_previews(
+            manifest, content, Path(vanilla).parent if vanilla else None)
         registry = {
             "schema_version": "1.0", "compiler_version": __version__, "content_id": manifest["id"],
             "axes": [a["id"] for a in manifest["axes"]],
@@ -130,6 +145,7 @@ Source and authoring documentation: https://github.com/maxmixalex/HOI4-Political
             "alliances": {a["id"]: {"numeric_id": a["_index"], "profile": p["id"]} for p in profiles(manifest) for a in p["alliances"]},
             "regimes": {r["id"]: r["_index"] for r in manifest["regimes"]},
             "ideologies": {i["id"]: i["_index"] for i in manifest["ideologies"]},
+            "modifiers": modifiers.registry(manifest),
             "effects": sorted(set(re.findall(r"^(psf_[a-zA-Z0-9_]+) =", effects + "\n" + runtime.core_effects(), re.M))),
             "triggers": sorted(set(re.findall(r"^(psf_[a-zA-Z0-9_]+) =", triggers + "\n" + runtime.core_triggers(), re.M))),
         }
@@ -138,11 +154,15 @@ Source and authoring documentation: https://github.com/maxmixalex/HOI4-Political
         for path in sorted(staging.rglob("*")):
             if path.is_file():
                 files[path.relative_to(staging).as_posix()] = hashlib.sha256(path.read_bytes()).hexdigest()
-        summary = {"compiler_version": __version__, "manifest_sha256": hashlib.sha256(manifest_path.read_bytes()).hexdigest(),
+        summary = {"compiler_version": __version__, "supported_version": supported_version,
+                   "manifest_sha256": hashlib.sha256(manifest_path.read_bytes()).hexdigest(),
                    "content_id": manifest["id"], "counts": {"axes": len(manifest["axes"]), "ideologies": len(manifest["ideologies"]), "regimes": len(manifest["regimes"]),
                    "country_profiles": len(manifest["profiles"]), "fallback_profiles": len(manifest["fallback_profiles"]), "groups": len(registry["groups"]),
-                   "alliances": len(registry["alliances"]), "scenarios": len(manifest["scenarios"]), "effects": len(registry["effects"]), "triggers": len(registry["triggers"])},
-                   "files": files, "ui": ui}
+                   "alliances": len(registry["alliances"]), "scenarios": len(manifest["scenarios"]),
+                   "named_modifiers": len(manifest.get("modifiers", [])),
+                   "native_modifiers": len(registry["groups"]) * (3 + len(manifest["axes"])) * 3,
+                   "effects": len(registry["effects"]), "triggers": len(registry["triggers"])},
+                   "files": files, "ui": ui, "bookmarks": bookmark_report}
         write(staging, "build-manifest.json", json.dumps(summary, ensure_ascii=False, indent=2, sort_keys=True) + "\n")
         for source in staging.iterdir():
             destination = output / source.name

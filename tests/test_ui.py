@@ -10,6 +10,7 @@ import tempfile
 import unittest
 
 from psf.ui import ASSETS, generate_ui, gui_nodes, patch_native
+from psf import charts
 
 
 def fixture():
@@ -33,8 +34,8 @@ class UIContractTests(unittest.TestCase):
         cls.temp = tempfile.TemporaryDirectory()
         cls.root = Path(cls.temp.name)
         cls.metadata = generate_ui(fixture(), cls.root)
-        cls.script = (cls.root / "common/scripted_guis/psf_society.txt").read_text()
-        cls.gui = (cls.root / "interface/psf_society.gui").read_text(encoding="utf-8-sig")
+        cls.script = "\n".join(p.read_text() for p in sorted((cls.root / "common/scripted_guis").glob("psf_society*.txt")))
+        cls.gui = "\n".join(p.read_text(encoding="utf-8") for p in sorted((cls.root / "interface").glob("psf_society*.gui")))
 
     @classmethod
     def tearDownClass(cls):
@@ -106,8 +107,8 @@ class UIContractTests(unittest.TestCase):
         self.assertIn("var = psf_governing_alliance value = 9753 compare = equals", combined)
 
     def test_live_axes_and_colliding_positions_remain_clickable(self):
-        self.assertIn("x = psf_g_alpha_position_economy", self.script)
-        self.assertIn("x = psf_g_beta_position_economy", self.script)
+        self.assertIn("x = psf_g_alpha_modified_position_economy", self.script)
+        self.assertIn("x = psf_g_beta_modified_position_economy", self.script)
         nodes = {n.name: n for n in gui_nodes(self.gui) if n.name}
         first = nodes["psf_axis_marker_alpha_economy"]
         second = nodes["psf_axis_marker_beta_economy"]
@@ -117,8 +118,8 @@ class UIContractTests(unittest.TestCase):
         self.assertIn("psf_ui_selection_is_current = yes", self.script)
 
     def test_supplied_icon_overrides_are_used_and_default_art_is_valid(self):
-        self.assertIn('spriteType = "GFX_custom_beta_large"', self.gui)
-        self.assertIn('spriteType = "GFX_custom_beta_small"', self.gui)
+        self.assertRegex(self.gui, r'spriteType\s*=\s*"GFX_custom_beta_large"')
+        self.assertRegex(self.gui, r'spriteType\s*=\s*"GFX_custom_beta_small"')
         for suffix, size in (("small", 24), ("large", 64)):
             payload = (self.root / f"gfx/interface/psf/alpha_{suffix}.tga").read_bytes()
             self.assertEqual(struct.unpack_from("<HH", payload, 12), (size, size))
@@ -141,6 +142,53 @@ class UIContractTests(unittest.TestCase):
             self.assertIn("psf_g_alpha_effective_influence", text)
             self.assertIn("psf_g_alpha_influence", text)
         self.assertEqual(keys[0], keys[1])
+
+    def test_interface_bytes_and_root_keywords_are_engine_safe(self):
+        for path in (self.root / "interface").iterdir():
+            data = path.read_bytes()
+            self.assertFalse(data.startswith(b"\xef\xbb\xbf"), path.name)
+            expected = b"guiTypes" if path.suffix == ".gui" else b"spriteTypes"
+            self.assertTrue(data.lstrip().startswith(expected), path.name)
+
+    def test_scripted_contexts_own_distinct_windows_and_use_nested_mount_instances(self):
+        windows = re.findall(r"^window_name = (\w+)$", self.script, re.M)
+        self.assertEqual(len(windows), len(set(windows)))
+        for mode in ("political", "diplomatic"):
+            for view in ("summary", "side"):
+                self.assertIn(f"parent_window_name = psf_{mode}_{view}_mount_instance", self.script)
+
+    def test_both_native_summaries_contain_two_complete_live_pies(self):
+        nodes = gui_nodes(self.gui)
+        for mode in ("political", "diplomatic"):
+            for metric in ("support", "influence"):
+                parent = f"psf_{mode}_{metric}_pie"
+                sectors = [n for n in nodes if parent in n.ancestry and n.name.startswith(f"psf_pie_{metric}_")]
+                self.assertEqual(len(sectors), charts.SECTORS)
+                hitbox = next(n for n in nodes if parent in n.ancestry and n.name == f"psf_open_{metric}")
+                self.assertEqual(hitbox.properties["pdx_tooltip"][2], f'"psf_ui_{metric}_chart_tip"')
+                self.assertIn("GFX_pol_piechart_overlay_63x63", hitbox.properties["quadtexturesprite"][2])
+        self.assertIn("frame = psf_pie_support_frames^179", self.script)
+        self.assertIn("frame = psf_pie_influence_frames^179", self.script)
+
+    def test_pie_pixels_cover_the_disk_once_without_rotated_sector_seams(self):
+        occupied = set()
+        center = (charts.SIZE - 1) / 2
+        for pixels in charts.sector_pixels():
+            self.assertTrue(pixels)
+            self.assertFalse(occupied.intersection(pixels))
+            occupied.update(pixels)
+        expected = {(x, y) for x in range(charts.SIZE) for y in range(charts.SIZE)
+                    if (x - center) ** 2 + (y - center) ** 2 <= center ** 2}
+        self.assertEqual(occupied, expected)
+        self.assertNotIn("rotation =", self.gui)
+
+    def test_compact_organization_rows_use_original_game_chrome(self):
+        nodes = gui_nodes(self.gui)
+        row = next(n for n in nodes if n.name == "psf_select_alpha")
+        self.assertEqual(row.properties["quadtexturesprite"][2], '"GFX_tiled_button"')
+        row_size = next(n for n in row.children if n.kind.lower() == "size")
+        self.assertEqual(row_size.properties["y"][2], "44")
+        self.assertFalse((self.root / "gfx/interface/psf/group_row.tga").exists())
 
 
 if __name__ == "__main__":

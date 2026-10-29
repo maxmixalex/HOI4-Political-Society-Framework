@@ -1,0 +1,16 @@
+# Copy these optional examples into the generated vanilla content mod.
+# No idea is granted automatically. All keys are ordinary custom modifiers.
+ideas = {
+    country = {
+        psf_example_union_forum = {
+            allowed = { original_tag = ENG }
+            removal_cost = -1
+            modifier = {
+                psf_eng_tuc_influence_add = 6
+                psf_eng_tuc_support_factor = 0.10
+                psf_eng_tuc_satisfaction_daily = 0.05
+                psf_eng_tuc_position_authority_add = -8
+            }
+        }
+    }
+}

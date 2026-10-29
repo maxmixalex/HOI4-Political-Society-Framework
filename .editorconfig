@@ -1,0 +1,10 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+
+# HOI4's localisation loader requires a BOM; its script/GUI loader does not.
+[**/localisation/**/*.yml]
+charset = utf-8-bom

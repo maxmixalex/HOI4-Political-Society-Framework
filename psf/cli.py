@@ -21,6 +21,7 @@ def main(argv=None) -> int:
     compile_cmd.add_argument("manifest", type=Path)
     compile_cmd.add_argument("--output", type=Path, default=Path("dist"))
     compile_cmd.add_argument("--vanilla", type=Path, help="Optional original game's interface directory for verified native patches")
+    compile_cmd.add_argument("--supported-version", help="Optional verified target version, e.g. 1.19.*; omitted when unknown")
     inspect = commands.add_parser("inspect", help="Inspect stable IDs and authored group positions")
     inspect.add_argument("manifest", type=Path)
     inspect.add_argument("--group")
@@ -33,7 +34,7 @@ def main(argv=None) -> int:
             manifest = load(args.manifest)
             print(f"Valid PSF manifest: {manifest['id']} ({len(profiles(manifest))} profiles, {sum(len(p['groups']) for p in profiles(manifest))} groups)")
         elif args.command == "compile":
-            report = compile_manifest(args.manifest, args.output, vanilla=args.vanilla)
+            report = compile_manifest(args.manifest, args.output, vanilla=args.vanilla, supported_version=args.supported_version)
             print(json.dumps({"output": str(args.output), **report["counts"]}, ensure_ascii=False, indent=2))
         elif args.command == "inspect":
             manifest = load(args.manifest)

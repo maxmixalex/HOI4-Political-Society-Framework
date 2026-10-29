@@ -12,7 +12,7 @@ Compilation validates before emitting into a temporary staging directory. It rep
 
 ## Country state and organization identity
 
-A country receives one profile. Authored country tags have priority, followed by one of four fallback templates selected by initial native ruling ideology. Initialization is guarded by `psf_initialized`; weekly and monthly updates can initialize newly encountered countries without overwriting an already initialized country's state.
+A country receives one profile. Authored country tags have priority, followed by one of four fallback templates selected by initial native ruling ideology. Initialization is guarded by `psf_initialized`; daily, weekly and monthly updates can initialize newly encountered countries without overwriting an already initialized country's state.
 
 Each organization keeps:
 
@@ -20,17 +20,31 @@ Each organization keeps:
 | --- | --- |
 | Identity and localized text | Full name, short name and description |
 | Kind | Party, union, institution, association or another declared kind |
-| Positions | One value for every declared political axis, bounded −100…100 |
+| Positions | Base and modified values for every declared political axis, bounded −100…100 |
 | Derived ideology | Closest authored ideology prototype, recomputed when positions change |
-| Support | Independent public approval, 0…100 |
+| Support | Base and modified independent public approval, 0…100 |
 | Baseline influence | Institutional resources, 0…100 |
-| Effective influence | Baseline influence reduced by current legal access |
-| Satisfaction | Acceptance of the present government, 0…100 |
+| Modified influence | Baseline influence with currently active add/factor modifiers |
+| Effective influence | Modified influence reduced by current legal access |
+| Satisfaction | Base and modified acceptance of the present government, 0…100 |
+| Named modifier sources | Per-group active flag and remaining daily ticks; −1 means permanent |
 | Activity and prohibition | Inactive, legal, underground or suppressed activity; a separate statutory prohibition bit |
 | Electoral eligibility | Whether this organization participates in the abstract ballot |
 | Alliance memberships | Independent membership bits for every alliance in its profile |
 
 An employer association can have low support and high influence. A worker can support a party and a union simultaneously. Therefore support and baseline influence do not form a compulsory national 100% distribution. The national government's displayed support is a relative electoral-party approval indicator; its displayed influence is its share of total effective institutional influence. Neither converts every organization into an exclusive slice of a political pie.
+
+### Attribute modifiers and daily updates
+
+Each group receives native custom modifier definitions for `add`, `factor` and `daily` on its three metrics and all declared axes. The engine combines sources such as national spirits and traits; PSF reads the resulting values using `modifier@token`. Named sources in the manifest provide a separate persistent, individually removable layer without occupying the national-spirit display.
+
+On refresh, the runtime derives `modified = clamp((base + sum(add)) * max(0, 1 + sum(factor)), bounds)`. It never subtracts a previously clamped bonus from the base on expiration. All political classification, influence aggregation, ballot weighting and threshold APIs read the derived values. Explicit score and axis effects write the base. Daily drift writes the base and remains after a source ends. Inactive groups do not accumulate drift; their timed agreements still expire with the calendar.
+
+The country-scoped `on_daily` calls `psf_daily_modifiers` once. In bidirectional bridge mode this first captures genuine native support changes, then applies daily drift and expiration, refreshes derived state and exports/captures the new projection. Native support deltas account for active support factors, so reading back the projection does not amplify its own changes. The supplied hook does not nest `every_country` inside the per-country update.
+
+Repeated application of the same `(group, modifier)` refreshes its duration. Different source IDs stack additively in their add and factor channels. Permanent sources end only when explicitly removed. Full API and lifecycle examples are in [MODIFIERS](MODIFIERS.md).
+
+The support pie normalizes the modified support of active electoral organizations only, so overlapping party and union support does not manufacture additional votes. The influence pie includes all active groups, using their status-adjusted effective influence. Both cache 180 sector frames after a model refresh and use the same group colors as the list and spectrum.
 
 ### Stable identifiers
 
@@ -159,7 +173,9 @@ An external `set_politics` operation also cannot describe a same-category switch
 
 ## UI integration and compatibility
 
-The native patcher preserves named widget identities and ancestry, moves only obsolete political widgets off-screen, and adds PSF summary/sidebar mounts. It fails when the expected native structure is absent. The global political-chart sprite is not replaced because other game interfaces use it for unrelated distributions.
+The native patcher preserves named widget identities and ancestry, moves only obsolete political widgets off-screen, and adds PSF summary/sidebar mounts. It fails when the expected native structure is absent. Nested mounts are referenced with their engine `_instance` suffix and each scripted context has its own root window. The global political-chart sprite is not replaced because other game interfaces use it for unrelated distributions.
+
+The front-end adapter separately wraps native bookmark `history` localization for declared country profiles. It renders immutable starting snapshots using the bookmark's actual date and the same starting overrides, while preserving original historical text through `$original_key$`. It does not apply campaign on-actions before a game exists. The map-side hardcoded four-ideology widget has no demonstrated arbitrary-group data binding; the starting-snapshot previews are in the native important-country history panel.
 
 The three complete native `.gui` overrides conflict with other mods replacing those files. A compatibility patch must merge the intended trees; load order alone chooses a winner and cannot merge both layouts. A supplied interface directory can be used as the patch source when its required structure is compatible. The lobby has no initialized campaign state, so it shows a static PSF notice rather than a fabricated live society model. See [UI.md](UI.md).
 
