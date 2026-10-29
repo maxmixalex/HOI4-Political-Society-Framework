@@ -1,0 +1,13 @@
+--- upstream/Config/interface/gfx.cwt
++++ vendor/rules/interface/gfx.cwt
+@@ -1,8 +1,9 @@
+ types = {
++	## type_key_filter = { spriteType frameAnimatedSpriteType corneredTileSpriteType maskedShieldType textSpriteType progressbartype pieChartType circularProgressBarType LineChartType }
+ 	type[spriteType] = {
+ 		path = "game/interface"
+ 
+-		skip_root_key = spriteTypes
++		skip_root_key = any
+ 		path_extension = .gfx
+ 		name_field = "name"
+ 		## type_key_filter = spriteType

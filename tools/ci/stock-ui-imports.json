@@ -1,0 +1,1805 @@
+{
+  "format_version": 1,
+  "purpose": "Exact imported stock GUI localisation references omitted from the supplied script-only vanilla archive. Declaration of external dependencies, not validation of the original translation files. Never shipped in either mod.",
+  "source_files": {
+    "interface/countrypoliticsview.gui": "811051a83ef087b87be4de9b226fb831f6d6d8f20cd440371619501b5710c183",
+    "interface/countrydiplomacyview.gui": "b6e085a7322a723ddff6566e172be77326ababcf95496034b0bd970767e5ea4c",
+    "interface/frontendgamesetupview.gui": "829f1bb6002021dbe644706a30a31470c680e4fa5087f1c5b5c6ad762cce4494"
+  },
+  "localisation_keys": {
+    "ACTIVE_THREATS": [
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 2045,
+        "field": "text"
+      }
+    ],
+    "AIR_VOLUNTEERS": [
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 2974,
+        "field": "text"
+      }
+    ],
+    "BACK": [
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 2700,
+        "field": "buttonText"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 3038,
+        "field": "buttonText"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 3124,
+        "field": "buttonText"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 3255,
+        "field": "buttonText"
+      },
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 520,
+        "field": "buttonText"
+      },
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 616,
+        "field": "buttonText"
+      },
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 666,
+        "field": "buttonText"
+      }
+    ],
+    "BM_HISTORY_TITLE": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 586,
+        "field": "text"
+      }
+    ],
+    "CLOSE": [
+      {
+        "file": "interface/countrypoliticsview.gui",
+        "line": 637,
+        "field": "pdx_tooltip"
+      },
+      {
+        "file": "interface/countrypoliticsview.gui",
+        "line": 864,
+        "field": "pdx_tooltip"
+      },
+      {
+        "file": "interface/countrypoliticsview.gui",
+        "line": 1225,
+        "field": "pdx_tooltip"
+      },
+      {
+        "file": "interface/countrypoliticsview.gui",
+        "line": 1410,
+        "field": "pdx_tooltip"
+      },
+      {
+        "file": "interface/countrypoliticsview.gui",
+        "line": 1745,
+        "field": "pdx_tooltip"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 918,
+        "field": "pdx_tooltip"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 3885,
+        "field": "pdx_tooltip"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 3968,
+        "field": "pdx_tooltip"
+      }
+    ],
+    "COUNTRYLIST_LABEL": [
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 848,
+        "field": "text"
+      }
+    ],
+    "COUP_START_STATE": [
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 1711,
+        "field": "text"
+      }
+    ],
+    "CREATE_FACTION": [
+      {
+        "file": "interface/countrypoliticsview.gui",
+        "line": 151,
+        "field": "text"
+      }
+    ],
+    "CUSTOM_GAME_RULES_TITLE": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 1436,
+        "field": "text"
+      }
+    ],
+    "CUSTOM_GAME_SETTINGS_LOAD": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 1497,
+        "field": "buttonText"
+      }
+    ],
+    "CUSTOM_GAME_SETTINGS_REVERT": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 1487,
+        "field": "buttonText"
+      }
+    ],
+    "CUSTOM_GAME_SETTINGS_SAVE": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 1507,
+        "field": "buttonText"
+      }
+    ],
+    "DIPLOMACY_CALL_ALL_ALLIES": [
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 1479,
+        "field": "text"
+      }
+    ],
+    "DIPLOMACY_CANCEL": [
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 1221,
+        "field": "buttonText"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 1222,
+        "field": "pdx_tooltip"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 1305,
+        "field": "buttonText"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 1306,
+        "field": "pdx_tooltip"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 1505,
+        "field": "buttonText"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 1506,
+        "field": "pdx_tooltip"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 1643,
+        "field": "buttonText"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 1644,
+        "field": "pdx_tooltip"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 1778,
+        "field": "buttonText"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 1779,
+        "field": "pdx_tooltip"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 1971,
+        "field": "buttonText"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 1972,
+        "field": "pdx_tooltip"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 2069,
+        "field": "buttonText"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 2070,
+        "field": "pdx_tooltip"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 2126,
+        "field": "buttonText"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 2127,
+        "field": "pdx_tooltip"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 2227,
+        "field": "buttonText"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 2228,
+        "field": "pdx_tooltip"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 2372,
+        "field": "buttonText"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 2373,
+        "field": "pdx_tooltip"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 2570,
+        "field": "buttonText"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 2571,
+        "field": "pdx_tooltip"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 2805,
+        "field": "buttonText"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 2806,
+        "field": "pdx_tooltip"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 2919,
+        "field": "buttonText"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 2920,
+        "field": "pdx_tooltip"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 3339,
+        "field": "buttonText"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 3340,
+        "field": "pdx_tooltip"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 3423,
+        "field": "buttonText"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 3424,
+        "field": "pdx_tooltip"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 3629,
+        "field": "buttonText"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 3630,
+        "field": "pdx_tooltip"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 4125,
+        "field": "pdx_tooltip"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 4329,
+        "field": "pdx_tooltip"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 4388,
+        "field": "pdx_tooltip"
+      }
+    ],
+    "DIPLOMACY_DIPLOMACY": [
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 794,
+        "field": "text"
+      }
+    ],
+    "DIPLOMACY_INFO_TAB": [
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 212,
+        "field": "buttonText"
+      }
+    ],
+    "DIPLOMACY_INTELLIGENCE": [
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 523,
+        "field": "text"
+      }
+    ],
+    "DIPLOMACY_LEND_LEASE_CANCEL": [
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 4116,
+        "field": "text"
+      }
+    ],
+    "DIPLOMACY_LEND_LEASE_HEADER_EQUIPMENT": [
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 3841,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 3934,
+        "field": "text"
+      }
+    ],
+    "DIPLOMACY_LEND_LEASE_HEADER_IN_STORAGE": [
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 3851,
+        "field": "text"
+      }
+    ],
+    "DIPLOMACY_LEND_LEASE_HEADER_PRODUCING": [
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 3861,
+        "field": "text"
+      }
+    ],
+    "DIPLOMACY_LEND_LEASE_NO_EQUIPMENT_CATEGORY": [
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 3871,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 3954,
+        "field": "text"
+      }
+    ],
+    "DIPLOMACY_LEND_LEASE_NUMBER": [
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 4030,
+        "field": "buttonText"
+      }
+    ],
+    "DIPLOMACY_LEND_LEASE_ONCE": [
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 4055,
+        "field": "buttonText"
+      }
+    ],
+    "DIPLOMACY_LEND_LEASE_ONCE_TOOLTIP": [
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 4057,
+        "field": "pdx_tooltip"
+      }
+    ],
+    "DIPLOMACY_LEND_LEASE_PERCENT": [
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 4039,
+        "field": "buttonText"
+      }
+    ],
+    "DIPLOMACY_LEND_LEASE_PRODUCTION": [
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 3944,
+        "field": "text"
+      }
+    ],
+    "DIPLOMACY_NO_WARGOAL": [
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 1451,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 1616,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 1932,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 1944,
+        "field": "text"
+      }
+    ],
+    "DIPLOMACY_RELATIONS_TAB": [
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 204,
+        "field": "buttonText"
+      }
+    ],
+    "DIPLOMACY_SEND": [
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 1208,
+        "field": "buttonText"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 1209,
+        "field": "pdx_tooltip"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 1292,
+        "field": "buttonText"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 1293,
+        "field": "pdx_tooltip"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 1492,
+        "field": "buttonText"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 1493,
+        "field": "pdx_tooltip"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 1630,
+        "field": "buttonText"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 1631,
+        "field": "pdx_tooltip"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 1766,
+        "field": "buttonText"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 1958,
+        "field": "buttonText"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 1959,
+        "field": "pdx_tooltip"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 2057,
+        "field": "buttonText"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 2058,
+        "field": "pdx_tooltip"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 2114,
+        "field": "buttonText"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 2115,
+        "field": "pdx_tooltip"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 2214,
+        "field": "buttonText"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 2215,
+        "field": "pdx_tooltip"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 2359,
+        "field": "buttonText"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 2360,
+        "field": "pdx_tooltip"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 2557,
+        "field": "buttonText"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 2558,
+        "field": "pdx_tooltip"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 2688,
+        "field": "buttonText"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 2792,
+        "field": "buttonText"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 2793,
+        "field": "pdx_tooltip"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 2906,
+        "field": "buttonText"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 2907,
+        "field": "pdx_tooltip"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 3026,
+        "field": "buttonText"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 3112,
+        "field": "buttonText"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 3243,
+        "field": "buttonText"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 3327,
+        "field": "buttonText"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 3411,
+        "field": "buttonText"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 3617,
+        "field": "buttonText"
+      }
+    ],
+    "DIPLOMACY_SHOW_ACTIVE_LICENSES": [
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 3485,
+        "field": "text"
+      }
+    ],
+    "DIPLOMACY_SHOW_AVAILABLE_LICENSES": [
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 3514,
+        "field": "text"
+      }
+    ],
+    "ELECTIONS": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 827,
+        "field": "text"
+      }
+    ],
+    "EQUIPMENT_NAVAL": [
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 3551,
+        "field": "pdx_tooltip"
+      }
+    ],
+    "ESTIMATED_AIR_FORCES": [
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 585,
+        "field": "pdx_tooltip"
+      }
+    ],
+    "ESTIMATED_CIVIL_INDUSTRY": [
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 608,
+        "field": "pdx_tooltip"
+      }
+    ],
+    "ESTIMATED_CONVOYS_ICON": [
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 677,
+        "field": "pdx_tooltip"
+      }
+    ],
+    "ESTIMATED_MANPOWER": [
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 700,
+        "field": "pdx_tooltip"
+      }
+    ],
+    "ESTIMATED_MILITARY_FORCES": [
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 539,
+        "field": "pdx_tooltip"
+      }
+    ],
+    "ESTIMATED_MIL_INDUSTRY": [
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 631,
+        "field": "pdx_tooltip"
+      }
+    ],
+    "ESTIMATED_NAVAL_INDUSTRY": [
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 654,
+        "field": "pdx_tooltip"
+      }
+    ],
+    "ESTIMATED_NAVY_FORCES": [
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 562,
+        "field": "pdx_tooltip"
+      }
+    ],
+    "FE_BOOKMARK_DATE": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 36,
+        "field": "text"
+      }
+    ],
+    "FE_CHANGE_SCENARIO": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 2083,
+        "field": "buttonText"
+      }
+    ],
+    "FE_COOP_LABEL": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 1247,
+        "field": "text"
+      }
+    ],
+    "FE_COOP_TOOLTIP": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 1248,
+        "field": "pdx_tooltip"
+      }
+    ],
+    "FE_COUNTRY_HISTORY_TITLE": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 935,
+        "field": "text"
+      }
+    ],
+    "FE_COUNTRY_INFO_TITLE": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 751,
+        "field": "text"
+      }
+    ],
+    "FE_COUNTRY_SPIRIT": [
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 420,
+        "field": "text"
+      }
+    ],
+    "FE_CUSTOM_DIFFUCULTY": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 1813,
+        "field": "pdx_tooltip"
+      }
+    ],
+    "FE_DIFFICULTY": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 1835,
+        "field": "text"
+      }
+    ],
+    "FE_DIFFICULTY_CUSTOM_BTN": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 1823,
+        "field": "text"
+      }
+    ],
+    "FE_DIFFICULTY_EASY": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 1843,
+        "field": "buttonText"
+      },
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 1852,
+        "field": "buttonText"
+      },
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 1903,
+        "field": "text"
+      }
+    ],
+    "FE_DIFFICULTY_HARD": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 1870,
+        "field": "buttonText"
+      },
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 1927,
+        "field": "text"
+      }
+    ],
+    "FE_DIFFICULTY_NORMAL": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 1862,
+        "field": "buttonText"
+      },
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 1915,
+        "field": "text"
+      }
+    ],
+    "FE_DIFFICULTY_VERY_EASY": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 1891,
+        "field": "text"
+      }
+    ],
+    "FE_DIFFICULTY_VERY_HARD": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 1879,
+        "field": "buttonText"
+      },
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 1939,
+        "field": "text"
+      }
+    ],
+    "FE_HISTORICAL": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 1969,
+        "field": "text"
+      }
+    ],
+    "FE_HISTORICAL_TOOLTIP": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 1970,
+        "field": "pdx_tooltip"
+      }
+    ],
+    "FE_HOTJOIN_LABEL": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 1229,
+        "field": "text"
+      }
+    ],
+    "FE_HOTJOIN_TOOLTIP": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 1230,
+        "field": "pdx_tooltip"
+      }
+    ],
+    "FE_INTERESTING_COUNTRIES": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 817,
+        "field": "text"
+      },
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 2139,
+        "field": "buttonText"
+      }
+    ],
+    "FE_INTERESTING_MAJORS": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 1314,
+        "field": "text"
+      }
+    ],
+    "FE_INTERESTING_MAJORS_TOOLTIP": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 1315,
+        "field": "pdx_tooltip"
+      }
+    ],
+    "FE_INTERESTING_MINORS": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 1333,
+        "field": "text"
+      }
+    ],
+    "FE_INTERESTING_MINORS_TOOLTIP": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 1334,
+        "field": "pdx_tooltip"
+      }
+    ],
+    "FE_IRONMAN": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 1950,
+        "field": "text"
+      }
+    ],
+    "FE_IRONMAN_TOOLTIP": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 1951,
+        "field": "pdx_tooltip"
+      }
+    ],
+    "FE_LOADING_HISTORY": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 2005,
+        "field": "text"
+      }
+    ],
+    "FE_NO_COUNTRY_SELECTED": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 2205,
+        "field": "text"
+      }
+    ],
+    "FE_OTHER_COUNTRIES": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 1352,
+        "field": "text"
+      }
+    ],
+    "FE_OTHER_COUNTRIES_TOOLTIP": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 1353,
+        "field": "pdx_tooltip"
+      }
+    ],
+    "FE_RANDOMIZE_COUNTRY": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 2151,
+        "field": "buttonText"
+      }
+    ],
+    "FE_SELECT_COUNTRY": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 651,
+        "field": "text"
+      },
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 678,
+        "field": "buttonText"
+      }
+    ],
+    "FE_SELECT_SCENARIO": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 554,
+        "field": "text"
+      },
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 628,
+        "field": "buttonText"
+      }
+    ],
+    "FE_START": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 2288,
+        "field": "buttonText"
+      }
+    ],
+    "FILTER": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 236,
+        "field": "buttonText"
+      }
+    ],
+    "GIE_PLAYER_CONTROLLED": [
+      {
+        "file": "interface/countrypoliticsview.gui",
+        "line": 1599,
+        "field": "pdx_tooltip"
+      }
+    ],
+    "GOVERNMENT": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 807,
+        "field": "text"
+      },
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 1146,
+        "field": "text"
+      }
+    ],
+    "Germanian": [
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 59,
+        "field": "text"
+      }
+    ],
+    "Government": [
+      {
+        "file": "interface/countrypoliticsview.gui",
+        "line": 761,
+        "field": "text"
+      }
+    ],
+    "HOST_PREPARING_GAME": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 1011,
+        "field": "text"
+      }
+    ],
+    "IDEA_SUB_CATEGORY_LIMIT": [
+      {
+        "file": "interface/countrypoliticsview.gui",
+        "line": 897,
+        "field": "text"
+      }
+    ],
+    "IDEOLOGY": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 788,
+        "field": "text"
+      },
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 1127,
+        "field": "text"
+      }
+    ],
+    "LEADER": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 766,
+        "field": "text"
+      },
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 1108,
+        "field": "text"
+      }
+    ],
+    "MAIN_MENU_BACK": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 2245,
+        "field": "buttonText"
+      }
+    ],
+    "MANAGE_EXILED_GOVERNMENTS": [
+      {
+        "file": "interface/countrypoliticsview.gui",
+        "line": 719,
+        "field": "text"
+      }
+    ],
+    "MANAGE_EXILES_HEADER": [
+      {
+        "file": "interface/countrypoliticsview.gui",
+        "line": 1419,
+        "field": "text"
+      }
+    ],
+    "MANAGE_OCCUPIED_TERRITORIES": [
+      {
+        "file": "interface/countrypoliticsview.gui",
+        "line": 667,
+        "field": "text"
+      }
+    ],
+    "MANAGE_OCCUPIED_TERRITORIES_HEADER": [
+      {
+        "file": "interface/countrypoliticsview.gui",
+        "line": 1753,
+        "field": "text"
+      }
+    ],
+    "MANAGE_SUBJECTS": [
+      {
+        "file": "interface/countrypoliticsview.gui",
+        "line": 688,
+        "field": "text"
+      }
+    ],
+    "MANAGE_SUBJECTS_HEADER": [
+      {
+        "file": "interface/countrypoliticsview.gui",
+        "line": 1234,
+        "field": "text"
+      }
+    ],
+    "MAPMODE_DEFAULT": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 2096,
+        "field": "pdx_tooltip"
+      },
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 2106,
+        "field": "pdx_tooltip"
+      }
+    ],
+    "MAPMODE_DEFAULT_DESCRIPTION": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 2097,
+        "field": "pdx_tooltip_delayed"
+      },
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 2107,
+        "field": "pdx_tooltip_delayed"
+      }
+    ],
+    "MAPMODE_PLAYERS": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 2119,
+        "field": "pdx_tooltip"
+      },
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 2128,
+        "field": "pdx_tooltip"
+      }
+    ],
+    "MENU_BAR_CLOUDGAMES": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 316,
+        "field": "text"
+      },
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 464,
+        "field": "text"
+      }
+    ],
+    "MENU_BAR_DISK_QUOTA": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 390,
+        "field": "text"
+      }
+    ],
+    "MENU_BAR_IRONMAN_SAVE": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 479,
+        "field": "text"
+      }
+    ],
+    "MENU_BAR_LOAD": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 2257,
+        "field": "buttonText"
+      }
+    ],
+    "MENU_BAR_LOCALGAMES": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 302,
+        "field": "text"
+      },
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 449,
+        "field": "text"
+      }
+    ],
+    "MENU_BAR_SAVE_GAME_FILENAME": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 501,
+        "field": "text"
+      }
+    ],
+    "MENU_BAR_SAVE_PLAY": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 532,
+        "field": "buttonText"
+      }
+    ],
+    "MONTHLY_LL_FREEDOM_VALUE_DESC": [
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 2416,
+        "field": "pdx_tooltip"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 2427,
+        "field": "pdx_tooltip"
+      }
+    ],
+    "Maus": [
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 965,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 1160,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 1170,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 1244,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 1254,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 1347,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 1357,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 1549,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 1559,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 1665,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 1690,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 1701,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 1823,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 1895,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 1993,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 2003,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 2092,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 2102,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 2155,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 2165,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 2644,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 2654,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 2723,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 2733,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 2828,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 2838,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 3146,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 3156,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 3277,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 3293,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 3361,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 3377,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 3558,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 3575,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 4885,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 4978,
+        "field": "text"
+      }
+    ],
+    "OCCUPATION_POLICY": [
+      {
+        "file": "interface/countrypoliticsview.gui",
+        "line": 1847,
+        "field": "text"
+      }
+    ],
+    "OPEN_COUNTRY_LIST": [
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 730,
+        "field": "buttonText"
+      }
+    ],
+    "OPEN_COUNTRY_LOGISTICS": [
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 740,
+        "field": "buttonText"
+      }
+    ],
+    "OPTIONS": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 2269,
+        "field": "buttonText"
+      }
+    ],
+    "PICK_RANDOM_COUNTRY_TITLE": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 1286,
+        "field": "text"
+      }
+    ],
+    "POLITICAL_POLITICAL": [
+      {
+        "file": "interface/countrypoliticsview.gui",
+        "line": 33,
+        "field": "text"
+      }
+    ],
+    "POLITICS_ACTIVE_GOAL": [
+      {
+        "file": "interface/countrypoliticsview.gui",
+        "line": 504,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 325,
+        "field": "text"
+      }
+    ],
+    "POLITICS_NATIONAL_SPIRIT": [
+      {
+        "file": "interface/countrypoliticsview.gui",
+        "line": 535,
+        "field": "text"
+      }
+    ],
+    "POLITICS_NEXTELECTION": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 1167,
+        "field": "text"
+      }
+    ],
+    "POTENTIAL_ENEMIES": [
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 1441,
+        "field": "text"
+      }
+    ],
+    "PRODUCTION_AIR_FILTER": [
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 3543,
+        "field": "pdx_tooltip"
+      }
+    ],
+    "PRODUCTION_ARMOR_FILTER": [
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 3535,
+        "field": "pdx_tooltip"
+      }
+    ],
+    "PRODUCTION_EQUIPMENT_FILTER": [
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 3527,
+        "field": "pdx_tooltip"
+      }
+    ],
+    "Player": [
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 778,
+        "field": "text"
+      }
+    ],
+    "RANDOMIZE_COUNTRY_BACK": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 1376,
+        "field": "buttonText"
+      }
+    ],
+    "RANDOMIZE_COUNTRY_PICK": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 1397,
+        "field": "buttonText"
+      }
+    ],
+    "READY": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 2300,
+        "field": "buttonText"
+      }
+    ],
+    "REINSTATE_EXILE": [
+      {
+        "file": "interface/countrypoliticsview.gui",
+        "line": 1669,
+        "field": "buttonText"
+      }
+    ],
+    "RELEASE": [
+      {
+        "file": "interface/countrypoliticsview.gui",
+        "line": 1803,
+        "field": "buttonText"
+      }
+    ],
+    "REPLYTEXT": [
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 1188,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 1272,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 2014,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 2194,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 2506,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 2773,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 2887,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 3594,
+        "field": "text"
+      }
+    ],
+    "REPLY_NOT_NEEDED": [
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 2308,
+        "field": "text"
+      }
+    ],
+    "RULING_PARTY": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 846,
+        "field": "text"
+      },
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 1188,
+        "field": "text"
+      }
+    ],
+    "SHIFT_CLICK_TO_ADD_ALL": [
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 4138,
+        "field": "pdx_tooltip"
+      }
+    ],
+    "SM_APPLY": [
+      {
+        "file": "interface/frontendgamesetupview.gui",
+        "line": 1477,
+        "field": "buttonText"
+      }
+    ],
+    "THEY_WILL_RECEIVE": [
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 2175,
+        "field": "text"
+      }
+    ],
+    "VIEW_FACTION": [
+      {
+        "file": "interface/countrypoliticsview.gui",
+        "line": 171,
+        "field": "pdx_tooltip"
+      }
+    ],
+    "autonomy": [
+      {
+        "file": "interface/countrypoliticsview.gui",
+        "line": 345,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrypoliticsview.gui",
+        "line": 1289,
+        "field": "text"
+      }
+    ],
+    "category": [
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 1096,
+        "field": "text"
+      }
+    ],
+    "country": [
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 3698,
+        "field": "text"
+      }
+    ],
+    "desc": [
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 4105,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 4308,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 4319,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 4377,
+        "field": "text"
+      }
+    ],
+    "elections": [
+      {
+        "file": "interface/countrypoliticsview.gui",
+        "line": 122,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 294,
+        "field": "text"
+      }
+    ],
+    "faction": [
+      {
+        "file": "interface/countrypoliticsview.gui",
+        "line": 190,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 76,
+        "field": "text"
+      }
+    ],
+    "filter": [
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 3760,
+        "field": "text"
+      }
+    ],
+    "ideology": [
+      {
+        "file": "interface/countrypoliticsview.gui",
+        "line": 113,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 285,
+        "field": "text"
+      }
+    ],
+    "invasion": [
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 3783,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 4545,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 4567,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 4590,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 4613,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 4635,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 4657,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 4679,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 4702,
+        "field": "text"
+      },
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 5036,
+        "field": "text"
+      }
+    ],
+    "leader_name": [
+      {
+        "file": "interface/countrypoliticsview.gui",
+        "line": 588,
+        "field": "text"
+      }
+    ],
+    "name": [
+      {
+        "file": "interface/countrypoliticsview.gui",
+        "line": 1092,
+        "field": "text"
+      }
+    ],
+    "party": [
+      {
+        "file": "interface/countrydiplomacyview.gui",
+        "line": 275,
+        "field": "text"
+      }
+    ]
+  }
+}

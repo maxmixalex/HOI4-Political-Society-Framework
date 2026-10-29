@@ -1,0 +1,10 @@
+--- upstream/Config/common/scripted_effects_locs_and_triggers.cwt
++++ vendor/rules/common/scripted_effects_locs_and_triggers.cwt
+@@ -12,6 +12,7 @@
+ 	type[scripted_loc] = {
+ 		name_field = "name"
+ 		path = "game/common/scripted_loc"
++		path = "game/common/scripted_localisation"
+ 	}
+ }
+ 

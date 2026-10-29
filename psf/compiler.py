@@ -1,0 +1,178 @@
+"""Reproducible framework and dependent content mod builds."""
+from __future__ import annotations
+
+import hashlib
+import json
+import re
+import shutil
+from pathlib import Path
+import tempfile
+import zipfile
+
+from . import __version__
+from . import gameplay, localization, runtime
+from .model import load, profiles
+from .script import quoted
+
+FRAMEWORK_NAME = "Political Society Framework"
+
+
+def write(root: Path, name: str, content: str) -> None:
+    path = root / name
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(content, encoding="utf-8", newline="\n")
+
+
+def write_effect_chunks(root: Path, text: str, max_bytes: int = 900_000) -> None:
+    """Keep whole effects together, below the engine/tool discovery size limit."""
+    matches = list(re.finditer(r"^psf_[a-zA-Z0-9_]+ = \{$", text, re.M))
+    starts = [m.start() for m in matches] + [len(text)]
+    chunk = text[:starts[0]] if matches else text
+    index = 0
+    for begin, end in zip(starts, starts[1:]):
+        effect = text[begin:end]
+        if len(effect.encode()) > max_bytes:
+            raise ValueError("One scripted effect exceeds the safe file size; split the profile into smaller declarations")
+        if chunk and len((chunk + effect).encode()) > max_bytes:
+            write(root, f"common/scripted_effects/10_psf_registry_{index:03}.txt", chunk)
+            chunk = ""
+            index += 1
+        chunk += effect
+    if chunk:
+        write(root, f"common/scripted_effects/10_psf_registry_{index:03}.txt", chunk)
+
+
+def descriptor(name: str, *, dependency: bool = False, launcher_path: str | None = None) -> str:
+    lines = [f"version={quoted(__version__)}", 'tags={ "Gameplay" "Alternative History" }', f"name={quoted(name)}", 'supported_version="1.*"']
+    if dependency:
+        lines.append("dependencies={ " + quoted(FRAMEWORK_NAME) + " }")
+    if launcher_path:
+        lines.append("path=" + quoted(launcher_path))
+    return "\n".join(lines) + "\n"
+
+
+def compile_manifest(manifest_path: str | Path, output: str | Path, *, vanilla: str | Path | None = None) -> dict:
+    manifest_path, output = Path(manifest_path), Path(output)
+    manifest = load(manifest_path)
+    for name in ("psf", manifest["id"]):
+        target = (output / name).resolve()
+        if Path(__file__).resolve().is_relative_to(target) or manifest_path.resolve().is_relative_to(target):
+            raise ValueError(f"Output would overwrite authoring source: {target}; choose a separate build directory")
+    output.mkdir(parents=True, exist_ok=True)
+    # Build outside the destination; validation errors cannot partially replace a
+    # working pack. Only PSF's known output directories are replaced on success.
+    with tempfile.TemporaryDirectory(prefix="psf-build-") as temporary:
+        staging = Path(temporary)
+        framework = staging / "psf"
+        content = staging / manifest["id"]
+        for mod in (framework, content):
+            for notice in ("LICENSE", "THIRD_PARTY_NOTICES.md"):
+                write(mod, notice, (Path(__file__).parent / "assets" / notice).read_text(encoding="utf-8"))
+        write(framework, "descriptor.mod", descriptor(FRAMEWORK_NAME))
+        write(staging, "psf.mod", descriptor(FRAMEWORK_NAME, launcher_path="mod/psf"))
+        write(framework, "common/scripted_effects/00_psf_core.txt", runtime.core_effects())
+        write(framework, "common/scripted_triggers/00_psf_core.txt", runtime.core_triggers())
+        write(framework, "common/dynamic_modifiers/00_psf_legitimacy.txt", """psf_political_legitimacy = {
+    enable = { has_country_flag = psf_initialized }
+    stability_factor = psf_stability_modifier
+    political_power_factor = psf_political_power_modifier
+}
+""")
+        localization.write_localization(framework, "psf_core", localization.core_localization())
+        write(content, "descriptor.mod", descriptor(manifest["name"]["english"], dependency=True))
+        write(staging, manifest["id"] + ".mod", descriptor(manifest["name"]["english"], dependency=True, launcher_path="mod/" + manifest["id"]))
+        write(staging, "INSTALL.md", f"""# Political Society Framework {__version__}
+
+## 安装
+
+将 `psf`、`{manifest['id']}` 两个目录，以及 `psf.mod`、`{manifest['id']}.mod` 两个文件，放入 HOI4 用户资料目录中的 `mod` 文件夹。
+
+- Windows 通常为 `文档/Paradox Interactive/Hearts of Iron IV/mod`。
+- Linux 通常为 `~/.local/share/Paradox Interactive/Hearts of Iron IV/mod`。
+- macOS 通常为 `~/Documents/Paradox Interactive/Hearts of Iron IV/mod`。
+
+在启动器的同一游玩集中同时启用 **{FRAMEWORK_NAME}** 和 **{manifest['name']['english']}**。本版本请开始新战役。
+打开本国政治面板或其他国家的外交面板，即可查看国家总览、政治团体、政治光谱与联盟。选中本国团体后，决议面板提供对应政治行动。
+
+此包按提供的原版界面脚本构建。会同时替换政治、外交或选国界面文件的其他模组需要合并适配。`supported_version=1.*` 是启动器匹配范围，并不代表所有旧版本均已验证。
+已完成 Schema、行为回归、界面结构和真实 cwtools 校验；尚未在实际 HOI4 引擎中运行验收。
+
+## Installation
+
+Copy both mod folders and both `.mod` launcher files to your HOI4 user-data `mod` directory. Enable the framework and the dependent content pack together and start a new campaign.
+Open politics or diplomacy to inspect societies. Select a domestic organization for its actions in the decisions panel.
+The native interface overrides need compatibility work with other UI overhauls. Static/script checks do not replace an in-game launch test.
+
+Source and authoring documentation: https://github.com/maxmixalex/HOI4-Political-Society-Framework
+
+`psf-registry.json` lists the compiled APIs and stable IDs. `build-manifest.json` records generated-file hashes. The per-mod notices retain original-work and third-party attribution.
+""")
+        effects = runtime.effects(manifest)
+        triggers = runtime.triggers(manifest)
+        write_effect_chunks(content, effects)
+        write(content, "common/scripted_effects/11_psf_ai.txt", gameplay.ai_effects(manifest))
+        write(content, "common/scripted_triggers/10_psf_registry.txt", triggers)
+        write(content, "common/on_actions/psf_on_actions.txt", gameplay.on_actions(manifest))
+        write(content, "common/decisions/categories/psf_categories.txt", gameplay.categories())
+        write(content, "common/decisions/psf_society_decisions.txt", gameplay.decisions(manifest))
+        write(content, "common/game_rules/psf_rules.txt", gameplay.rules(manifest))
+        write(content, "events/psf_events.txt", gameplay.events(manifest))
+        write(content, "common/scripted_localisation/psf_events.txt", localization.dynamic_localization(manifest))
+        localization.write_localization(content, "psf_content", localization.content_localization(manifest))
+        from .ui import generate_ui
+        ui = generate_ui(manifest, content, Path(vanilla) if vanilla else None)
+        registry = {
+            "schema_version": "1.0", "compiler_version": __version__, "content_id": manifest["id"],
+            "axes": [a["id"] for a in manifest["axes"]],
+            "groups": {g["id"]: {"numeric_id": g["_index"], "profile": p["id"], "kind": g["kind"],
+                                  "variables": {field: runtime.gv(g["id"], field) for field in ("support", "influence", "effective_influence", "satisfaction", "status", "prohibited", "ideology", "governing", "vote_share")}}
+                       for p in profiles(manifest) for g in p["groups"]},
+            "alliances": {a["id"]: {"numeric_id": a["_index"], "profile": p["id"]} for p in profiles(manifest) for a in p["alliances"]},
+            "regimes": {r["id"]: r["_index"] for r in manifest["regimes"]},
+            "ideologies": {i["id"]: i["_index"] for i in manifest["ideologies"]},
+            "effects": sorted(set(re.findall(r"^(psf_[a-zA-Z0-9_]+) =", effects + "\n" + runtime.core_effects(), re.M))),
+            "triggers": sorted(set(re.findall(r"^(psf_[a-zA-Z0-9_]+) =", triggers + "\n" + runtime.core_triggers(), re.M))),
+        }
+        write(staging, "psf-registry.json", json.dumps(registry, ensure_ascii=False, indent=2) + "\n")
+        files = {}
+        for path in sorted(staging.rglob("*")):
+            if path.is_file():
+                files[path.relative_to(staging).as_posix()] = hashlib.sha256(path.read_bytes()).hexdigest()
+        summary = {"compiler_version": __version__, "manifest_sha256": hashlib.sha256(manifest_path.read_bytes()).hexdigest(),
+                   "content_id": manifest["id"], "counts": {"axes": len(manifest["axes"]), "ideologies": len(manifest["ideologies"]), "regimes": len(manifest["regimes"]),
+                   "country_profiles": len(manifest["profiles"]), "fallback_profiles": len(manifest["fallback_profiles"]), "groups": len(registry["groups"]),
+                   "alliances": len(registry["alliances"]), "scenarios": len(manifest["scenarios"]), "effects": len(registry["effects"]), "triggers": len(registry["triggers"])},
+                   "files": files, "ui": ui}
+        write(staging, "build-manifest.json", json.dumps(summary, ensure_ascii=False, indent=2, sort_keys=True) + "\n")
+        for source in staging.iterdir():
+            destination = output / source.name
+            if destination.exists():
+                if destination.is_dir():
+                    shutil.rmtree(destination)
+                else:
+                    destination.unlink()
+            if source.is_dir():
+                shutil.copytree(source, destination)
+            else:
+                shutil.copy2(source, destination)
+    return summary
+
+
+def pack(output: str | Path, archive: str | Path) -> Path:
+    output, archive = Path(output), Path(archive)
+    manifest = json.loads((output / "build-manifest.json").read_text())
+    archive.parent.mkdir(parents=True, exist_ok=True)
+    expected = manifest["files"]
+    for name, digest in expected.items():
+        path = output / name
+        if not path.resolve().is_relative_to(output.resolve()):
+            raise ValueError(f"Unsafe build-manifest path: {name}")
+        if not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != digest:
+            raise ValueError(f"Build changed after compilation: {name}. Recompile before packaging.")
+    with zipfile.ZipFile(archive, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as z:
+        for name in sorted([*expected, "build-manifest.json"]):
+            info = zipfile.ZipInfo(name, date_time=(2026, 1, 1, 0, 0, 0))
+            info.compress_type = zipfile.ZIP_DEFLATED
+            info.external_attr = 0o644 << 16
+            z.writestr(info, (output / name).read_bytes())
+    return archive

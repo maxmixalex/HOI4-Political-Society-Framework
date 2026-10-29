@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hoi4-psf"
+version = "0.1.0"
+description = "Declarative political society framework and compiler for Hearts of Iron IV"
+requires-python = ">=3.11"
+dependencies = ["jsonschema==4.25.1", "PyYAML==6.0.3"]
+license = "MIT"
+
+[project.scripts]
+psf = "psf.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["psf*"]
+
+[tool.setuptools.package-data]
+psf = ["schemas/*.json", "assets/native_gui/*.gui", "assets/LICENSE", "assets/THIRD_PARTY_NOTICES.md"]

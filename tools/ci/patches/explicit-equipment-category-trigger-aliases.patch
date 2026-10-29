@@ -1,0 +1,86 @@
+--- upstream/Config/triggers.cwt
++++ vendor/rules/triggers.cwt
+@@ -2107,7 +2107,82 @@
+ 
+ ### Check ratio of this type of unit for commander.
+ ## scope = { unit_leader combat }
+-alias[trigger:enum[equipment_category]] = variable_field
++## scope = { unit_leader combat }
++alias[trigger:convoy] = variable_field
++## scope = { unit_leader combat }
++alias[trigger:train] = variable_field
++## scope = { unit_leader combat }
++alias[trigger:floating_harbor] = variable_field
++## scope = { unit_leader combat }
++alias[trigger:railway_gun] = variable_field
++## scope = { unit_leader combat }
++alias[trigger:armor] = variable_field
++## scope = { unit_leader combat }
++alias[trigger:motorized] = variable_field
++## scope = { unit_leader combat }
++alias[trigger:mechanized] = variable_field
++## scope = { unit_leader combat }
++alias[trigger:infantry] = variable_field
++## scope = { unit_leader combat }
++alias[trigger:capital_ship] = variable_field
++## scope = { unit_leader combat }
++alias[trigger:submarine] = variable_field
++## scope = { unit_leader combat }
++alias[trigger:screen_ship] = variable_field
++## scope = { unit_leader combat }
++alias[trigger:fighter] = variable_field
++## scope = { unit_leader combat }
++alias[trigger:heavy_fighter] = variable_field
++## scope = { unit_leader combat }
++alias[trigger:interceptor] = variable_field
++## scope = { unit_leader combat }
++alias[trigger:tactical_bomber] = variable_field
++## scope = { unit_leader combat }
++alias[trigger:strategic_bomber] = variable_field
++## scope = { unit_leader combat }
++alias[trigger:cas] = variable_field
++## scope = { unit_leader combat }
++alias[trigger:naval_bomber] = variable_field
++## scope = { unit_leader combat }
++alias[trigger:missile] = variable_field
++## scope = { unit_leader combat }
++alias[trigger:emplacement_gun_ammo] = variable_field
++## scope = { unit_leader combat }
++alias[trigger:ballistic_missile] = variable_field
++## scope = { unit_leader combat }
++alias[trigger:nuclear_missile] = variable_field
++## scope = { unit_leader combat }
++alias[trigger:sam_missile] = variable_field
++## scope = { unit_leader combat }
++alias[trigger:support_ship] = variable_field
++## scope = { unit_leader combat }
++alias[trigger:suicide] = variable_field
++## scope = { unit_leader combat }
++alias[trigger:scout_plane] = variable_field
++## scope = { unit_leader combat }
++alias[trigger:maritime_patrol_plane] = variable_field
++## scope = { unit_leader combat }
++alias[trigger:air_transport] = variable_field
++## scope = { unit_leader combat }
++alias[trigger:carrier] = variable_field
++## scope = { unit_leader combat }
++alias[trigger:missile_launcher] = variable_field
++## scope = { unit_leader combat }
++alias[trigger:support] = variable_field
++## scope = { unit_leader combat }
++alias[trigger:amphibious] = variable_field
++## scope = { unit_leader combat }
++alias[trigger:anti_air] = variable_field
++## scope = { unit_leader combat }
++alias[trigger:artillery] = variable_field
++## scope = { unit_leader combat }
++alias[trigger:anti_tank] = variable_field
++## scope = { unit_leader combat }
++alias[trigger:rocket] = variable_field
++## scope = { unit_leader combat }
++alias[trigger:flame] = variable_field
++## scope = { unit_leader combat }
++alias[trigger:land_cruiser] = variable_field
+ 
+ ### Trigger not shown in tooltips.
+ ## scope = any

@@ -1,0 +1,393 @@
+{
+  "schema_version": "1.0",
+  "id": "psf_minimal",
+  "name": {
+    "english": "PSF Minimal Example",
+    "simp_chinese": "PSF 最小示例"
+  },
+  "axes": [
+    {
+      "id": "economy",
+      "name": {
+        "english": "Economic organization",
+        "simp_chinese": "经济组织"
+      },
+      "description": {
+        "english": "Ownership and allocation preference.",
+        "simp_chinese": "所有制与资源配置倾向。"
+      },
+      "left": {
+        "english": "Collective ownership",
+        "simp_chinese": "集体所有"
+      },
+      "right": {
+        "english": "Private enterprise",
+        "simp_chinese": "私营经济"
+      },
+      "weight": 1
+    },
+    {
+      "id": "authority",
+      "name": {
+        "english": "Political authority",
+        "simp_chinese": "政治权力"
+      },
+      "description": {
+        "english": "Distribution of political power.",
+        "simp_chinese": "政治权力的分配方式。"
+      },
+      "left": {
+        "english": "Distributed",
+        "simp_chinese": "分散"
+      },
+      "right": {
+        "english": "Concentrated",
+        "simp_chinese": "集中"
+      },
+      "weight": 1
+    }
+  ],
+  "ideologies": [
+    {
+      "id": "example_democratic",
+      "name": {
+        "english": "Democratic",
+        "simp_chinese": "民主"
+      },
+      "description": {
+        "english": "A deliberately simple two-axis compatibility prototype.",
+        "simp_chinese": "用于演示的简化双维度兼容原型。"
+      },
+      "positions": {
+        "economy": 50,
+        "authority": -60
+      },
+      "engine_ideology": "democratic"
+    },
+    {
+      "id": "example_fascism",
+      "name": {
+        "english": "Fascism",
+        "simp_chinese": "法西斯"
+      },
+      "description": {
+        "english": "A deliberately simple two-axis compatibility prototype.",
+        "simp_chinese": "用于演示的简化双维度兼容原型。"
+      },
+      "positions": {
+        "economy": 30,
+        "authority": 90
+      },
+      "engine_ideology": "fascism"
+    },
+    {
+      "id": "example_communism",
+      "name": {
+        "english": "Communism",
+        "simp_chinese": "共产主义"
+      },
+      "description": {
+        "english": "A deliberately simple two-axis compatibility prototype.",
+        "simp_chinese": "用于演示的简化双维度兼容原型。"
+      },
+      "positions": {
+        "economy": -90,
+        "authority": 80
+      },
+      "engine_ideology": "communism"
+    },
+    {
+      "id": "example_neutrality",
+      "name": {
+        "english": "Neutrality",
+        "simp_chinese": "非结盟"
+      },
+      "description": {
+        "english": "A deliberately simple two-axis compatibility prototype.",
+        "simp_chinese": "用于演示的简化双维度兼容原型。"
+      },
+      "positions": {
+        "economy": 20,
+        "authority": 55
+      },
+      "engine_ideology": "neutrality"
+    }
+  ],
+  "regimes": [
+    {
+      "id": "institutions_democratic",
+      "name": {
+        "english": "Democratic institutions",
+        "simp_chinese": "民主制度"
+      },
+      "description": {
+        "english": "Institutional authority follows this example prototype.",
+        "simp_chinese": "本示例制度的权力结构与对应原型一致。"
+      },
+      "positions": {
+        "authority": -60
+      },
+      "elections": true
+    },
+    {
+      "id": "institutions_fascism",
+      "name": {
+        "english": "Fascism institutions",
+        "simp_chinese": "法西斯制度"
+      },
+      "description": {
+        "english": "Institutional authority follows this example prototype.",
+        "simp_chinese": "本示例制度的权力结构与对应原型一致。"
+      },
+      "positions": {
+        "authority": 90
+      },
+      "elections": false
+    },
+    {
+      "id": "institutions_communism",
+      "name": {
+        "english": "Communism institutions",
+        "simp_chinese": "共产主义制度"
+      },
+      "description": {
+        "english": "Institutional authority follows this example prototype.",
+        "simp_chinese": "本示例制度的权力结构与对应原型一致。"
+      },
+      "positions": {
+        "authority": 80
+      },
+      "elections": false
+    },
+    {
+      "id": "institutions_neutrality",
+      "name": {
+        "english": "Neutrality institutions",
+        "simp_chinese": "非结盟制度"
+      },
+      "description": {
+        "english": "Institutional authority follows this example prototype.",
+        "simp_chinese": "本示例制度的权力结构与对应原型一致。"
+      },
+      "positions": {
+        "authority": 55
+      },
+      "elections": false
+    }
+  ],
+  "profiles": [],
+  "fallback_profiles": [
+    {
+      "id": "minimal_democratic",
+      "engine_ideology": "democratic",
+      "regime": "institutions_democratic",
+      "legitimacy": 60,
+      "groups": [
+        {
+          "id": "minimal_democratic_party",
+          "kind": "party",
+          "name": {
+            "english": "Democratic example party",
+            "simp_chinese": "民主示例党"
+          },
+          "short_name": {
+            "english": "Example party",
+            "simp_chinese": "示例党"
+          },
+          "description": {
+            "english": "Replace this abstract organization with your own content.",
+            "simp_chinese": "可将此抽象组织替换为自己的内容。"
+          },
+          "positions": {
+            "economy": 50,
+            "authority": -60
+          },
+          "support": 60,
+          "influence": 70,
+          "satisfaction": 70,
+          "status": "legal",
+          "electoral": true,
+          "icon": "party"
+        }
+      ],
+      "alliances": [
+        {
+          "id": "minimal_democratic_cabinet",
+          "name": {
+            "english": "Governing agreement",
+            "simp_chinese": "执政协议"
+          },
+          "description": {
+            "english": "An example governing agreement.",
+            "simp_chinese": "示例执政协议。"
+          },
+          "kind": "government",
+          "members": [
+            "minimal_democratic_party"
+          ],
+          "cohesion": 70
+        }
+      ]
+    },
+    {
+      "id": "minimal_fascism",
+      "engine_ideology": "fascism",
+      "regime": "institutions_fascism",
+      "legitimacy": 60,
+      "groups": [
+        {
+          "id": "minimal_fascism_party",
+          "kind": "party",
+          "name": {
+            "english": "Fascism example party",
+            "simp_chinese": "法西斯示例党"
+          },
+          "short_name": {
+            "english": "Example party",
+            "simp_chinese": "示例党"
+          },
+          "description": {
+            "english": "Replace this abstract organization with your own content.",
+            "simp_chinese": "可将此抽象组织替换为自己的内容。"
+          },
+          "positions": {
+            "economy": 30,
+            "authority": 90
+          },
+          "support": 60,
+          "influence": 70,
+          "satisfaction": 70,
+          "status": "legal",
+          "electoral": true,
+          "icon": "party"
+        }
+      ],
+      "alliances": [
+        {
+          "id": "minimal_fascism_cabinet",
+          "name": {
+            "english": "Governing agreement",
+            "simp_chinese": "执政协议"
+          },
+          "description": {
+            "english": "An example governing agreement.",
+            "simp_chinese": "示例执政协议。"
+          },
+          "kind": "government",
+          "members": [
+            "minimal_fascism_party"
+          ],
+          "cohesion": 70
+        }
+      ]
+    },
+    {
+      "id": "minimal_communism",
+      "engine_ideology": "communism",
+      "regime": "institutions_communism",
+      "legitimacy": 60,
+      "groups": [
+        {
+          "id": "minimal_communism_party",
+          "kind": "party",
+          "name": {
+            "english": "Communism example party",
+            "simp_chinese": "共产主义示例党"
+          },
+          "short_name": {
+            "english": "Example party",
+            "simp_chinese": "示例党"
+          },
+          "description": {
+            "english": "Replace this abstract organization with your own content.",
+            "simp_chinese": "可将此抽象组织替换为自己的内容。"
+          },
+          "positions": {
+            "economy": -90,
+            "authority": 80
+          },
+          "support": 60,
+          "influence": 70,
+          "satisfaction": 70,
+          "status": "legal",
+          "electoral": true,
+          "icon": "party"
+        }
+      ],
+      "alliances": [
+        {
+          "id": "minimal_communism_cabinet",
+          "name": {
+            "english": "Governing agreement",
+            "simp_chinese": "执政协议"
+          },
+          "description": {
+            "english": "An example governing agreement.",
+            "simp_chinese": "示例执政协议。"
+          },
+          "kind": "government",
+          "members": [
+            "minimal_communism_party"
+          ],
+          "cohesion": 70
+        }
+      ]
+    },
+    {
+      "id": "minimal_neutrality",
+      "engine_ideology": "neutrality",
+      "regime": "institutions_neutrality",
+      "legitimacy": 60,
+      "groups": [
+        {
+          "id": "minimal_neutrality_party",
+          "kind": "party",
+          "name": {
+            "english": "Neutrality example party",
+            "simp_chinese": "非结盟示例党"
+          },
+          "short_name": {
+            "english": "Example party",
+            "simp_chinese": "示例党"
+          },
+          "description": {
+            "english": "Replace this abstract organization with your own content.",
+            "simp_chinese": "可将此抽象组织替换为自己的内容。"
+          },
+          "positions": {
+            "economy": 20,
+            "authority": 55
+          },
+          "support": 60,
+          "influence": 70,
+          "satisfaction": 70,
+          "status": "legal",
+          "electoral": true,
+          "icon": "party"
+        }
+      ],
+      "alliances": [
+        {
+          "id": "minimal_neutrality_cabinet",
+          "name": {
+            "english": "Governing agreement",
+            "simp_chinese": "执政协议"
+          },
+          "description": {
+            "english": "An example governing agreement.",
+            "simp_chinese": "示例执政协议。"
+          },
+          "kind": "government",
+          "members": [
+            "minimal_neutrality_party"
+          ],
+          "cohesion": 70
+        }
+      ]
+    }
+  ],
+  "scenarios": [],
+  "settings": {
+    "scenarios_enabled": false
+  }
+}

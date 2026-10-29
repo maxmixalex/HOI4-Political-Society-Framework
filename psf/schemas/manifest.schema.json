@@ -1,0 +1,738 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/maxmixalex/HOI4-Political-Society-Framework/schema/psf.schema.json",
+  "title": "Political Society Framework manifest",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "id": {
+      "$ref": "#/$defs/id"
+    },
+    "name": {
+      "$ref": "#/$defs/loc"
+    },
+    "description": {
+      "$ref": "#/$defs/loc"
+    },
+    "axes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/axis"
+      },
+      "minItems": 1
+    },
+    "ideologies": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/ideology"
+      },
+      "minItems": 1
+    },
+    "regimes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/regime"
+      },
+      "minItems": 1
+    },
+    "profiles": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/profile"
+      },
+      "minItems": 0
+    },
+    "fallback_profiles": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/profile"
+      },
+      "minItems": 1
+    },
+    "scenarios": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/scenario"
+      },
+      "minItems": 0
+    },
+    "settings": {
+      "$ref": "#/$defs/settings"
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 0
+    },
+    "notes": {
+      "$ref": "#/$defs/loc"
+    }
+  },
+  "required": [
+    "schema_version",
+    "id",
+    "name",
+    "axes",
+    "ideologies",
+    "regimes",
+    "profiles",
+    "fallback_profiles"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]{0,62}$"
+    },
+    "loc": {
+      "type": "object",
+      "properties": {
+        "english": {
+          "type": "string",
+          "minLength": 1
+        },
+        "simp_chinese": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "english",
+        "simp_chinese"
+      ],
+      "additionalProperties": false
+    },
+    "positions": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9_]{0,62}$"
+      },
+      "additionalProperties": {
+        "type": "number",
+        "minimum": -100,
+        "maximum": 100
+      },
+      "minProperties": 1
+    },
+    "date": {
+      "type": "string",
+      "pattern": "^[0-9]{4}\\.[0-9]{1,2}\\.[0-9]{1,2}$"
+    },
+    "engine": {
+      "enum": [
+        "democratic",
+        "fascism",
+        "communism",
+        "neutrality"
+      ]
+    },
+    "axis": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "numeric_id": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 999999
+        },
+        "name": {
+          "$ref": "#/$defs/loc"
+        },
+        "description": {
+          "$ref": "#/$defs/loc"
+        },
+        "left": {
+          "$ref": "#/$defs/loc"
+        },
+        "right": {
+          "$ref": "#/$defs/loc"
+        },
+        "weight": {
+          "type": "number",
+          "minimum": 0.01,
+          "maximum": 100
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "description",
+        "left",
+        "right",
+        "weight"
+      ],
+      "additionalProperties": false
+    },
+    "ideology": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "numeric_id": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 999999
+        },
+        "name": {
+          "$ref": "#/$defs/loc"
+        },
+        "description": {
+          "$ref": "#/$defs/loc"
+        },
+        "positions": {
+          "$ref": "#/$defs/positions"
+        },
+        "engine_ideology": {
+          "$ref": "#/$defs/engine"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "description",
+        "positions",
+        "engine_ideology"
+      ],
+      "additionalProperties": false
+    },
+    "regime": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "numeric_id": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 999999
+        },
+        "name": {
+          "$ref": "#/$defs/loc"
+        },
+        "description": {
+          "$ref": "#/$defs/loc"
+        },
+        "positions": {
+          "$ref": "#/$defs/positions"
+        },
+        "elections": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "description",
+        "positions"
+      ],
+      "additionalProperties": false
+    },
+    "group": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "numeric_id": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 999999
+        },
+        "name": {
+          "$ref": "#/$defs/loc"
+        },
+        "description": {
+          "$ref": "#/$defs/loc"
+        },
+        "kind": {
+          "$ref": "#/$defs/id"
+        },
+        "short_name": {
+          "$ref": "#/$defs/loc"
+        },
+        "positions": {
+          "$ref": "#/$defs/positions"
+        },
+        "support": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "influence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "satisfaction": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "status": {
+          "enum": [
+            "inactive",
+            "legal",
+            "underground",
+            "banned"
+          ]
+        },
+        "electoral": {
+          "type": "boolean"
+        },
+        "icon": {
+          "$ref": "#/$defs/id"
+        },
+        "small_icon": {
+          "type": "string",
+          "pattern": "^GFX_[A-Za-z0-9_]+$"
+        },
+        "large_icon": {
+          "type": "string",
+          "pattern": "^GFX_[A-Za-z0-9_]+$"
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 0
+        },
+        "notes": {
+          "$ref": "#/$defs/loc"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "short_name",
+        "description",
+        "kind",
+        "positions",
+        "support",
+        "influence",
+        "satisfaction",
+        "status",
+        "electoral"
+      ],
+      "additionalProperties": false
+    },
+    "alliance": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "numeric_id": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 999999
+        },
+        "name": {
+          "$ref": "#/$defs/loc"
+        },
+        "description": {
+          "$ref": "#/$defs/loc"
+        },
+        "kind": {
+          "enum": [
+            "government",
+            "opposition",
+            "electoral"
+          ]
+        },
+        "members": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "cohesion": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "description",
+        "kind",
+        "members",
+        "cohesion"
+      ],
+      "additionalProperties": false
+    },
+    "profile": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "tag": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9]{2}$"
+        },
+        "engine_ideology": {
+          "$ref": "#/$defs/engine"
+        },
+        "regime": {
+          "$ref": "#/$defs/id"
+        },
+        "legitimacy": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "groups": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/group"
+          },
+          "minItems": 1
+        },
+        "alliances": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/alliance"
+          },
+          "minItems": 1
+        },
+        "start_overrides": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "date": {
+                "$ref": "#/$defs/date"
+              },
+              "regime": {
+                "$ref": "#/$defs/id"
+              },
+              "legitimacy": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "groups": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "$ref": "#/$defs/id"
+                    },
+                    "positions": {
+                      "$ref": "#/$defs/positions"
+                    },
+                    "support": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 100
+                    },
+                    "influence": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 100
+                    },
+                    "satisfaction": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 100
+                    },
+                    "status": {
+                      "enum": [
+                        "inactive",
+                        "legal",
+                        "underground",
+                        "banned"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ],
+                  "additionalProperties": false
+                },
+                "minItems": 0
+              },
+              "alliances": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "$ref": "#/$defs/id"
+                    },
+                    "members": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/$defs/id"
+                      },
+                      "minItems": 0,
+                      "uniqueItems": true
+                    },
+                    "kind": {
+                      "enum": [
+                        "government",
+                        "opposition",
+                        "electoral"
+                      ]
+                    },
+                    "cohesion": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 100
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ],
+                  "additionalProperties": false
+                },
+                "minItems": 0
+              },
+              "election_months_elapsed": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 120
+              },
+              "election_term_months": {
+                "type": "integer",
+                "minimum": 6,
+                "maximum": 120
+              }
+            },
+            "required": [
+              "date"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 0
+        },
+        "notes": {
+          "$ref": "#/$defs/loc"
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 0
+        },
+        "election_months_elapsed": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 120
+        },
+        "election_term_months": {
+          "type": "integer",
+          "minimum": 6,
+          "maximum": 120
+        }
+      },
+      "required": [
+        "id",
+        "regime",
+        "legitimacy",
+        "groups",
+        "alliances"
+      ],
+      "additionalProperties": false
+    },
+    "operation": {
+      "type": "object",
+      "properties": {
+        "op": {
+          "enum": [
+            "activate",
+            "ban",
+            "legalize",
+            "underground",
+            "deactivate",
+            "support",
+            "influence",
+            "satisfaction",
+            "join",
+            "leave",
+            "govern",
+            "dissolve",
+            "regime",
+            "legitimacy",
+            "position",
+            "cohesion"
+          ]
+        },
+        "group": {
+          "$ref": "#/$defs/id"
+        },
+        "alliance": {
+          "$ref": "#/$defs/id"
+        },
+        "regime": {
+          "$ref": "#/$defs/id"
+        },
+        "axis": {
+          "$ref": "#/$defs/id"
+        },
+        "value": {
+          "type": "number",
+          "minimum": -200,
+          "maximum": 200
+        }
+      },
+      "required": [
+        "op"
+      ],
+      "additionalProperties": false
+    },
+    "scenario": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "profile": {
+          "$ref": "#/$defs/id"
+        },
+        "title": {
+          "$ref": "#/$defs/loc"
+        },
+        "description": {
+          "$ref": "#/$defs/loc"
+        },
+        "date": {
+          "$ref": "#/$defs/date"
+        },
+        "options": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "$ref": "#/$defs/id"
+              },
+              "label": {
+                "$ref": "#/$defs/loc"
+              },
+              "effects": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/operation"
+                },
+                "minItems": 1
+              },
+              "ai_chance": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100
+              }
+            },
+            "required": [
+              "id",
+              "label",
+              "effects"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 0
+        },
+        "notes": {
+          "$ref": "#/$defs/loc"
+        }
+      },
+      "required": [
+        "id",
+        "profile",
+        "title",
+        "description",
+        "date",
+        "options"
+      ],
+      "additionalProperties": false
+    },
+    "settings": {
+      "type": "object",
+      "properties": {
+        "bridge_mode": {
+          "enum": [
+            "bidirectional",
+            "export",
+            "none"
+          ]
+        },
+        "term_months": {
+          "type": "integer",
+          "minimum": 6,
+          "maximum": 120
+        },
+        "monthly_legitimacy_recovery": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 10
+        },
+        "alignment_penalty": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "underground_influence_factor": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "banned_influence_factor": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "monthly_government_satisfaction": {
+          "type": "number",
+          "minimum": -5,
+          "maximum": 5
+        },
+        "monthly_opposition_satisfaction": {
+          "type": "number",
+          "minimum": -5,
+          "maximum": 5
+        },
+        "cohesion_gap_penalty": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "coalition_fracture_threshold": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "member_defection_satisfaction": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "scenarios_enabled": {
+          "type": "boolean"
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    }
+  }
+}

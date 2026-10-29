@@ -1,0 +1,3 @@
+# Explicit CI configuration prevents automatic discovery of a user's editor
+# config from adding ignored errors, ignored files or an allow-empty override.
+game = "hoi4"
