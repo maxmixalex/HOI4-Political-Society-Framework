@@ -55,6 +55,8 @@ semantic report as proof of engine loader compatibility.
 - Twenty country/date starting previews through twenty-eight native bookmark
   history bindings, preserving original historical text and DLC conditions.
 - Complete generated definitions split into bounded files before validation.
+- Floating-point totals use `math.fsum()` so Python 3.11 and 3.12 produce the
+  same bookmark reports and weight divisors, preserving the package byte check.
 
 ### Verification and remaining runtime boundary
 

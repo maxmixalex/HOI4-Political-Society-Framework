@@ -105,7 +105,9 @@ def bookmark_artwork(manifest: dict, profile: dict, date: str, output: Path) -> 
                 elif status == "banned":
                     value *= settings.get("banned_influence_factor", .12)
             values.append(max(0, min(100, value)))
-        total = sum(values)
+        # Built-in sum(float) changed in Python 3.12. Keep report hashes and
+        # snapshot boundaries identical on every supported Python version.
+        total = math.fsum(values)
         totals[metric] = {g["id"]: value * 100 / total if total else 0
                           for g, value in zip(organizations, values)}
         segments = [(74, 79, 73)] * SECTORS

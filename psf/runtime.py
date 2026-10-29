@@ -6,6 +6,7 @@ variables; declaration-specific wrappers save authors from numeric registry IDs.
 from __future__ import annotations
 
 from datetime import date, timedelta
+import math
 
 from .model import ENGINE_IDEOLOGIES, ROLES, STATUS, profiles
 from . import modifiers, charts
@@ -45,7 +46,9 @@ def distance(destination: str, pairs: list[tuple[str, str | float, float]], scal
                 conditional([check("psf_delta", 0, "less_than")], mulv("psf_delta", -1, True)),
                 mulv("psf_delta", weight, True), addv(destination, "psf_delta", True)]
     if pairs:
-        out.append(divv(destination, sum(p[2] for p in pairs) / scale, True))
+        # Unlike built-in sum(float), fsum keeps the same accumulation across
+        # Python 3.11/3.12; a changed last bit can cross our rounding boundary.
+        out.append(divv(destination, math.fsum(p[2] for p in pairs) / scale, True))
     return out
 
 

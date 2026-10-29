@@ -67,6 +67,7 @@ jobs:
           if-no-files-found: error
 
       - name: Validate native ideas, traits and dynamic modifier examples
+        id: native_integration
         run: |
           python -m psf compile examples/vanilla/manifest.json --output build/native-integration
           cp -R examples/native_modifiers/common build/native-integration/psf_vanilla_example/
@@ -74,7 +75,7 @@ jobs:
           python tools/ci/validate.py --root build/native-integration --reports build/native-integration-validation
 
       - name: Publish native modifier integration diagnostics
-        if: always()
+        if: ${{ always() && steps.native_integration.outcome != 'skipped' }}
         uses: actions/upload-artifact@v4
         with:
           name: native-modifier-integration-diagnostics
