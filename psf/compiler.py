@@ -10,7 +10,7 @@ import tempfile
 import zipfile
 
 from . import __version__
-from . import bookmarks, gameplay, localization, modifiers, runtime
+from . import bookmarks, bootstrap, gameplay, icons, identity, localization, mechanics, modifiers, runtime
 from .model import load, profiles
 from .script import quoted
 
@@ -134,6 +134,10 @@ Source and authoring documentation: https://github.com/maxmixalex/HOI4-Political
         write(content, "common/scripted_localisation/psf_events.txt", localization.dynamic_localization(manifest))
         localization.write_localization(content, "psf_content", localization.content_localization(manifest))
         localization.write_localization(content, "psf_modifiers", modifiers.localizations(manifest))
+        identity_report = identity.write_assets(manifest, content, manifest_path.parent)
+        native_root = Path(vanilla).parent if vanilla else None
+        bootstrap_report = bootstrap.write_bootstrap_history(manifest, content, native_root)
+        mechanics_report = mechanics.write_native_mechanics(manifest, content, native_root)
         from .ui import generate_ui
         ui = generate_ui(manifest, content, Path(vanilla) if vanilla else None)
         bookmark_report = bookmarks.generate_bookmark_previews(
@@ -142,11 +146,20 @@ Source and authoring documentation: https://github.com/maxmixalex/HOI4-Political
             "schema_version": "1.0", "compiler_version": __version__, "content_id": manifest["id"],
             "axes": [a["id"] for a in manifest["axes"]],
             "groups": {g["id"]: {"numeric_id": g["_index"], "profile": p["id"], "kind": g["kind"], "color": g["color"],
+                                  "large_icon": icons.sprite(g, "group", "large"), "small_icon": icons.sprite(g, "group", "small"),
+                                  "texticon": icons.texticon(g, "group"),
                                   "variables": {field: runtime.gv(g["id"], field) for field in ("support", "influence", "effective_influence", "satisfaction", "status", "prohibited", "ideology", "governing", "vote_share")}}
                        for p in profiles(manifest) for g in p["groups"]},
             "alliances": {a["id"]: {"numeric_id": a["_index"], "profile": p["id"]} for p in profiles(manifest) for a in p["alliances"]},
             "regimes": {r["id"]: r["_index"] for r in manifest["regimes"]},
             "ideologies": {i["id"]: i["_index"] for i in manifest["ideologies"]},
+            "ideology_icons": {i["id"]: {"large_icon": icons.sprite(i, "ideology", "large"),
+                                          "small_icon": icons.sprite(i, "ideology", "small"),
+                                          "texticon": icons.texticon(i, "ideology")} for i in manifest["ideologies"]},
+            "identities": identity_report["identities"],
+            "governments": {p["id"]: p["government"] for p in profiles(manifest)},
+            "government_variables": {"independent_group": "psf_governing_group", "alliance": "psf_governing_alliance",
+                                     "display_party": "psf_government_leader_group", "caretaker": "psf_caretaker"},
             "modifiers": modifiers.registry(manifest),
             "effects": sorted(set(re.findall(r"^(psf_[a-zA-Z0-9_]+) =", effects + "\n" + runtime.core_effects(), re.M))),
             "triggers": sorted(set(re.findall(r"^(psf_[a-zA-Z0-9_]+) =", triggers + "\n" + runtime.core_triggers(), re.M))),
@@ -162,9 +175,11 @@ Source and authoring documentation: https://github.com/maxmixalex/HOI4-Political
                    "country_profiles": len(manifest["profiles"]), "fallback_profiles": len(manifest["fallback_profiles"]), "groups": len(registry["groups"]),
                    "alliances": len(registry["alliances"]), "scenarios": len(manifest["scenarios"]),
                    "named_modifiers": len(manifest.get("modifiers", [])),
+                   "country_identities": len(identity_report["identities"]),
                    "native_modifiers": len(registry["groups"]) * (3 + len(manifest["axes"])) * 3,
                    "effects": len(registry["effects"]), "triggers": len(registry["triggers"])},
-                   "files": files, "ui": ui, "bookmarks": bookmark_report}
+                   "files": files, "ui": ui, "bookmarks": bookmark_report, "identities": identity_report,
+                   "bootstrap": bootstrap_report, "native_mechanics": mechanics_report}
         write(staging, "build-manifest.json", json.dumps(summary, ensure_ascii=False, indent=2, sort_keys=True) + "\n")
         for source in staging.iterdir():
             destination = output / source.name

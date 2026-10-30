@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "hoi4-psf"
-version = "0.3.1"
+version = "0.4.0"
 description = "Declarative political society framework and compiler for Hearts of Iron IV"
 requires-python = ">=3.11"
 dependencies = ["jsonschema==4.25.1", "PyYAML==6.0.3"]
@@ -17,4 +17,4 @@ psf = "psf.cli:main"
 include = ["psf*"]
 
 [tool.setuptools.package-data]
-psf = ["schemas/*.json", "assets/native_gui/*.gui", "assets/native_bookmarks/*.txt", "assets/native_bookmarks/*.json", "assets/LICENSE", "assets/THIRD_PARTY_NOTICES.md"]
+psf = ["schemas/*.json", "assets/native_gui/*.gui", "assets/native_history/*.txt", "assets/native_history/*.md", "assets/native_ideologies/*.txt", "assets/native_bookmarks/*.txt", "assets/native_bookmarks/*.json", "assets/LICENSE", "assets/THIRD_PARTY_NOTICES.md"]

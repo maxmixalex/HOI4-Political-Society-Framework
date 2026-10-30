@@ -18,6 +18,7 @@ STATUS = {"inactive": 0, "legal": 1, "underground": 2, "banned": 3}
 ROLES = {"government": 1, "opposition": 2, "electoral": 3}
 DEFAULTS = {
     "bridge_mode": "bidirectional",
+    "mechanics_mode": "compat",
     "term_months": 48,
     "monthly_legitimacy_recovery": 0.8,
     "alignment_penalty": 0.04,
@@ -104,15 +105,34 @@ def validate(data: dict) -> None:
     if problems:
         raise ManifestError("\n".join(f"/{'/'.join(map(str, e.path))}: {e.message}" for e in problems[:30]))
     errors: list[str] = []
+    settings = data.get("settings", {})
+    if settings.get("mechanics_mode") == "strict" and settings.get("bridge_mode", "export") != "export":
+        errors.append("strict mechanics require bridge_mode='export' so native party drift cannot change PSF support")
     if data["id"] == "psf":
         errors.append("content id 'psf' is reserved for the reusable framework mod")
     axis_ids = _ids(data["axes"], "axes", errors)
-    _ids(data["ideologies"], "ideologies", errors)
+    ideology_ids = _ids(data["ideologies"], "ideologies", errors)
     regime_ids = _ids(data["regimes"], "regimes", errors)
     all_profiles = profiles(data)
     profile_ids = _ids(all_profiles, "profiles", errors)
     all_groups = [g for p in all_profiles for g in p["groups"]]
     all_alliances = [a for p in all_profiles for a in p["alliances"]]
+    all_identities = [identity for p in all_profiles for identity in p.get("identities", [])]
+    _ids(all_identities, "country identities (global)", errors)
+    cosmetic_tags = set()
+    identity_indices = set()
+    for identity in all_identities:
+        tag = identity.get("cosmetic_tag", "PSF_" + identity["id"].upper())
+        if tag in cosmetic_tags:
+            errors.append(f"identity {identity['id']}: duplicate cosmetic tag {tag}")
+        cosmetic_tags.add(tag)
+        index = stable_id(identity["id"])
+        if index in identity_indices:
+            errors.append(f"identity {identity['id']}: numeric id collision; rename the identity")
+        identity_indices.add(index)
+        for source in identity.get("flags", {}).values():
+            if Path(source).is_absolute() or ".." in Path(source).parts:
+                errors.append(f"identity {identity['id']}: flag asset must stay within the manifest directory")
     group_ids = _ids(all_groups, "groups (global)", errors)
     _ids(data.get("modifiers", []), "modifiers", errors)
     modifier_map = {m["id"]: m for m in data.get("modifiers", [])}
@@ -182,16 +202,44 @@ def validate(data: dict) -> None:
             errors.append(f"{p['id']}: unknown regime {p['regime']}")
         gids = {g["id"] for g in p["groups"]}
         aids = {a["id"] for a in p["alliances"]}
+        for i, identity in enumerate(p.get("identities", [])):
+            if {"group", "alliance"} <= identity.get("when", {}).keys():
+                errors.append(f"identity {identity['id']}: group and alliance government conditions are mutually exclusive")
+            for field, allowed in (("regime", regime_ids), ("ideology", ideology_ids), ("group", gids), ("alliance", aids)):
+                value = identity.get("when", {}).get(field)
+                if value is not None and value not in allowed:
+                    errors.append(f"identity {identity['id']}: unknown or cross-country {field}: {value}")
+            if not identity.get("when") and i != len(p["identities"]) - 1:
+                errors.append(f"identity {identity['id']}: an unconditional identity must be last")
         governments = [a for a in p["alliances"] if a["kind"] == "government"]
-        if len(governments) != 1:
-            errors.append(f"{p['id']}: exactly one initial government alliance is required")
+        if len(governments) > 1:
+            errors.append(f"{p['id']}: at most one initial government alliance is allowed")
+        def check_government(government, groups, alliances, location):
+            if government is None:
+                return
+            if "group" in government:
+                selected = next((g for g in groups if g["id"] == government["group"]), None)
+                if selected is None:
+                    errors.append(f"{location}: government group must belong to the same profile")
+                elif selected["status"] != "legal":
+                    errors.append(f"{location}: government group must be legal")
+            if "alliance" in government:
+                selected = next((a for a in alliances if a["id"] == government["alliance"]), None)
+                if selected is None:
+                    errors.append(f"{location}: government alliance must belong to the same profile")
+                elif not any(g["status"] == "legal" and g["id"] in selected["members"] for g in groups):
+                    errors.append(f"{location}: government alliance needs at least one legal group")
+        if "government" in p:
+            check_government(p["government"], p["groups"], p["alliances"], p["id"])
         for a in p["alliances"]:
             if set(a["members"]) - gids:
                 errors.append(f"{a['id']}: members must belong to the same profile")
-            if a["kind"] == "government" and not any(g["status"] == "legal" and g["id"] in a["members"] for g in p["groups"]):
+            if "government" not in p and a["kind"] == "government" and not any(g["status"] == "legal" and g["id"] in a["members"] for g in p["groups"]):
                 errors.append(f"{a['id']}: initial government needs at least one legal group")
         dates = []
-        for override in p.get("start_overrides", []):
+        current_groups = copy.deepcopy(p["groups"])
+        current_alliances = copy.deepcopy(p["alliances"])
+        for override in sorted(p.get("start_overrides", []), key=lambda item: tuple(map(int, item["date"].split(".")))):
             try:
                 dates.append(date_tuple(override["date"]))
             except ValueError:
@@ -206,6 +254,13 @@ def validate(data: dict) -> None:
             for a in override.get("alliances", []):
                 if a["id"] not in aids or set(a.get("members", [])) - gids:
                     errors.append(f"{p['id']}: override has unknown alliance/member")
+            for items, changes in ((current_groups, override.get("groups", [])), (current_alliances, override.get("alliances", []))):
+                for changed in changes:
+                    for item in items:
+                        if item["id"] == changed["id"]:
+                            item.update(changed)
+            if "government" in override:
+                check_government(override["government"], current_groups, current_alliances, p["id"] + "/" + override["date"])
         if len(set(dates)) != len(dates):
             errors.append(f"{p['id']}: duplicate bookmark override date")
     if fallbacks != set(ENGINE_IDEOLOGIES):
@@ -238,6 +293,7 @@ def validate(data: dict) -> None:
                     "support": {"group", "value"}, "influence": {"group", "value"},
                     "satisfaction": {"group", "value"}, "join": {"group", "alliance"},
                     "leave": {"group", "alliance"}, "govern": {"alliance"},
+                    "govern_group": {"group"}, "clear_government": set(),
                     "dissolve": {"alliance"}, "regime": {"regime"},
                     "legitimacy": {"value"}, "position": {"group", "axis", "value"},
                     "cohesion": {"alliance", "value"},
@@ -272,22 +328,28 @@ def validate(data: dict) -> None:
 
 def normalize(data: dict) -> dict:
     data = copy.deepcopy(data)
-    data["settings"] = {**DEFAULTS, **data.get("settings", {})}
+    supplied_settings = data.get("settings", {})
+    if supplied_settings.get("mechanics_mode") == "strict":
+        supplied_settings.setdefault("bridge_mode", "export")
+    data["settings"] = {**DEFAULTS, **supplied_settings}
     data.setdefault("scenarios", [])
     data.setdefault("modifiers", [])
     for modifier in data["modifiers"]:
         modifier.setdefault("duration_days", -1)
         modifier["_index"] = modifier.get("numeric_id", stable_id(modifier["id"]))
+    for ideology in data["ideologies"]:
+        ideology["color"] = list(color(ideology))
     for p in profiles(data):
-        identifier = p["id"] + "_transition_cabinet"
-        if any(a["id"] == identifier for a in p["alliances"]):
-            raise ManifestError(f"{identifier} is reserved for the compiler's transitional cabinet")
-        p["alliances"].append({
-            "id": identifier,
-            "name": {"english": "Cabinet agreement", "simp_chinese": "内阁协定"},
-            "description": {"english": "A cabinet formed following an election or a change of government. Other legal organizations can negotiate membership.", "simp_chinese": "由选举或政府更替产生的内阁。其他合法政治组织可以协商加入。"},
-            "kind": "opposition", "members": [], "cohesion": 65,
-        })
+        p.setdefault("identities", [])
+        for identity in p["identities"]:
+            identity["_index"] = stable_id(identity["id"])
+            identity.setdefault("cosmetic_tag", "PSF_" + identity["id"].upper())
+            identity.setdefault("adjective", copy.deepcopy(identity["name"]))
+            identity.setdefault("definite_name", copy.deepcopy(identity["name"]))
+            identity.setdefault("when", {})
+        if "government" not in p:
+            government = next((a for a in p["alliances"] if a["kind"] == "government"), None)
+            p["government"] = {"alliance": government["id"]} if government else None
     for item in data["regimes"] + data["ideologies"] + [x for p in profiles(data) for x in p["groups"] + p["alliances"]]:
         item["_index"] = item.get("numeric_id", stable_id(item["id"]))
     alliance_indices = {}
@@ -295,7 +357,7 @@ def normalize(data: dict) -> dict:
         for alliance in p["alliances"]:
             index = alliance["_index"]
             if index in alliance_indices:
-                raise ManifestError(f"Alliance numeric id collision including generated cabinets: {alliance_indices[index]} and {alliance['id']}; give the authored alliance a different numeric_id")
+                raise ManifestError(f"Alliance numeric id collision: {alliance_indices[index]} and {alliance['id']}; give the authored alliance a different numeric_id")
             alliance_indices[index] = alliance["id"]
     for p in profiles(data):
         # Canonical RGB keeps JSON/TOML/YAML and equivalent hex spellings

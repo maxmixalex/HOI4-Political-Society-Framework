@@ -16,6 +16,7 @@ from hoi4_interpreter import Interpreter, State, entries, mapping, parse
 
 def fixture():
     return {
+        "settings": {"mechanics_mode": "strict"},
         "axes": [{"id": "economy", "name": {"english": "Economy"},
                   "left": {"english": "Public"}, "right": {"english": "Private"}}],
         "ideologies": [{"id": "liberal", "_index": 88412}],
@@ -64,15 +65,38 @@ class UIContractTests(unittest.TestCase):
         self.assertIn('name = "open_faction_button"', data)
         self.assertIn('name = "show_power_balance"', data)
 
-    def test_pregame_both_detail_panels_are_replaced(self):
+    def test_pregame_both_detail_panels_retain_native_party_binding(self):
         data = (self.root / "interface/frontendgamesetupview.gui").read_text(encoding="utf-8-sig")
         nodes = gui_nodes(data)
         for n in nodes:
-            if n.name in ("ideology", "party") and "info" in n.ancestry:
+            if n.name in ("ideology", "government") and "info" in n.ancestry:
                 position = next(child for child in n.children if child.kind == "position")
                 self.assertIn("-12000", data[position.start:position.end])
-        self.assertIn("psf_interesting_pregame_explanation", data)
-        self.assertIn("psf_pregame_explanation", data)
+        for parent in ("gamesetup_country_details", "gamesetup_interesting_countries_window"):
+            party = next(n for n in nodes if n.name == "party" and parent in n.ancestry)
+            # These engine-owned fields have no static text key; the game
+            # supplies the selected country's party name via their identity.
+            self.assertNotIn("text", party.properties)
+            self.assertNotEqual(party.properties.get("hide", (0, 0, "no"))[2], "yes")
+            self.assertEqual(party.properties["multiline"][2], "yes")
+            info = next(n for n in nodes if n.name == "info" and parent in n.ancestry)
+            self.assertEqual(info.properties["clipping"][2], "yes")
+            self.assertEqual(sum(n.kind.lower() == "size" for n in info.children), 1)
+        self.assertNotIn("psf_pregame_explanation", data)
+        self.assertNotIn("psf_interesting_pregame_explanation", data)
+
+    def test_compat_without_history_binding_keeps_the_entire_native_frontend(self):
+        original = (ASSETS / "frontendgamesetupview.gui").read_text(encoding="utf-8-sig")
+        for settings in ({}, {"mechanics_mode": "compat"}):
+            with self.subTest(settings=settings), tempfile.TemporaryDirectory() as folder:
+                manifest = fixture()
+                manifest["settings"] = settings
+                metadata = generate_ui(manifest, Path(folder))
+                generated = (Path(folder) / "interface/frontendgamesetupview.gui").read_text(encoding="utf-8-sig")
+                self.assertEqual(generated, original)
+                self.assertFalse(metadata["frontend_adapter"])
+                self.assertNotIn("psf_pregame_explanation", generated)
+                self.assertNotIn("psf_interesting_pregame_explanation", generated)
 
     def test_native_tree_change_requires_explicit_update(self):
         with tempfile.TemporaryDirectory() as folder:
@@ -108,8 +132,8 @@ class UIContractTests(unittest.TestCase):
         self.assertIn("var = psf_governing_alliance value = 9753 compare = equals", combined)
 
     def test_live_axes_and_colliding_positions_remain_clickable(self):
-        self.assertIn("x = psf_g_alpha_ui_position_economy", self.script)
-        self.assertIn("x = psf_g_beta_ui_position_economy", self.script)
+        self.assertIn("x = ROOT.psf_g_alpha_ui_position_economy", self.script)
+        self.assertIn("x = THIS.psf_g_beta_ui_position_economy", self.script)
         nodes = {n.name: n for n in gui_nodes(self.gui) if n.name}
         first = nodes["psf_axis_marker_alpha_economy"]
         second = nodes["psf_axis_marker_beta_economy"]
@@ -121,10 +145,31 @@ class UIContractTests(unittest.TestCase):
     def test_supplied_icon_overrides_are_used_and_default_art_is_valid(self):
         self.assertRegex(self.gui, r'spriteType\s*=\s*"GFX_custom_beta_large"')
         self.assertRegex(self.gui, r'spriteType\s*=\s*"GFX_custom_beta_small"')
-        for suffix, size in (("small", 24), ("large", 64)):
-            payload = (self.root / f"gfx/interface/psf/alpha_{suffix}.tga").read_bytes()
-            self.assertEqual(struct.unpack_from("<HH", payload, 12), (size, size))
-            self.assertEqual(len(payload), 18 + size * size * 4)
+        identity = (self.root / "interface/psf_identity_icons.gfx").read_text()
+        for suffix in ("small", "large"):
+            self.assertIn(f'"GFX_psf_group_alpha_{suffix}"', identity)
+            self.assertFalse((self.root / f"gfx/interface/psf/alpha_{suffix}.tga").exists())
+        self.assertIn("gfx/interface/ideologies/neutrality_group.dds", identity)
+        self.assertNotIn('name = "GFX_custom_beta_large"', identity)
+
+    def test_native_and_custom_icons_fit_reserved_lanes(self):
+        from tools.ui.audit_layout import point, size
+        nodes = gui_nodes(self.gui)
+        for mode in ("political", "diplomatic"):
+            spectrum = next(n for n in nodes if n.name == f"psf_{mode}_spectrum_test")
+            markers = {n.name: n for n in spectrum.children if n.name.startswith("psf_axis_marker_")}
+            self.assertAlmostEqual(float(markers["psf_axis_marker_alpha_economy"].properties["scale"][2]) * 20, 16)
+            self.assertAlmostEqual(float(markers["psf_axis_marker_beta_economy"].properties["scale"][2]) * 24, 16, places=4)
+            for gid in ("alpha", "beta"):
+                detail = next(n for n in nodes if n.name == f"psf_{mode}_detail_{gid}")
+                frame = next(n for n in detail.children if n.name == f"psf_detail_icon_frame_{gid}")
+                status = next(n for n in detail.children if n.name == f"psf_detail_status_{gid}")
+                name = next(n for n in detail.children if n.name == f"psf_detail_name_{gid}")
+                self.assertEqual(frame.properties["clipping"][2], "yes")
+                self.assertGreaterEqual(size(frame)[0], 60)
+                self.assertGreaterEqual(size(frame)[1], 68)
+                self.assertLessEqual(point(frame)[0] + size(frame)[0], point(name)[0])
+                self.assertLessEqual(point(frame)[1] + size(frame)[1], point(status)[1])
 
     def test_compact_summary_and_scroll_layout_bounds(self):
         from tools.ui.audit_layout import audit
@@ -176,10 +221,10 @@ class UIContractTests(unittest.TestCase):
                 sectors = [n for n in parent.children if n.name.startswith(f"psf_pie_{metric}_")]
                 self.assertEqual(len(sectors), charts.SECTORS)
                 hitbox = next(n for n in parent.children if n.name == f"psf_open_{metric}")
-                self.assertEqual(hitbox.properties["pdx_tooltip"][2], f'"psf_ui_{metric}_chart_tip"')
+                self.assertEqual(hitbox.properties["pdx_tooltip"][2], f'"psf_ui_{mode}_{metric}_chart_tip"')
                 self.assertIn("GFX_pol_piechart_overlay_63x63", hitbox.properties["quadtexturesprite"][2])
-        self.assertIn("frame = psf_pie_support_frames^179", self.script)
-        self.assertIn("frame = psf_pie_influence_frames^179", self.script)
+        self.assertIn("frame = ROOT.psf_pie_support_frames^179", self.script)
+        self.assertIn("frame = THIS.psf_pie_influence_frames^179", self.script)
 
     def test_rendered_page_visibility_is_exclusive_through_navigation_and_country_changes(self):
         scripts = [entry for root in entries(parse(self.script)) for entry in entries(root.value)]
@@ -209,6 +254,20 @@ class UIContractTests(unittest.TestCase):
             self.assertEqual(shown(mode), [f"psf_{mode}_groups_other_gui"])
             vm.state.flags.remove("psf_profile_other")
             vm.state.flags.add("psf_profile_test")
+
+    def test_selected_tab_and_regular_tab_are_mutually_exclusive(self):
+        scripts = [entry for root in entries(parse(self.script)) for entry in entries(root.value)]
+        vm = Interpreter(State())
+        for mode in ("political", "diplomatic"):
+            root = next(n for n in scripts if n.key == f"psf_{mode}_society_side_gui")
+            triggers = mapping(mapping(root.value)["triggers"])
+            for page in range(4):
+                vm.state.variables["psf_ui_page"] = page
+                for tab, expected in (("groups", page < 2), ("spectrum", page == 2), ("alliances", page == 3)):
+                    normal = vm.condition(triggers[f"psf_tab_{tab}_visible"])
+                    selected = vm.condition(triggers[f"psf_tab_{tab}_selected_visible"])
+                    self.assertNotEqual(normal, selected)
+                    self.assertEqual(selected, expected)
 
     def test_localized_control_keys_have_real_translation_wrappers(self):
         texts = [(self.root / f"localisation/{lang}/psf_ui_l_{lang}.yml").read_text(encoding="utf-8-sig")
@@ -242,9 +301,9 @@ class UIContractTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "Unknown UI localisation reference"):
                 generate_ui(content, Path(folder))
 
-    def test_authored_color_reaches_default_badge_and_custom_icon_swatch(self):
+    def test_authored_color_stays_in_swatches_with_native_or_custom_icons(self):
         color = (0x12, 0x34, 0xAB)
-        payload = (self.root / "gfx/interface/psf/alpha_small.tga").read_bytes()[18:]
+        payload = (self.root / "gfx/interface/psf/colors/alpha.tga").read_bytes()[18:]
         pixels = [tuple(payload[i:i+4]) for i in range(0, len(payload), 4)]
         self.assertIn((color[2], color[1], color[0], 255), pixels)
         for mode in ("political", "diplomatic"):
@@ -273,21 +332,146 @@ class UIContractTests(unittest.TestCase):
         occupied = set()
         center = (charts.SIZE - 1) / 2
         for pixels in charts.sector_pixels():
-            self.assertTrue(pixels)
             self.assertFalse(occupied.intersection(pixels))
             occupied.update(pixels)
         expected = {(x, y) for x in range(charts.SIZE) for y in range(charts.SIZE)
-                    if (x - center) ** 2 + (y - center) ** 2 <= center ** 2}
+                    if (x - center) ** 2 + (y - center) ** 2 <= charts.RADIUS ** 2}
         self.assertEqual(occupied, expected)
         self.assertNotIn("rotation =", self.gui)
 
     def test_compact_organization_rows_use_original_game_chrome(self):
         nodes = gui_nodes(self.gui)
         row = next(n for n in nodes if n.name == "psf_select_alpha")
-        self.assertEqual(row.properties["quadtexturesprite"][2], '"GFX_tiled_button"')
+        self.assertEqual(row.properties["quadtexturesprite"][2], '"GFX_tiled_window_small_small"')
         row_size = next(n for n in row.children if n.kind.lower() == "size")
         self.assertEqual(row_size.properties["y"][2], "44")
         self.assertFalse((self.root / "gfx/interface/psf/group_row.tga").exists())
+
+    def test_political_and_foreign_text_properties_use_explicit_distinct_scopes(self):
+        from tools.ui.audit_layout import script_bindings
+        locale = (self.root / "localisation/english/psf_ui_l_english.yml").read_text(encoding="utf-8-sig")
+        strings = dict(re.findall(r'^ (\w+):0 "(.*)"$', locale, re.M))
+        nodes = {n.name: n for n in gui_nodes(self.gui) if n.name and n.kind == "containerWindowType"}
+        bindings = script_bindings(self.root)
+        for mode, scope in (("political", "ROOT"), ("diplomatic", "THIS")):
+            summary = nodes[f"psf_{mode}_summary"]
+            binding = bindings[summary.name]
+            self.assertEqual(binding.properties["dirty"][2], f"{scope}.psf_ui_revision")
+            regime = next(n for n in summary.children if n.name == f"psf_{mode}_regime")
+            key = regime.properties["text"][2].strip('"')
+            self.assertEqual(strings[key], f"[{scope}.PSFUIRegime]")
+            tooltip_key = regime.properties["pdx_tooltip"][2].strip('"')
+            self.assertIn(f"[?{scope}.psf_legitimacy|1]", strings[tooltip_key])
+            for window in (nodes[f"psf_{mode}_groups_test"], nodes[f"psf_{mode}_detail_alpha"], summary):
+                for child in window.children:
+                    for prop in ("text", "pdx_tooltip"):
+                        key = child.properties.get(prop, (0, 0, ""))[2].strip('"')
+                        if key in strings and "[" in strings[key]:
+                            self.assertIsNone(re.search(r"\[(?:\?psf_|PSFUI)", strings[key]), key)
+                            self.assertNotIn("\x01", strings[key])
+            properties = next(n for n in binding.children if n.kind == "properties")
+            for prop in properties.children:
+                if "frame" in prop.properties:
+                    self.assertTrue(prop.properties["frame"][2].startswith(scope + ".psf_pie_"))
+                elif "image" in prop.properties:
+                    self.assertTrue(prop.properties["image"][2].startswith('"[' + scope + ".PSFUI"))
+            detail_binding = bindings[f"psf_{mode}_detail_alpha"]
+            detail_properties = next(n for n in detail_binding.children if n.kind == "properties")
+            image = next(n for n in detail_properties.children if n.kind == "psf_detail_ideology_icon_alpha")
+            self.assertEqual(image.properties["image"][2], f'"[{scope}.PSFUIIdeologyIcon_alpha]"')
+
+    def test_native_scrollbar_has_background_gutter_and_real_overflow(self):
+        from tools.ui.audit_layout import point, size, property_block
+        content = fixture()
+        content["profiles"][0]["groups"] = [dict(content["profiles"][0]["groups"][0], id=f"row_{i}", _index=1000+i) for i in range(24)]
+        with tempfile.TemporaryDirectory() as folder:
+            generate_ui(content, Path(folder))
+            nodes = [n for path in (Path(folder) / "interface").glob("psf_society*.gui") for n in gui_nodes(path.read_text())]
+            for mode in ("political", "diplomatic"):
+                window = next(n for n in nodes if n.name == f"psf_{mode}_groups_test")
+                self.assertEqual(window.properties["verticalscrollbar"][2], '"right_vertical_slider"')
+                self.assertEqual(window.properties["clipping"][2], "yes")
+                self.assertTrue(any(n.kind == "background" for n in window.children))
+                gutter = int(property_block(window, "margin")["right"])
+                self.assertGreaterEqual(gutter, 12)
+                rows = [n for n in window.children if n.name.startswith("psf_select_row_")]
+                self.assertEqual(len(rows), 24)
+                self.assertGreater(max(point(n)[1] + size(n)[1] for n in rows), size(window)[1])
+                self.assertTrue(all(point(n)[0] + size(n)[0] <= size(window)[0] - gutter for n in rows))
+
+    def test_diplomacy_offsets_include_its_native_country_info_origin(self):
+        from tools.ui.audit_layout import point
+        nodes = {n.name: n for n in gui_nodes(self.gui) if n.name and n.kind == "containerWindowType"}
+        native = gui_nodes((self.root / "interface/countrydiplomacyview.gui").read_text())
+        country_info = next(n for n in native if n.name == "country_info")
+        diplomacy = next(n for n in native if n.name == "diplomacy_tab_top")
+        self.assertEqual(point(nodes["psf_diplomatic_summary"])[1], point(diplomacy)[1])
+        self.assertEqual(point(nodes["psf_diplomatic_society_side"])[1] + point(country_info)[1], 0)
+
+    def test_government_getter_supports_single_group_alliance_and_caretaker(self):
+        definitions = [entry for path in (self.root / "common/scripted_localisation").glob("psf_ui*.txt")
+                       for entry in entries(parse(path.read_text()))]
+        getter = next(node for node in definitions if mapping(node.value).get("name") == "PSFUIGovernment")
+        vm = Interpreter(State())
+        def evaluate():
+            for option in entries(getter.value):
+                if option.key == "text":
+                    fields = mapping(option.value)
+                    if "trigger" not in fields or vm.condition(fields["trigger"]):
+                        return fields["localization_key"]
+        self.assertEqual(evaluate(), "psf_ui_caretaker")
+        vm.state.variables["psf_governing_group"] = 90117
+        self.assertEqual(evaluate(), "psf_group_alpha_short_name")
+        vm.state.variables.update(psf_governing_group=0, psf_governing_alliance=9753)
+        self.assertEqual(evaluate(), "psf_alliance_cabinet_name")
+
+    def test_opening_own_summary_refreshes_data_without_advancing_time(self):
+        scripts = [entry for root in entries(parse(self.script)) for entry in entries(root.value)]
+        for mode in ("political", "diplomatic"):
+            owners = [n for n in scripts if n.key in (f"psf_{mode}_summary_gui", f"psf_{mode}_government_party_gui")]
+            effects = {name: value for node in owners for name, value in mapping(mapping(node.value)["effects"]).items()}
+            for action in ("groups", "spectrum", "support", "influence"):
+                effect = effects[f"psf_open_{action}_click"]
+                condition = entries(effect)[0]
+                self.assertEqual(condition.key, "if")
+                self.assertEqual(mapping(mapping(condition.value)["limit"])["tag"], "ROOT")
+                self.assertEqual(mapping(condition.value)["psf_bootstrap"], "yes")
+
+    def test_government_party_and_ideology_large_art_uses_live_scoped_getters(self):
+        from tools.ui.audit_layout import script_bindings
+        bindings = script_bindings(self.root)
+        for mode, scope in (("political", "ROOT"), ("diplomatic", "THIS")):
+            for element, getter, owner in (("psf_open_spectrum", "PSFUIGovIdeologyIcon", "summary"),
+                                           ("psf_open_groups", "PSFUIGovernmentPartyIcon", "summary" if mode == "political" else "government_party")):
+                binding = bindings[f"psf_{mode}_{owner}"]
+                properties = next(n for n in binding.children if n.kind == "properties")
+                image = next(n for n in properties.children if n.kind == element)
+                self.assertEqual(image.properties["image"][2], f'"[{scope}.{getter}]"')
+                window = next(n for n in gui_nodes(self.gui) if n.name == f"psf_{mode}_{owner}")
+                control = next(n for n in window.children if n.name == element)
+                self.assertEqual(control.kind.lower(), "buttontype")
+                self.assertEqual(control.properties["quadtexturesprite"][2], '"GFX_ideology_unknown"')
+                self.assertEqual(window.properties["clipping"][2], "yes")
+        definitions = [node for path in (self.root / "common/scripted_localisation").glob("psf_ui*.txt")
+                       for node in entries(parse(path.read_text()))]
+        vm = Interpreter(State())
+        def evaluate(name):
+            getter = next(n for n in definitions if mapping(n.value).get("name") == name)
+            for option in entries(getter.value):
+                if option.key == "text":
+                    fields = mapping(option.value)
+                    if "trigger" not in fields or vm.condition(fields["trigger"]):
+                        return fields["localization_key"]
+        self.assertEqual(evaluate("PSFUIGovernmentPartyIcon"), "psf_ui_unknown_ideology_sprite")
+        vm.state.variables.update(psf_government_leader_group=90117, psf_governing_alliance=9753,
+                                  psf_g_alpha_status=1, psf_g_alpha_governing=1, psf_government_ideology=88412)
+        self.assertEqual(evaluate("PSFUIGovernmentParty"), "psf_group_alpha_short_name")
+        self.assertEqual(evaluate("PSFUIGovernmentPartyIcon"), "psf_ui_government_party_sprite_alpha")
+        self.assertEqual(evaluate("PSFUIGovIdeologyIcon"), "psf_ui_government_ideology_sprite_liberal")
+        vm.state.variables["psf_g_alpha_status"] = 2
+        self.assertEqual(evaluate("PSFUIGovernmentPartyIcon"), "psf_ui_unknown_ideology_sprite")
+        vm.state.variables["psf_caretaker"] = 1
+        self.assertEqual(evaluate("PSFUIGovIdeologyIcon"), "psf_ui_unknown_ideology_sprite")
 
 
 if __name__ == "__main__":

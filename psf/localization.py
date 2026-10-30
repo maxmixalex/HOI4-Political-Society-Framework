@@ -78,6 +78,9 @@ def content_localization(manifest: dict) -> dict[str, dict[str, str]]:
         "psf_snap_election": ("Call an early election", "举行提前选举"),
         "psf_snap_election_desc": ("Available after six months under an electoral constitution. Legal electoral parties compete with current support; civil organizations have no extra votes. Electoral pacts combine member ballots. The winning pact or party forms a cabinet. Cost: 100 political power.", "采用允许选举的制度并经过六个月后可用。合法参选政党依当前支持率竞争，社会团体不会增加选票。选举联盟合计成员得票，由胜出的联盟或政党组阁。花费100政治点。"),
         "psf_open_society_view": ("Select the political society sidebar", "打开政治社会侧栏"),
+        "psf_appoint_caretaker": ("Appoint a caretaker government", "任命看守政府"),
+        "psf_appoint_caretaker_desc": ("Remove the current governing organization or alliance from office. Political alliances and their memberships remain in existence. Cost: 50 political power.", "结束当前组织或联盟的执政地位，保留各政治联盟及其成员关系。花费50政治点。"),
+        "psf_effect_clear_government": ("The government becomes a caretaker administration; existing political alliances remain active.", "政府进入看守状态；现有政治联盟继续存在。"),
         "psf_open_society_view_desc": ("Enable the organization sidebar. Open the country's politics tab to view it.", "开启团体侧栏；打开本国政治面板即可查看。"),
         "psf_event_1_title": ("The ballot has been counted", "选举结果揭晓"),
         "psf_event_1_desc": ("The largest individual electoral party is [PSFRuntimeGetWinner]. The government is [PSFUIGovernment].\n\nVotes were normalized among legal electoral organizations. An electoral alliance may form the government even when a different party holds the largest individual vote.\n\nThe country's institutions remain [PSFUIRegime].", "单个政党中得票最多的是[PSFRuntimeGetWinner]。现执政联盟为[PSFUIGovernment]。\n\n选票在合法参选组织之间归一分配。选举联盟可能凭合计票数组阁，而不是由单党得票第一者组阁。\n\n国家实际制度仍为[PSFUIRegime]。"),
@@ -100,11 +103,13 @@ def content_localization(manifest: dict) -> dict[str, dict[str, str]]:
         "negotiate": ("Negotiate with", "与其协商：", "Add 10 satisfaction toward the present government; 60-day cooldown.", "对现政府满意度提高10点；冷却60天。"),
         "campaign": ("Campaign for", "开展支持动员：", "Add 4 popular support; 60-day cooldown. This is approval, not an additional vote from nonparty organizations.", "支持率提高4点；冷却60天。社会组织的支持率不额外算作选票。"),
         "empower": ("Increase institutional access for", "扩大制度参与：", "Add 4 baseline influence; 90-day cooldown. This does not automatically increase popular support.", "基础影响力提高4点；冷却90天。不会自动增加民众支持率。"),
+        "govern_group": ("Form a government led by", "由该组织独立组阁：", "This legal organization forms a government using its own institutional influence. No political alliance is required or dissolved. Cost: 100 political power; 90-day cooldown.", "由该合法组织凭自身制度影响力独立执政，无需组建联盟，也不会解散现有联盟。花费100政治点；冷却90天。"),
     }
     for p in profiles(manifest):
         for g in p["groups"]:
             gid = g['id']
             short = '$psf_group_' + gid + '_short_name$'
+            add(f'psf_effect_govern_group_{gid}', short + ' forms an independent government.', short + '独立组织政府。')
             for action, en, zh in (
                 ('ban', 'Prohibit', '查禁'), ('legalize', 'Restore legal activity for', '恢复合法活动：'),
                 ('activate', 'Begin political activity for', '开始政治活动：'), ('underground', 'Move into underground activity:', '转入地下活动：'),

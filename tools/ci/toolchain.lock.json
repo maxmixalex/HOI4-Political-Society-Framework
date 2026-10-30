@@ -164,6 +164,8 @@
     "patches/sprite-types-in-bitmapfonts.patch": "a6fc0a55c29d2eca426d23f6f2a3f9897b1a098d331033073377b2a781a76604",
     "patches/scripted-localisation-path.patch": "08db914f12ee687d030d6707455b2d64fa9223cc3fa336afabeb43be8c32b75d",
     "patches/explicit-equipment-category-trigger-aliases.patch": "f67f96b3f698c931978f59bf37cba154c78f55409c9da7a02a875a12a0520e2f",
-    "stock-bookmark-imports.json": "008f801539a31aafdb9c3f6033ccf26949dfc8a3c386ea93c59969250e0a20c6"
+    "stock-bookmark-imports.json": "008f801539a31aafdb9c3f6033ccf26949dfc8a3c386ea93c59969250e0a20c6",
+    "stock-texture-imports.json": "b07f0c2e6d01f13fc458ee7187ca3846b8759e7aeddef57ddbc6337005cd910a",
+    "native-history-imports.json": "fe3e27e38540c51b502c486f9b5e50bcba80828ab91ee6c1723e3991b98f3912"
   }
 }

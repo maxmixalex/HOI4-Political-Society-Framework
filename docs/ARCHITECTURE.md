@@ -50,7 +50,7 @@ The support pie normalizes the modified support of active electoral organization
 
 Readable IDs determine generated variable and API names. Numeric IDs default to the first four bytes of SHA-256 reduced modulo 900,000, plus one; authors can set `numeric_id` explicitly. Numeric IDs are used for selections and identity comparisons. File order is not organization identity.
 
-Save state still depends on readable IDs and declared axes. A rename creates a new set of variable names. Adding a group does not retroactively initialize that group's data in a country already marked initialized. Preserve IDs and provide an explicit migration when changing a deployed registry; otherwise start a new campaign. The compiler's internal `<profile>_transition_cabinet` alliance ID is reserved.
+Save state still depends on readable IDs and declared axes. A rename creates a new set of variable names. Adding a group does not retroactively initialize that group's data in a country already marked initialized. Preserve IDs and provide an explicit migration when changing a deployed registry; otherwise start a new campaign. The compiler does not create synthetic cabinet alliances. A profile may contain zero alliances and an independent governing organization.
 
 ## Political spectrum and classification
 
@@ -85,6 +85,8 @@ Implementation: [`runtime.group_effects`](../psf/runtime.py).
 
 ## Alliances and governing agreements
 
+`government` is either an object containing `group`, an object containing `alliance`, or `null` for a caretaker. Omitting it preserves compatibility with an authored initial alliance whose `kind` is `government`; zero such alliances is also valid. The runtime keeps `psf_governing_group` and `psf_governing_alliance` mutually exclusive. Several non-governing alliances can coexist, including overlapping opposition and electoral agreements. Changing the selected government does not dissolve them.
+
 An alliance has an active flag, role, independent electoral-pact flag, member set and cohesion. A government support agreement can become an opposition agreement after another alliance forms a government. Electoral identity can persist through a change of governing role.
 
 Alliance coordinates and satisfaction are weighted by member effective influence. Its internal gap is the weighted mean distance of members from that alliance's mean position, divided by two to map the maximum 200-coordinate difference onto 0…100.
@@ -107,7 +109,7 @@ Only legal groups marked `electoral: true` enter the ballot. Their support is no
 vote_i = 100\frac{support_i}{\sum_{j\in legal\ electoral}support_j}.
 \]
 
-Civil associations do not create additional votes. Electoral pacts sum the votes of their eligible members, counting each member once inside the pact. The largest party is recorded separately from the winning pact, so election reporting can explain why the largest individual party and the governing agreement differ. A winning party can form the reserved cabinet agreement; a winning pact can govern through its existing identity.
+Civil associations do not create additional votes. Electoral pacts sum the votes of their eligible members, counting each member once inside the pact. The largest party is recorded separately from the winning pact, so election reporting can explain why the largest individual party and the governing agreement differ. A winning party can govern directly without a generated alliance; a winning pact governs through its existing identity. Other alliances keep their activity and independent memberships.
 
 The default term is 48 monthly updates, configurable by `settings.term_months`. A profile can override it with `election_term_months` and seed `election_months_elapsed`; starting-bookmark overrides accept both fields. A country therefore need not start a fresh term on 1 January 1936. These are abstract monthly intervals, not a reconstruction of the exact historical election day. The example seeds major democratic profiles where dates are available and uses Spain's declared 36-month opening term. Authored election-related events are separate political-content choices, not an exact electoral-calendar simulator.
 
@@ -157,6 +159,8 @@ Transactions group compatible mutations and recalculate once at commit. They are
 
 ## Native ideology compatibility
 
+The vanilla example uses strict mechanics and an export-only projection. This is separate from the bridge direction: `mechanics_mode` controls native political numerical effects and rules, while `bridge_mode` controls data synchronization. See [NATIVE_MECHANICS](NATIVE_MECHANICS.md) for the exact removals and retained engine boundaries. Country appearance has a separate [identity adapter](IDENTITY.md).
+
 The engine's `democratic`, `fascism`, `communism` and `neutrality` categories remain available to original content. An ideology prototype names one of these categories as `engine_ideology`.
 
 | Bridge mode | Behavior |
@@ -169,15 +173,15 @@ Projection aggregates declared active electoral parties by their current derived
 
 The projection is lossy. Four native values cannot encode multiple parties, association memberships or nine-dimensional positions. A native script saying “add democratic popularity” cannot specify which of several democratic parties should benefit; PSF distributes a compatibility delta rather than inventing that missing intent. A profile with no compatible declared organization cannot preserve arbitrary changes to an otherwise unrepresented native category. Authors should call organization-specific effects for precise behavior.
 
-An external `set_politics` operation also cannot describe a same-category switch from one PSF party to another. Use a governing-alliance effect for that change. The framework does not rewrite foreign-policy, national-focus or war goals to guess what a party ought to do. These remain content-author decisions.
+An external `set_politics` operation also cannot describe a same-category switch from one PSF party to another. Use an independent-group or governing-alliance effect for that change. The framework does not rewrite foreign-policy, national-focus or war goals to guess what a party ought to do. These remain content-author decisions.
 
 ## UI integration and compatibility
 
-The native patcher preserves named widget identities and ancestry, moves only obsolete political widgets off-screen, and adds PSF summary/sidebar mounts. It fails when the expected native structure is absent. Nested mounts are referenced with their engine `_instance` suffix and each scripted context has its own root window. The global political-chart sprite is not replaced because other game interfaces use it for unrelated distributions.
+The native patcher preserves engine-owned widget names and ancestry, hides obsolete political widgets and attaches explicitly scoped scripted-GUI roots to the native politics and diplomacy tokens. Domestic values use ROOT, foreign values use THIS. The diplomacy token starts inside the native country-info region, so its extra vertical offset is accounted for. No invented instance suffix is used. The global political-chart sprite is not replaced because other interfaces use it for unrelated distributions.
 
-The front-end adapter separately wraps native bookmark `history` localization for declared country profiles. It renders immutable starting snapshots using the bookmark's actual date and the same starting overrides, while preserving original historical text through `$original_key$`. It does not apply campaign on-actions before a game exists. The map-side hardcoded four-ideology widget has no demonstrated arbitrary-group data binding; the starting-snapshot previews are in the native important-country history panel.
+Country selection uses the engine's existing selected-country party-name binding. Country history prepares a temporary, date-specific PSF presentation in a dedicated political region in both selection panels. The ordinary historical introduction and the bookmark definitions remain unchanged. Campaign bootstrap restores ordinary party names without applying a day of simulation. The front end does not use an unsupported scripted-GUI context. See [BOOKMARKS](BOOKMARKS.md).
 
-The three complete native `.gui` overrides conflict with other mods replacing those files. A compatibility patch must merge the intended trees; load order alone chooses a winner and cannot merge both layouts. A supplied interface directory can be used as the patch source when its required structure is compatible. The lobby has no initialized campaign state, so it shows a static PSF notice rather than a fabricated live society model. See [UI.md](UI.md).
+The complete native GUI overrides need a compatibility patch when another mod replaces the same files. Strict vanilla integration also preserves and patches the original country-history files and replaces the four native ideology groups' mechanical bodies. A matching installed game's interface directory can be supplied as the source; the compiler reads its sibling history and ideology directories. Load order does not merge conflicting layouts or history. See [UI](UI.md) and [NATIVE_MECHANICS](NATIVE_MECHANICS.md).
 
 ## Verification boundaries
 

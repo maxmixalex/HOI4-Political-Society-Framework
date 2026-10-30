@@ -14,8 +14,12 @@ layered first and the dependent content pack second. `content_id` is read from
 the generated `build-manifest.json`, so the same command validates custom
 framework packs as well as the vanilla example. Reports are available
 as the `cwtools-diagnostics` Actions artifact; successfully checked launcher
-mods are the `psf-mods` artifact. Any engine error or warning, unexpected nonzero exit,
-missing report, empty output, or toolchain hash mismatch fails the job.
+mods are the `psf-mods` artifact. Any unresolved code error or warning, unexpected
+nonzero exit, missing report, empty output, or toolchain hash mismatch fails the
+job. Exact, evidenced native texture dependencies and diagnostics reproduced
+on unmodified original history are reported separately as described below.
+Their original diagnostics are retained and are never described as a clean
+raw engine report.
 The wrapper also rejects scripts over 2 MiB: the supplied CLI silently skips
 larger files during discovery. The compiler must split complete top-level
 definitions into smaller files so no generated effects escape validation.
@@ -115,10 +119,35 @@ baseline, allow-empty flag, or conversion of errors into warnings.
 
 `stock-bookmark-imports.json` similarly records the original bookmark names,
 descriptions and country-history localisation keys, with their source lines
-and source-file hashes. The front-end adapter substitutes a new PSF history
-key that embeds the chart and includes `$original_history_key$`; it never
-copies, replaces or deletes the original game's translated prose. These
-imports are pinned in the same toolchain lock and remain validation-only.
+and source-file hashes. The current frontend leaves historical prose separate
+from its political presentation and retains the game's historical text keys.
+These imports are pinned in the same toolchain lock and remain validation-only.
+
+## Native texture dependencies
+
+The source archive also omits original DDS textures. `stock-texture-imports.json`
+records only exact paths already declared in supplied native `.gfx` files,
+together with each original file's SHA-256, sprite name, line and declaration.
+The metadata itself is pinned by `toolchain.lock.json`. Its sixteen paths cover
+the fourteen default icon textures plus the two native unknown/anarchism
+fallbacks. No DDS placeholder is created, no binary cache is forged, and no
+CWT filepath rule or severity is changed.
+
+The engine's complete original output remains in `cwtools.json`. In the absence
+of `--vanilla`, the wrapper separates only error-code `CW113` with the exact
+native missing-file message, an exact declared texture path and a `.gfx` source
+into `stock-texture-dependencies.json`. Everything else remains a normal code
+diagnostic. A case mismatch, typo or new missing PSF texture therefore fails.
+Only the engine's ordinary diagnostic exit 1 can become a dependency-only
+validation result; crashes, empty discovery and other statuses still fail.
+
+`summary.json` reports `raw_engine_errors` and `raw_engine_exit_code` separately
+from unresolved `errors`, `warnings` and the wrapper's `exit_code`. It also
+records the number of external dependency occurrences and unique paths,
+`stock_texture_payloads_bundled = false`, and `runtime_launch_tested = false`.
+A successful wrapper result means that the remaining code passed this static
+check with these declared game dependencies. It does not prove that the absent
+textures exist in a particular installation or render correctly.
 
 To check against a complete, licensed installation instead:
 
@@ -126,8 +155,57 @@ To check against a complete, licensed installation instead:
 python tools/ci/validate.py --root dist --vanilla '/path/to/Hearts of Iron IV' --self-test
 ```
 
-This replaces the bundled script-symbol cache and skips synthetic import
-declarations, resolving against your real installation instead.
+This replaces the bundled script-symbol cache, skips synthetic localization
+declarations and disables stock-texture classification. A missing texture in
+generated GFX remains an unresolved engine error, even for a declared path.
+
+## Original country-history baseline
+
+Strict mode preserves 364 supplied native country histories and adds bootstrap
+calls. Importing those complete files also exposes their existing diagnostics:
+some reflect CWT limitations, while others concern native resources omitted
+from the supplied script archive. They must not be described collectively as
+false positives or silently assigned to new PSF code.
+
+`native-history-imports.json` pins every original bundled file's SHA-256 and is
+itself pinned in the toolchain lock. Before validation,
+`tools/ci/native_history.py` verifies the complete output filename inventory,
+each original hash, the combined source hash, and every generated file's exact
+bytes against `bootstrap.patch_history(original)`. Any additional change to a
+bootstrap call or original statement fails before baseline classification.
+For builds compiled from an explicit installation, that same `--vanilla`
+installation must independently provide originals matching the compilation
+hashes; generated files cannot serve as their own originals.
+
+The wrapper then runs the real binary twice in the **same complete staged PSF
+environment**. The first run validates generated histories. For the second,
+only those verified history files are swapped for their originals without PSF
+bootstrap calls. Both runs retain the same PSF effects, variables, GUI,
+localization, rules and lookup source. The baseline applies only the compiler's
+documented BOM normalization and exact-hash Norway repairs: the missing final
+brace and the commented-out empty pre-MtG branch. It does not invent or simplify
+other source statements. Generated histories are restored even if the baseline
+engine run fails.
+
+`cwtools.json` and `native-history-baseline.json` retain both full raw reports.
+The classifier maps only unchanged complete generated lines to the baseline
+and then to the original source. A diagnostic can be inherited only when its
+relative filename, code, severity, complete message, mapped source line and
+original surrounding-line SHA-256 all match a baseline diagnostic, one for
+one. PSF insertion lines have no original mapping. Repeated messages elsewhere
+in a file, new unknown effects, and changed original statements do not qualify.
+The CLI report does not contain columns, so the implementation records the
+exact available line and source-context proof rather than inventing columns.
+
+`inherited-native-history-diagnostics.json` records both matching diagnostics
+and their source proof. Summary fields separately count
+`inherited_native_history_errors`, `inherited_native_history_warnings` and
+`inherited_native_history_info`, as well as the verified source-file count and
+baseline exit code. `validation_errors`/`validation_warnings` describe the
+remaining new diagnostics; `raw_engine_errors`/`raw_engine_warnings` remain the
+actual binary's totals. Baseline comparison also works with `--vanilla`; it
+never exempts new generated script and does not claim the original game files
+are free of errors or compatible with every game version.
 
 ## Proving the gate does work
 
@@ -146,6 +224,12 @@ same binary and full ruleset used for the build:
 | Unknown trigger in `common/scripted_localisation` | Nonzero, CW263 |
 | `always = perhaps` trigger | Nonzero, CW240 |
 | Valid native equipment category trigger | Exit 0, no errors |
+| Exact declared native texture path, with no DDS payload supplied | Raw CW113/nonzero retained; one explicit external dependency |
+| Misspelled variant of that native texture path | Raw CW113/nonzero retained; unresolved error, no dependency classification |
+| Actual PRC source plus exact PSF history insertions | Real baseline/generated reports agree on original statements; inherited diagnostics retain source proof |
+| New unknown effect on a PSF insertion line | Real CWTools error remains new and fails after baseline comparison |
+| Bootstrap call changed from `yes` to `no` | Exact-byte reconstruction fails before invoking the engine |
+| Original native `state` assignment changed | Exact-byte reconstruction fails before invoking the engine |
 
 The negative examples are valid enough to reach semantic validation where
 appropriate; a brace counter alone cannot pass them. JSON results are retained

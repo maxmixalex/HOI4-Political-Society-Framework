@@ -11,9 +11,41 @@ from unittest.mock import patch
 
 from psf.compiler import compile_manifest
 from tools.ci.engine_safety import MAX_SCRIPT_BYTES, UTF8_BOM, file_findings, gui_windows, inspect_build
-from tools.ci.validate import main as validate
+from tools.ci.validate import (main as validate, classify_stock_texture_dependencies,
+                               declared_stock_textures)
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+class StockTextureImportTests(unittest.TestCase):
+    def diagnostic(self, path="gfx/interface/ideologies/democratic_group.dds", **changes):
+        return {"code": "CW113", "severity": "error", "file": "interface/probe.gfx",
+                "line": 1, "message": f"File {path} not found, this is case sensitive", **changes}
+
+    def test_only_exact_native_declarations_are_external_dependencies(self):
+        known = self.diagnostic()
+        for candidate in (self.diagnostic("gfx/interface/ideologies/democratic_groupp.dds"),
+                          self.diagnostic("gfx/interface/ideologies/Democratic_group.dds"),
+                          self.diagnostic("gfx/interface/psf/missing.dds"),
+                          self.diagnostic(code="CW500")):
+            diagnostics, dependencies = classify_stock_texture_dependencies([known, candidate], enabled=True)
+            self.assertEqual(diagnostics, [candidate])
+            self.assertEqual(len(dependencies), 1)
+            self.assertEqual(dependencies[0]["diagnostic"], known)
+            self.assertTrue(all(item["source"].endswith(".gfx") and item["line"] > 0
+                                for item in dependencies[0]["evidence"]))
+
+    def test_full_install_never_waives_missing_original_textures(self):
+        known = self.diagnostic()
+        diagnostics, dependencies = classify_stock_texture_dependencies([known], enabled=False)
+        self.assertEqual(diagnostics, [known])
+        self.assertEqual(dependencies, [])
+
+    def test_default_icons_have_pinned_native_texture_evidence(self):
+        from psf import icons
+        used = set(icons.IDEOLOGY_LARGE.values()) | set(icons.IDEOLOGY_SMALL.values())
+        used |= {path for pair in icons.CATEGORY_TEXTURES.values() for path in pair}
+        self.assertLessEqual(used, set(declared_stock_textures()))
 
 
 class EngineSafetyTests(unittest.TestCase):

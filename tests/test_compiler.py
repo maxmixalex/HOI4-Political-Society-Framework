@@ -36,6 +36,17 @@ class CompilerTests(unittest.TestCase):
         self.assertEqual(registry["groups"]["eng_labour"]["color"], [207, 83, 96])
         self.assertEqual(registry["groups"]["eng_conservative"]["color"], [84, 133, 191])
 
+    def test_registry_exposes_two_icon_sizes_identity_and_independent_government(self):
+        registry = json.loads((self.output / "psf-registry.json").read_text())
+        for group in registry["groups"].values():
+            self.assertTrue(group["large_icon"].startswith("GFX_"))
+            self.assertTrue(group["small_icon"].startswith("GFX_"))
+            self.assertTrue(group["texticon"].startswith("£"))
+        self.assertEqual(len(registry["ideology_icons"]), len(registry["ideologies"]))
+        self.assertEqual(registry["identities"]["ger_national_identity"]["cosmetic_tag"], "PSF_GER_NATIONAL_IDENTITY")
+        self.assertEqual(registry["governments"]["generic_democratic"], {"group": "generic_democratic_government"})
+        self.assertFalse(any(key.endswith("transition_cabinet") for key in registry["alliances"]))
+
     def test_launcher_version_is_optional_and_engine_compatible(self):
         self.assertNotIn("supported_version", descriptor("Example"))
         self.assertIn('supported_version="1.19.*"', descriptor("Example", supported_version="1.19.*"))

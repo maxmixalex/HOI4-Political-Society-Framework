@@ -20,7 +20,7 @@ def main(argv=None) -> int:
     compile_cmd = commands.add_parser("compile", help="Build the reusable framework and dependent content mod")
     compile_cmd.add_argument("manifest", type=Path)
     compile_cmd.add_argument("--output", type=Path, default=Path("dist"))
-    compile_cmd.add_argument("--vanilla", type=Path, help="Optional original game's interface directory for verified native patches")
+    compile_cmd.add_argument("--vanilla", type=Path, help="Original game's interface directory; strict mode also reads sibling history/countries and common/ideologies")
     compile_cmd.add_argument("--supported-version", help="Optional verified target version, e.g. 1.19.*; omitted when unknown")
     inspect = commands.add_parser("inspect", help="Inspect stable IDs and authored group positions")
     inspect.add_argument("manifest", type=Path)

@@ -987,6 +987,41 @@
             }
           ]
         }
+      ],
+      "identities": [
+        {
+          "id": "ger_constitutional_identity",
+          "name": {
+            "english": "German Republic",
+            "simp_chinese": "德意志共和国"
+          },
+          "adjective": {
+            "english": "German",
+            "simp_chinese": "德国"
+          },
+          "when": {
+            "regime": "parliamentary_republic"
+          },
+          "definite_name": {
+            "english": "the German Republic",
+            "simp_chinese": "德意志共和国"
+          }
+        },
+        {
+          "id": "ger_national_identity",
+          "name": {
+            "english": "German Reich",
+            "simp_chinese": "德意志国"
+          },
+          "adjective": {
+            "english": "German",
+            "simp_chinese": "德国"
+          },
+          "definite_name": {
+            "english": "the German Reich",
+            "simp_chinese": "德意志国"
+          }
+        }
       ]
     },
     {
@@ -1361,7 +1396,42 @@
         }
       ],
       "election_months_elapsed": 2,
-      "election_term_months": 48
+      "election_term_months": 48,
+      "identities": [
+        {
+          "id": "eng_constitutional_identity",
+          "name": {
+            "english": "British Republic",
+            "simp_chinese": "不列颠共和国"
+          },
+          "adjective": {
+            "english": "British",
+            "simp_chinese": "英国"
+          },
+          "when": {
+            "regime": "parliamentary_republic"
+          },
+          "definite_name": {
+            "english": "the British Republic",
+            "simp_chinese": "不列颠共和国"
+          }
+        },
+        {
+          "id": "eng_national_identity",
+          "name": {
+            "english": "United Kingdom",
+            "simp_chinese": "联合王国"
+          },
+          "adjective": {
+            "english": "British",
+            "simp_chinese": "英国"
+          },
+          "definite_name": {
+            "english": "the United Kingdom",
+            "simp_chinese": "联合王国"
+          }
+        }
+      ]
     },
     {
       "id": "fra",
@@ -1795,7 +1865,42 @@
         }
       ],
       "election_months_elapsed": 44,
-      "election_term_months": 48
+      "election_term_months": 48,
+      "identities": [
+        {
+          "id": "fra_constitutional_identity",
+          "name": {
+            "english": "French State",
+            "simp_chinese": "法兰西国"
+          },
+          "adjective": {
+            "english": "French",
+            "simp_chinese": "法国"
+          },
+          "when": {
+            "regime": "authoritarian_republic"
+          },
+          "definite_name": {
+            "english": "the French State",
+            "simp_chinese": "法兰西国"
+          }
+        },
+        {
+          "id": "fra_national_identity",
+          "name": {
+            "english": "French Republic",
+            "simp_chinese": "法兰西共和国"
+          },
+          "adjective": {
+            "english": "French",
+            "simp_chinese": "法国"
+          },
+          "definite_name": {
+            "english": "the French Republic",
+            "simp_chinese": "法兰西共和国"
+          }
+        }
+      ]
     },
     {
       "id": "usa",
@@ -2209,7 +2314,42 @@
         }
       ],
       "election_months_elapsed": 38,
-      "election_term_months": 48
+      "election_term_months": 48,
+      "identities": [
+        {
+          "id": "usa_constitutional_identity",
+          "name": {
+            "english": "American Parliamentary Republic",
+            "simp_chinese": "美利坚议会共和国"
+          },
+          "adjective": {
+            "english": "American",
+            "simp_chinese": "美国"
+          },
+          "when": {
+            "regime": "parliamentary_republic"
+          },
+          "definite_name": {
+            "english": "the American Parliamentary Republic",
+            "simp_chinese": "美利坚议会共和国"
+          }
+        },
+        {
+          "id": "usa_national_identity",
+          "name": {
+            "english": "United States of America",
+            "simp_chinese": "美利坚合众国"
+          },
+          "adjective": {
+            "english": "American",
+            "simp_chinese": "美国"
+          },
+          "definite_name": {
+            "english": "the United States of America",
+            "simp_chinese": "美利坚合众国"
+          }
+        }
+      ]
     },
     {
       "id": "sov",
@@ -2533,6 +2673,41 @@
               "influence": 1
             }
           ]
+        }
+      ],
+      "identities": [
+        {
+          "id": "sov_constitutional_identity",
+          "name": {
+            "english": "Russian Federal Republic",
+            "simp_chinese": "俄罗斯联邦共和国"
+          },
+          "adjective": {
+            "english": "Soviet",
+            "simp_chinese": "苏联"
+          },
+          "when": {
+            "regime": "parliamentary_republic"
+          },
+          "definite_name": {
+            "english": "the Russian Federal Republic",
+            "simp_chinese": "俄罗斯联邦共和国"
+          }
+        },
+        {
+          "id": "sov_national_identity",
+          "name": {
+            "english": "Soviet Union",
+            "simp_chinese": "苏维埃联盟"
+          },
+          "adjective": {
+            "english": "Soviet",
+            "simp_chinese": "苏联"
+          },
+          "definite_name": {
+            "english": "the Soviet Union",
+            "simp_chinese": "苏维埃联盟"
+          }
         }
       ]
     },
@@ -2889,6 +3064,41 @@
               "satisfaction": 33
             }
           ]
+        }
+      ],
+      "identities": [
+        {
+          "id": "ita_constitutional_identity",
+          "name": {
+            "english": "Italian Republic",
+            "simp_chinese": "意大利共和国"
+          },
+          "adjective": {
+            "english": "Italian",
+            "simp_chinese": "意大利"
+          },
+          "when": {
+            "regime": "parliamentary_republic"
+          },
+          "definite_name": {
+            "english": "the Italian Republic",
+            "simp_chinese": "意大利共和国"
+          }
+        },
+        {
+          "id": "ita_national_identity",
+          "name": {
+            "english": "Kingdom of Italy",
+            "simp_chinese": "意大利王国"
+          },
+          "adjective": {
+            "english": "Italian",
+            "simp_chinese": "意大利"
+          },
+          "definite_name": {
+            "english": "the Kingdom of Italy",
+            "simp_chinese": "意大利王国"
+          }
         }
       ]
     },
@@ -3284,7 +3494,42 @@
         }
       ],
       "election_months_elapsed": 0,
-      "election_term_months": 48
+      "election_term_months": 48,
+      "identities": [
+        {
+          "id": "jap_constitutional_identity",
+          "name": {
+            "english": "Japanese Republic",
+            "simp_chinese": "日本共和国"
+          },
+          "adjective": {
+            "english": "Japanese",
+            "simp_chinese": "日本"
+          },
+          "when": {
+            "regime": "parliamentary_republic"
+          },
+          "definite_name": {
+            "english": "the Japanese Republic",
+            "simp_chinese": "日本共和国"
+          }
+        },
+        {
+          "id": "jap_national_identity",
+          "name": {
+            "english": "Empire of Japan",
+            "simp_chinese": "日本帝国"
+          },
+          "adjective": {
+            "english": "Japanese",
+            "simp_chinese": "日本"
+          },
+          "definite_name": {
+            "english": "the Empire of Japan",
+            "simp_chinese": "日本帝国"
+          }
+        }
+      ]
     },
     {
       "id": "chi",
@@ -3673,6 +3918,41 @@
               "support": 51
             }
           ]
+        }
+      ],
+      "identities": [
+        {
+          "id": "chi_constitutional_identity",
+          "name": {
+            "english": "Chinese Parliamentary Republic",
+            "simp_chinese": "中华议会共和国"
+          },
+          "adjective": {
+            "english": "Chinese",
+            "simp_chinese": "中国"
+          },
+          "when": {
+            "regime": "parliamentary_republic"
+          },
+          "definite_name": {
+            "english": "the Chinese Parliamentary Republic",
+            "simp_chinese": "中华议会共和国"
+          }
+        },
+        {
+          "id": "chi_national_identity",
+          "name": {
+            "english": "Republic of China",
+            "simp_chinese": "中华民国"
+          },
+          "adjective": {
+            "english": "Chinese",
+            "simp_chinese": "中国"
+          },
+          "definite_name": {
+            "english": "the Republic of China",
+            "simp_chinese": "中华民国"
+          }
         }
       ]
     },
@@ -4237,7 +4517,42 @@
         }
       ],
       "election_months_elapsed": 35,
-      "election_term_months": 36
+      "election_term_months": 36,
+      "identities": [
+        {
+          "id": "spr_constitutional_identity",
+          "name": {
+            "english": "Spanish State",
+            "simp_chinese": "西班牙国"
+          },
+          "adjective": {
+            "english": "Spanish",
+            "simp_chinese": "西班牙"
+          },
+          "when": {
+            "regime": "authoritarian_republic"
+          },
+          "definite_name": {
+            "english": "the Spanish State",
+            "simp_chinese": "西班牙国"
+          }
+        },
+        {
+          "id": "spr_national_identity",
+          "name": {
+            "english": "Spanish Republic",
+            "simp_chinese": "西班牙共和国"
+          },
+          "adjective": {
+            "english": "Spanish",
+            "simp_chinese": "西班牙"
+          },
+          "definite_name": {
+            "english": "the Spanish Republic",
+            "simp_chinese": "西班牙共和国"
+          }
+        }
+      ]
     },
     {
       "id": "pol",
@@ -4657,6 +4972,41 @@
             }
           ]
         }
+      ],
+      "identities": [
+        {
+          "id": "pol_constitutional_identity",
+          "name": {
+            "english": "Polish Parliamentary Republic",
+            "simp_chinese": "波兰议会共和国"
+          },
+          "adjective": {
+            "english": "Polish",
+            "simp_chinese": "波兰"
+          },
+          "when": {
+            "regime": "parliamentary_republic"
+          },
+          "definite_name": {
+            "english": "the Polish Parliamentary Republic",
+            "simp_chinese": "波兰议会共和国"
+          }
+        },
+        {
+          "id": "pol_national_identity",
+          "name": {
+            "english": "Republic of Poland",
+            "simp_chinese": "波兰共和国"
+          },
+          "adjective": {
+            "english": "Polish",
+            "simp_chinese": "波兰"
+          },
+          "definite_name": {
+            "english": "the Republic of Poland",
+            "simp_chinese": "波兰共和国"
+          }
+        }
       ]
     }
   ],
@@ -4906,25 +5256,10 @@
           "color": "#6193B8"
         }
       ],
-      "alliances": [
-        {
-          "id": "generic_democratic_compact",
-          "name": {
-            "english": "Governing political compact",
-            "simp_chinese": "执政政治协议"
-          },
-          "description": {
-            "english": "A political agreement whose members retain their own interests and positions.",
-            "simp_chinese": "成员保留各自利益与立场的政治协议。"
-          },
-          "kind": "government",
-          "members": [
-            "generic_democratic_government",
-            "generic_democratic_business"
-          ],
-          "cohesion": 70
-        }
-      ]
+      "alliances": [],
+      "government": {
+        "group": "generic_democratic_government"
+      }
     },
     {
       "id": "generic_fascism",
@@ -5171,25 +5506,10 @@
           "color": "#81D68A"
         }
       ],
-      "alliances": [
-        {
-          "id": "generic_fascism_compact",
-          "name": {
-            "english": "Governing political compact",
-            "simp_chinese": "执政政治协议"
-          },
-          "description": {
-            "english": "A political agreement whose members retain their own interests and positions.",
-            "simp_chinese": "成员保留各自利益与立场的政治协议。"
-          },
-          "kind": "government",
-          "members": [
-            "generic_fascism_government",
-            "generic_fascism_business"
-          ],
-          "cohesion": 70
-        }
-      ]
+      "alliances": [],
+      "government": {
+        "group": "generic_fascism_government"
+      }
     },
     {
       "id": "generic_communism",
@@ -5436,25 +5756,10 @@
           "color": "#9C5978"
         }
       ],
-      "alliances": [
-        {
-          "id": "generic_communism_compact",
-          "name": {
-            "english": "Governing political compact",
-            "simp_chinese": "执政政治协议"
-          },
-          "description": {
-            "english": "A political agreement whose members retain their own interests and positions.",
-            "simp_chinese": "成员保留各自利益与立场的政治协议。"
-          },
-          "kind": "government",
-          "members": [
-            "generic_communism_government",
-            "generic_communism_military"
-          ],
-          "cohesion": 70
-        }
-      ]
+      "alliances": [],
+      "government": {
+        "group": "generic_communism_government"
+      }
     },
     {
       "id": "generic_neutrality",
@@ -5701,25 +6006,10 @@
           "color": "#66AA79"
         }
       ],
-      "alliances": [
-        {
-          "id": "generic_neutrality_compact",
-          "name": {
-            "english": "Governing political compact",
-            "simp_chinese": "执政政治协议"
-          },
-          "description": {
-            "english": "A political agreement whose members retain their own interests and positions.",
-            "simp_chinese": "成员保留各自利益与立场的政治协议。"
-          },
-          "kind": "government",
-          "members": [
-            "generic_neutrality_government",
-            "generic_neutrality_military"
-          ],
-          "cohesion": 70
-        }
-      ]
+      "alliances": [],
+      "government": {
+        "group": "generic_neutrality_government"
+      }
     }
   ],
   "scenarios": [
@@ -10061,5 +10351,9 @@
         }
       }
     }
-  ]
+  ],
+  "settings": {
+    "mechanics_mode": "strict",
+    "bridge_mode": "export"
+  }
 }

@@ -60,20 +60,25 @@ def audit(mod: Path) -> dict:
     dip_summary = windows["psf_diplomatic_summary"]
     pol_bottom = point(pol_summary)[1] + size(pol_summary)[1]
     native_bottom_start = point(named(politics, "politics_bottom"))[1]
-    dip_bottom = point(dip_summary)[1] + size(dip_summary)[1]
+    diplomacy_token_y = point(named(diplomacy, "country_info"))[1]
+    dip_bottom = diplomacy_token_y + point(dip_summary)[1] + size(dip_summary)[1]
     focus_start = (point(named(diplomacy, "country_info"))[1]
                    + point(named(diplomacy, "diplomacy_tab_top"))[1]
                    + point(named(diplomacy, "active_national_focus_info", "diplomacy_tab_top"))[1])
     checks = {
         "political_summary_precedes_native_management_strip": pol_bottom <= native_bottom_start,
         "diplomatic_summary_precedes_native_focus": dip_bottom <= focus_start,
+        "diplomatic_summary_starts_at_native_party_region": point(dip_summary)[1] == point(named(diplomacy, "diplomacy_tab_top"))[1],
         "every_script_owns_one_top_level_window": set(bindings) == set(windows),
     }
     for mode, token in (("political", "politics_tab"), ("diplomatic", "selected_country_view_diplomacy")):
         sidebar = windows[f"psf_{mode}_society_side"]
         sw, sh = size(sidebar)
         checks[mode + "_sidebar_outside_native_panel"] = point(sidebar)[0] >= 550
-        for view in ("summary", "society_side"):
+        token_y = 0 if mode == "political" else diplomacy_token_y
+        checks[mode + "_sidebar_header_aligned_to_native_top"] = point(sidebar)[1] + token_y == 0
+        native_views = ("summary", "society_side", "government_party") if mode == "diplomatic" else ("summary", "society_side")
+        for view in native_views:
             binding = bindings[f"psf_{mode}_{view}"]
             checks[mode + "_" + view + "_native_token"] = binding.properties.get("parent_window_token", (0, 0, ""))[2] == token
             checks[mode + "_" + view + "_no_fabricated_instance"] = "parent_window_name" not in binding.properties
@@ -84,7 +89,7 @@ def audit(mod: Path) -> dict:
             if child.kind.lower() == "instanttextboxtype":
                 w = int(child.properties["maxwidth"][2]); h = int(child.properties["maxheight"][2])
             elif child.kind.lower() == "buttontype":
-                if child.name.startswith("psf_open_") and child.name.endswith(("support", "influence")):
+                if child.name.startswith("psf_open_"):
                     w, h = 63, 63
                 else:
                     w, h = size(child) if any(n.kind.lower() == "size" for n in child.children) else (123, 34)
@@ -92,16 +97,29 @@ def audit(mod: Path) -> dict:
                 continue
             checks[f"{mode}/{child.name}_in_summary"] = 0 <= x and 0 <= y and x + w <= width and y + h <= height
         for name, node in windows.items():
-            if not name.startswith(f"psf_{mode}_") or name in (f"psf_{mode}_summary", f"psf_{mode}_society_side"):
+            if not name.startswith(f"psf_{mode}_") or name in tuple(f"psf_{mode}_{view}" for view in native_views):
                 continue
             x, y = point(node); w, h = size(node)
             checks[name + "_viewport_inside_sidebar"] = x >= 0 and y >= 0 and x + w <= sw and y + h <= sh
             checks[name + "_native_scrollbar"] = node.properties.get("verticalscrollbar", (0, 0, ""))[2] == '"right_vertical_slider"'
             checks[name + "_clips_to_viewport"] = node.properties.get("clipping", (0, 0, ""))[2] == "yes"
+            checks[name + "_native_scroll_background"] = any(n.kind == "background" for n in node.children)
+            margin = property_block(node, "margin")
+            checks[name + "_scrollbar_gutter"] = int(margin.get("right", "0")) >= 12
             binding = bindings[name]
             checks[name + "_explicit_parent"] = binding.properties.get("parent_scripted_gui", (0, 0, ""))[2] == f"psf_{mode}_society_side_gui"
             checks[name + "_own_visibility"] = any(n.kind == "visible" for n in binding.children)
             checks[name + "_reacts_to_ui_state"] = "dirty" not in binding.properties
+        if mode == "diplomatic":
+            party_window = windows["psf_diplomatic_government_party"]
+            native_icon = named(diplomacy, "ideology_icon", "country_info")
+            # Hidden native widget retains Y=0, while X is moved off-screen.
+            px, py = point(party_window); pw, ph = size(party_window)
+            leader_x = point(named(diplomacy, "leader_name", "country_info"))[0]
+            tabs_y = point(named(diplomacy, "relations_tab_button", "country_info"))[1]
+            checks["diplomatic_party_icon_keeps_native_header_slot"] = px == 158 and py == point(native_icon)[1]
+            checks["diplomatic_party_icon_precedes_leader_text_and_tabs"] = px + pw <= leader_x and py + ph <= tabs_y
+            checks["diplomatic_party_icon_clips_artwork"] = party_window.properties.get("clipping", (0, 0, ""))[2] == "yes"
         for name, binding in bindings.items():
             if not name.startswith(f"psf_{mode}_"):
                 continue
@@ -160,11 +178,17 @@ def projection(mod: Path, destination: Path) -> None:
         else:
             rect(ox+13, oy+160, 125, 138, "#303b3e", "Native leader")
             rect(ox+144, oy+248, 376, 76, "#564b32", "Existing national focus")
+            party_window = named(society, "psf_diplomatic_government_party")
+            px, py = point(party_window); pw, ph = size(party_window)
+            rect(ox+px, oy+py+point(named(native,"country_info"))[1], pw, ph,
+                 "#426354", "Party icon")
             sx, sy = point(named(society, "psf_diplomatic_summary"))
+            sy += point(named(native, "country_info"))[1]
         summary = named(society, f"psf_{mode}_summary")
         w, h = size(summary)
         rect(ox+sx, oy+sy, w, h, "#273e34", "")
-        labels = {"regime": "Actual regime", "government": "Governing alliance", "metrics": "Support / effective influence", "legitimacy": "Legitimacy / active groups"}
+        labels = {"regime": "Actual regime", "government": "Governing party", "metrics": "Support / influence", "legitimacy": "Legitimacy / groups",
+                  "party_label": "Government", "ideology_label": "Ideology", "support_label": "Support", "influence_label": "Influence"}
         for child in summary.children:
             x, y = point(child)
             if child.kind.lower() == "instanttextboxtype":
@@ -175,10 +199,11 @@ def projection(mod: Path, destination: Path) -> None:
                 if child.name.endswith(("support", "influence")):
                     rect(ox+sx+x, oy+sy+y, 63, 63, "#426354", child.name.removeprefix("psf_open_").title())
                 else:
-                    bw,bh=size(child) if any(n.kind.lower()=="size" for n in child.children) else (123,34)
-                    rect(ox+sx+x, oy+sy+y, bw,bh, "#5b5b43", "Groups" if child.name.endswith("groups") else "Spectrum")
+                    rect(ox+sx+x, oy+sy+y, 63,63, "#5b5b43", "Party icon" if child.name.endswith("groups") else "Ideology")
         side_name = f"psf_{mode}_society_side"
         mx, my = point(named(society, side_name))
+        if mode == "diplomatic":
+            my += point(named(native, "country_info"))[1]
         side = named(society, side_name)
         sw, sh = size(side)
         rect(ox+mx, oy+my, sw, sh, "#273331", "Optional sidebar; opens on request")
@@ -201,11 +226,22 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument("mod",type=Path)
     parser.add_argument("--svg",type=Path)
+    parser.add_argument("--report",type=Path,help="Write the complete per-control report without printing it")
     args=parser.parse_args()
     result=audit(args.mod)
     if args.svg:
         projection(args.mod,args.svg)
-    print(json.dumps(result,indent=2))
+    if args.report:
+        args.report.parent.mkdir(parents=True,exist_ok=True)
+        args.report.write_text(json.dumps(result,indent=2)+"\n",encoding="utf-8")
+    failures = [name for name, passed in result["checks"].items() if not passed]
+    print(f"UI audit: {len(result['checks'])} checks, {result['scripted_windows']} windows; "
+          f"{len(failures)} failures")
+    print(f"Politics bottom {result['political_summary_bottom']} / native management {result['native_management_top']}; "
+          f"diplomacy bottom {result['diplomatic_summary_bottom']} / native focus {result['native_focus_top']}")
+    for name in failures:
+        print("FAIL:",name)
+    print(result["limitation"])
     return 0 if result["passed"] else 1
 
 

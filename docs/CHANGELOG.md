@@ -1,5 +1,56 @@
 # Release notes
 
+## 0.4.0 — immediate country data, native presentation and independent government
+
+Repairs the second set of in-game screenshots: domestic localized values and
+chart frames now use the explicit player scope; foreign data uses the selected
+country, with the native diplomacy container's vertical offset accounted for.
+The filled pie stays inside the original rim. Sidebars use original title,
+frame and button artwork, actual scrolling backgrounds, reserved scrollbar
+space, compact alliance cards and colored value/status tooltips.
+
+Country selection keeps its original historical text. A separate political
+region uses the native selected-country party binding for dated PSF pies,
+governing party and regime; the old ideology icon and explanatory framework
+copy are removed. Preview names are restored to normal native party names on
+campaign bootstrap. Organizations and ideology prototypes have independent
+large/small native-artwork sprites, texticons and author-supplied overrides.
+
+Government may be a single organization, an authored alliance or a caretaker.
+Multiple alliances can coexist without being dissolved by a government change.
+The compiler no longer invents transition cabinets. The four vanilla fallback
+templates use independent governing organizations. A leading party is derived
+separately from coalition identity, so strong military or court members do not
+replace a governing party in its display slot.
+
+The vanilla example opts into strict native mechanics with an export-only
+bridge. The adapter removes the ordinary native popularity stability bonus,
+cancels additional popularity coefficients, unifies the four ideology slots'
+mechanical differences, adjusts seventeen native defines and derives five
+diplomatic thresholds from PSF institutions. Native elections are disabled;
+PSF's election clock remains active. Original focus/event and some hardcoded
+conditions still use the compatibility projection; this is documented rather
+than described as removal of every ideology-dependent game script.
+
+All 364 supplied country-history files initialize PSF before daily advancement,
+including dated starts. Original statements and filenames are preserved; one
+exactly identified malformed Norway source receives a recorded closing-brace
+repair. Campaign bootstrap is idempotent and does not apply daily drift or
+expire timed sources.
+
+The country-identity adapter emits cosmetic-tag names and optional three-size
+flags from PSF regime/government conditions. Four native ideology flag variants
+receive identical authored pixels. External cosmetic tags are respected after
+they take ownership. Twenty name identities and an executable fictional flag
+example demonstrate the authoring path. The vanilla example inherits installed
+game flags until the author supplies its own images.
+
+CWTools keeps its raw diagnostics. Proven references to original game textures
+are reported explicitly as external dependencies when only the script snapshot
+is available; unknown or misspelled textures fail. A complete `--vanilla`
+validation does not apply this external-resource exception. No HOI4 engine
+launch is claimed by the static or interpreter checks.
+
 ## 0.3.1 — native UI placement, organization colors and later campaigns
 
 - Bind political and diplomatic summaries and sidebars to native window tokens; use the diplomacy-specific token confirmed in the supplied KR/PB scripts so the panel does not leak into intelligence views.

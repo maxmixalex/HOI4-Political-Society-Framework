@@ -1,136 +1,152 @@
-# Country-selection previews
+# Country-selection politics
 
-PSF displays compact organization rows with support and influence percentages in
-the native **interesting-country selection history panel**. The vanilla example supplies
-**20 date-specific snapshots** for ten countries and both stock bookmarks,
-bound to **28 existing country/DLC history variants**.
+Country selection displays the selected country's governing organization,
+regime, ideology artwork, and separate support and influence pies in its native
+political information area. This works through the existing `party` binding in
+both the interesting-country panel and the map-selection details panel. The
+original history description contains no political statistics, generated
+charts, or framework explanations.
 
-The countries are China, France, Germany, Italy, Japan, Poland, the Soviet Union,
-Spain, the United Kingdom and the United States. Their actual stock bookmark
-dates are `1936.1.1.12` and `1939.8.14.12`. Country entries without a declared
-PSF country profile are unchanged; generic fallback data is not presented as
-an authored country snapshot.
+This automatic frontend binding is enabled by the strict vanilla adapter,
+which also supplies the necessary country-history preparation. In `compat`
+mode the compiler retains the complete original country-selection layout;
+it does not hide native fields when no history hook supplies the replacement.
+Compiled snapshot metadata records `binding_enabled` separately from the
+available artwork.
 
-## Native binding and preserved history
+The vanilla example covers ten authored countries and both stock bookmarks:
+`1936.1.1.12` and `1939.8.14.12`. The coverage report lists **20 country/date
+snapshots** across **28 existing country/DLC variants**. Fallback profiles also
+receive compiled presentations for countries without an authored profile.
 
-`psf/bookmarks.py` reads each existing `common/bookmarks/*.txt` country entry
-and replaces only its `history` localisation reference. For example, the
-generated key contains this structure:
+## Binding to the selected country
 
-```text
-Support / Influence
-£psf_bookmark_key_example_party£ Example Party 50.0% / 40.0%
+The front end has no established scripted-GUI country context that PSF can
+safely assume. It does have native `leader` and `party` fields that the engine
+updates as the player selects countries. Native country history already uses
+`set_party_name`, including both short and long localisation keys. PSF uses
+that existing connection:
 
-$GER_GATHERING_STORM_DESC$
-```
+1. A preserved native history file initializes the PSF profile at its root and
+   relevant date boundaries, then calls `psf_prepare_frontend`.
+2. Preparation assigns a compiled presentation key to the four native party
+   slots' short and long names. All four slots receive the same selected
+   profile/date presentation, so the display does not depend on which native
+   ideology slot currently projects the government.
+3. The native `party` textbox displays the governing organization's small icon
+   and name, the actual regime, and a separate artwork row containing the PSF
+   ideology's large icon and a 140×63 support/influence image.
+4. `psf_finish_frontend` restores ordinary short and long party names. Campaign
+   startup and `psf_bootstrap`, including opening the campaign political
+   interface, call this idempotent restoration.
 
-The exact generated sprite and localisation keys are recorded in
-`psf_bookmark_manifest.json`; the example above illustrates the structure and
-uses an illustrative organization and percentages.
-The original `GER_GATHERING_STORM_DESC` remains owned by the installed game.
-PSF references it through localisation substitution and does not replace its
-translated text. Original DLC conditions, country order, ideas, focuses,
-portraits and every other bookmark field are retained.
+Presentation names are temporary selection state. Ordinary party names use
+actual electoral organizations matching each engine ideology projection. An
+empty projection has a neutral “No electoral organization” name; it does not
+create an organization, cabinet, or alliance. The original engine-owned leader
+name and portrait remain bound to the selected country.
 
-The engine already selects the `history` field for the current country and
-bookmark. The existing `history` textbox keeps its native identity and ancestry,
-with a 160-pixel viewport and the stock `standardtext_slider`. The adapter does
-not add a hypothetical frontend scripted-GUI country context.
+The game's exact startup rendering order still needs a live engine check.
+`on_startup` may occur after the first paused frame; the GUI bootstrap also
+restores names when a campaign political interface is opened. Script tests
+verify the actual emitted prepare/finish effects and both name forms, not a
+claim that every engine window has already rendered those effects.
 
-## Fix for overlapping history text
+## Independent layout and unchanged history
 
-The previous implementation inserted a 140×63 dual-pie texture into an ordinary
-16-pixel text row. The supplied game screenshot showed the image overlapping
-both the metric labels and the first paragraph of the original history. Text
-icons do not provide an independently sized GUI container, so adding empty
-lines would leave the rendering dependent on the icon's baseline behavior.
+`psf/frontend.py::patch_native` preserves all native widget names and ancestry.
+It hides the old four-slot ideology icon, wheel and redundant ideology,
+government and election text fields. The `party_label` uses the native
+`GOVERNMENT` localisation, with the native leader fields retained. No visible
+“PSF” banner or implementation explanation replaces the country's politics.
 
-The history adapter now inserts only **12×12 color keys**. Each organization
-uses one ordinary line containing its short name and both percentages. The
-native textbox controls wrapping and scrolling; every image is smaller than
-the text font's nominal 16-pixel height. The original history begins after one
-blank separator line. There are no large inline charts to extend into adjacent
-lines. Short labels are conservatively bounded to 22 Latin-width columns
-(wide CJK characters count as two); longer labels end with an ellipsis. Full
-organization names remain available in the campaign interface.
+The interesting-country political region is 245×225 pixels at `(35,477)`;
+its 245×170 party field starts at `(0,52)`. The neighboring native portrait
+continues to start at x=289. The map-selection information region remains
+inside the native 492×301 panel: its party field is 350×170 at `(110,34)`,
+with the leader row below and the native spirit grid at y=230. Explicit
+clipping contains the presentation within these political regions. Text rows
+use a native 18-point font and compact labels; the artwork row has its own
+reserved space below them. The large archetype icon and dual pies fit the
+left-column width without widening into the portrait.
 
-The campaign's political and diplomatic panels retain their separate native
-support and influence pies. `charts.bookmark_artwork` can still produce a full
-dual-pie snapshot for an appropriately sized custom GUI widget or offline use;
-the standard history adapter does not generate or embed those large textures.
+This is distinct from the earlier history-inline implementation. PSF no longer
+writes `common/bookmarks/*.txt`, creates replacement history keys, or appends
+statistics to original descriptions. The original historical text remains
+fully owned by the installed game and its selected DLC variant. The native
+history textbox simply gains a 160-pixel scrolling viewport.
 
-Text-icon definitions use ordinary `spriteType` entries with
-`legacy_lazy_load = no`, matching the supplied `interface/texticons.gfx`.
-Localisation refers to each sprite without its `GFX_` prefix, using the normal
-`£icon_name£` notation. The color keys use the exact organization `color` values
-and are shared between dates and DLC variants.
+No live HOI4 render was performed in the headless development environment.
+Geometry checks establish parent bounds, preserved bindings, image dimensions,
+and separate text/image structure; actual font baselines, external custom art,
+and the engine's first-frame order remain part of the in-game smoke test.
 
-## What the snapshots show
+## Data and artwork
 
-`psf/charts.py::bookmark_values` applies every `start_overrides` entry whose
-date is at or before the selected bookmark. Support includes active electoral
-organizations; influence includes active organizations after the configured
-underground/banned influence penalties. Both metrics normalize their own total;
-the row's color key matches that organization's campaign pie sectors and badge.
-An organization with zero shares in both metrics is omitted from the compact
-table. Non-electoral organizations can still appear with an influence share
-and zero electoral support.
+Every profile has a base presentation and one presentation for each distinct
+`start_overrides` boundary. For a selected date, all preceding overrides are
+applied cumulatively, including group status, support, influence, positions,
+regime, and an explicitly selected governing group or alliance.
 
-These are the declared starting political society values, including the
-date-specific overrides. They are not a campaign simulation, and they cannot
-predict later events or externally supplied native modifiers. A snapshot with
-no nonzero organization shares shows an explicit empty-state line before the
-original history. The generated report records each snapshot's normalized
-support/influence values, original history key, replacement key, row labels,
-color-key sprites and textures, and DLC variant.
+Support includes active electoral organizations. Influence includes active
+organizations with the configured underground/banned penalties. Each metric
+normalizes its own total. Both pies use the same exact authored organization
+RGB values as the campaign charts and color keys. The 63-pixel pie canvases
+reserve a four-pixel transparent inset around a 27-pixel fill radius.
 
-## Separate map-selection panel
+The governing organization follows the campaign rule: among legal government
+members, prefer a party or electoral organization and select the greatest
+effective influence; use the lowest stable numeric ID to break ties. Only when
+no such party exists does an ordinary governing organization represent the
+government. A zero-weight or absent government has an explicit caretaker
+presentation. A strong court or army does not replace its coalition's party
+merely because its influence is greater. The displayed ideology is the closest
+archetype to the government's influence-weighted positions.
 
-The map-selection right-hand `gamesetup_country_details` panel is a different
-native window. The supplied definition has no `history` binding, and its
-political pie is tied to the engine's ideology categories. The bookmark adapter
-does **not** make that panel display arbitrary PSF organization data. PSF hides
-its obsolete ideology/party wheel and labels and retains a concise notice.
-The 20 snapshots described here appear in the interesting-country history
-panel only.
+All groups and archetypes have separate native-artwork large and small sprites,
+with independent authored overrides. The frontend consumes the government's
+party small sprite and ideology large sprite; campaign politics and diplomacy
+also use both large identities. Default artwork represents broad political
+families or organization types, not a claim to reproduce every historical
+party emblem. See [AUTHORING.md](AUTHORING.md#custom-icons) for custom sprites.
 
-Both bookmark files are full native-file overrides, as required by the game's
-file replacement rules. A mod changing the same bookmark files needs a merged
-adapter, in addition to the interface compatibility work described in
-[UI.md](UI.md). Adjusting load order alone cannot preserve both sets of edits.
+## Files, compatibility and verification
 
-## Source provenance and verification
+`psf_bookmark_manifest.json` reports original source hashes and history keys,
+DLC coverage, normalized metrics, and the selected compiled presentation.
+Its `frontend` section lists every generated state, texture and sprite;
+`history_overridden` and `runtime_render_tested` are both explicitly false.
+The generated interface definitions are in `interface/psf_frontend.gfx`, and
+translations are in each language's `psf_frontend` localisation file.
 
-The bundled source snapshots come from the user-supplied original game script
-archive. They remain Paradox Interactive material, excluded from PSF's MIT
-grant. `psf/assets/native_bookmarks/sources.json` records these exact hashes:
+The original bookmark snapshots used for coverage come from the user-supplied
+Paradox Interactive game script archive. Their provenance is recorded in
+`psf/assets/native_bookmarks/sources.json`. They are excluded from PSF's MIT
+grant. Their hashes are:
 
 | Original game path | SHA-256 |
 | --- | --- |
 | `common/bookmarks/the_gathering_storm.txt` | `31d22ba3fdd6160be56f198f0ec078c09156d3fdcfadced809f73226f698422f` |
 | `common/bookmarks/blitzkrieg.txt` | `54f6f23dec5a066dca37125f69a29b8cc0400b4c0d598ff6e6ba71bd82dcf25d` |
 
-The runtime bindings are visible in the supplied
-`interface/frontendgamesetupview.gui`: the `history` textbox belongs to
-`gamesetup_interesting_countries_window`; the separate
-`gamesetup_country_details` contains the hardcoded political pie.
-`tools/ci/stock-bookmark-imports.json` records the original bookmark
-localisation dependencies and their source lines for script-only validation;
-those synthetic validation declarations are never shipped in the mod.
+This adapter does not introduce a bookmark-file load-order conflict. The native
+GUI and country-history adapters still require merging when another mod
+changes the same files; use that mod's native source tree for compilation.
+Changing load order alone cannot merge two incompatible native UI definitions.
 
-Run the regression suite with:
+Run the focused regression suites with:
 
 ```sh
+python -m unittest discover -s tests -p 'test_frontend.py' -v
 python -m unittest discover -s tests -p 'test_bookmarks.py' -v
+python -m unittest discover -s tests -p 'test_charts.py' -v
 ```
 
-It compares the entire native bookmark structure before and after the change,
-checks all 28 history variants, verifies original-prose substitution and DLC
-gates, and proves that the 1939 overrides change the displayed data while
-retaining the organization's color. Pixel checks inspect every generated
-front-end texture's dimensions and RGB values; text-structure checks enforce
-one font-sized icon per organization line and a separate original-history
-paragraph, including long names and the zero-total case.
-CWTools checks the resulting bookmark, sprite and localisation references.
-Neither check constitutes a completed HOI4 render or launch test; the generated
-report explicitly retains `runtime_render_tested: false`.
+They execute emitted selection/name-restoration effects across authored and
+fallback profiles and both dates; cover direct governments, alliances and
+caretakers; verify original histories are never overridden; inspect generated
+image dimensions and exact pie colors; and check reproducible output. The UI
+suite checks native identities, ancestry, separate political bounds and hidden
+obsolete controls. CWTools validates script, GUI, sprite and localisation
+references. These checks complement the in-game smoke test rather than
+standing in for one.

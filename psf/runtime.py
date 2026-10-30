@@ -9,7 +9,7 @@ from datetime import date, timedelta
 import math
 
 from .model import ENGINE_IDEOLOGIES, ROLES, STATUS, profiles
-from . import modifiers, charts
+from . import modifiers, charts, identity, mechanics, frontend
 from .script import Block, addv, block, check, clamp, conditional, divv, emit, mulv, setv, subv
 
 
@@ -36,6 +36,24 @@ def active(group: dict) -> str:
 
 def legal(group: dict) -> str:
     return check(gv(group["id"], "status"), 1)
+
+
+def government_selection(profile: dict) -> dict | None:
+    """Explicit government takes precedence; omitted fields keep legacy data."""
+    if "government" in profile:
+        return profile["government"]
+    return next(({"alliance": a["id"]} for a in profile.get("alliances", [])
+                 if a["kind"] == "government"), None)
+
+
+def select_government(profile: dict, selection: dict | None) -> list[Block | str]:
+    out: list[Block | str] = [setv("psf_governing_alliance", 0), setv("psf_governing_group", 0)]
+    if selection:
+        kind = "group" if "group" in selection else "alliance"
+        items = profile["groups"] if kind == "group" else profile["alliances"]
+        chosen = next(item for item in items if item["id"] == selection[kind])
+        out.append(setv("psf_governing_" + kind, chosen["_index"]))
+    return out
 
 
 def distance(destination: str, pairs: list[tuple[str, str | float, float]], scale: float = 1) -> list[Block | str]:
@@ -95,6 +113,8 @@ def core_triggers() -> str:
         block("psf_has_stable_government", check("psf_caretaker", 0), check("psf_legitimacy", 60, "greater_than_or_equals")),
         block("psf_has_elections", check("psf_elections_enabled", 1)),
         block("psf_is_caretaker", check("psf_caretaker", 1)),
+        block("psf_has_group_government", check("psf_governing_group", 0, "greater_than"), check("psf_caretaker", 0)),
+        block("psf_has_alliance_government", check("psf_governing_alliance", 0, "greater_than"), check("psf_caretaker", 0)),
         block("psf_legitimacy_at_least", check("psf_legitimacy", "psf_threshold", "greater_than_or_equals")),
     ]) + "\n"
 
@@ -107,9 +127,14 @@ def refresh_effect(manifest: dict, p: dict) -> Block:
         setv("psf_government_weight", 0), setv("psf_government_support", 0),
         setv("psf_government_satisfaction", 0), setv("psf_group_count", 0),
         setv("psf_government_members", 0), setv("psf_caretaker", 1),
+        setv("psf_government_leader_group", 0), setv("psf_government_leader_weight", -1, True),
     ]
     for axis in axes:
         out.append(setv("psf_gov_" + axis["id"], 0))
+    for alliance in p["alliances"]:
+        out += [setv(av(alliance["id"], "active"), 0),
+                conditional([block("OR", [check(av(alliance["id"], "g_" + group["id"]), 1) for group in p["groups"]])],
+                            setv(av(alliance["id"], "active"), 1))]
     for g in p["groups"]:
         gid = g["id"]
         out += modifiers.recalculate_group(manifest, g)
@@ -121,7 +146,7 @@ def refresh_effect(manifest: dict, p: dict) -> Block:
                 conditional([active(g)], addv("psf_group_count", 1))]
         if g["electoral"]:
             out.append(conditional([active(g)], addv("psf_total_party_support", ev(gid, "support"))))
-        membership = [block("AND", check("psf_governing_alliance", a["_index"]), check(av(a["id"], "active"), 1), check(av(a["id"], "g_" + gid), 1)) for a in p["alliances"]]
+        membership = [check("psf_governing_group", g["_index"])] + [block("AND", check("psf_governing_alliance", a["_index"]), check(av(a["id"], "active"), 1), check(av(a["id"], "g_" + gid), 1)) for a in p["alliances"]]
         body: list[Block | str] = [setv(gv(gid, "governing"), 1), setv("psf_caretaker", 0), addv("psf_government_members", 1),
                                   addv("psf_government_weight", gv(gid, "effective_influence")),
                                   setv("psf_weighted", ev(gid, "satisfaction"), True), mulv("psf_weighted", gv(gid, "effective_influence"), True),
@@ -139,8 +164,21 @@ def refresh_effect(manifest: dict, p: dict) -> Block:
                            [divv("psf_gov_" + axis["id"], "psf_government_weight") for axis in axes],
                            divv("psf_government_satisfaction", "psf_government_weight")))
     # Zero-power legal cabinets remain a caretaker: their coordinates are undefined.
-    out.append(conditional([check("psf_government_weight", 0)], setv("psf_caretaker", 1), setv("psf_governing_alliance", 0),
+    out.append(conditional([check("psf_government_weight", 0)], setv("psf_caretaker", 1), setv("psf_governing_alliance", 0), setv("psf_governing_group", 0),
                            [setv(gv(g['id'], 'governing'), 0) for g in p['groups']]))
+    # The displayed governing organization prioritizes a governing party over
+    # the army, palace or another institutional member of a coalition. This is
+    # presentation data; it does not change cabinet membership or its weights.
+    political, other = [], []
+    for g in sorted(p["groups"], key=lambda group: group["_index"]):
+        candidate = conditional([check(gv(g["id"], "governing"), 1),
+                                 check(gv(g["id"], "effective_influence"), "psf_government_leader_weight", "greater_than")],
+                                setv("psf_government_leader_group", g["_index"]),
+                                setv("psf_government_leader_weight", gv(g["id"], "effective_influence"), True))
+        (political if g.get("electoral", False) or g.get("kind") == "party" else other).append(candidate)
+    out += political
+    if other:
+        out.append(conditional([check("psf_government_leader_group", 0)], other))
     out.append("psf_classify_government = yes")
     out += [setv("psf_alignment_gap", 0), setv("psf_elections_enabled", 0)]
     for regime in manifest["regimes"]:
@@ -151,12 +189,17 @@ def refresh_effect(manifest: dict, p: dict) -> Block:
     out.append(conditional([check("psf_caretaker", 1)], setv("psf_alignment_gap", 100), setv("psf_government_ideology", 0)))
     for alliance in p["alliances"]:
         aid = alliance["id"]
-        body = [setv(av(aid, "member_count"), 0), setv(av(aid, "support"), 0), setv(av(aid, "influence"), 0), setv(av(aid, "satisfaction"), 0), setv(av(aid, "gap"), 0)]
+        body = [conditional([check("psf_governing_alliance", alliance["_index"])], setv(av(aid, "role"), 1)),
+                conditional([block("NOT", check("psf_governing_alliance", alliance["_index"])), check(av(aid, "role"), 1)], setv(av(aid, "role"), 2)),
+                setv(av(aid, "member_count"), 0), setv(av(aid, "support"), 0), setv(av(aid, "influence"), 0), setv(av(aid, "satisfaction"), 0), setv(av(aid, "gap"), 0)]
         for axis in axes:
             body.append(setv(av(aid, "position_" + axis["id"]), 0))
         for g in p["groups"]:
             gid = g["id"]
-            contribution: list[Block | str] = [addv(av(aid, "member_count"), 1), addv(av(aid, "influence"), gv(gid, "effective_influence")),
+            # Membership and active political weight are distinct. A pact with
+            # dormant members still exists until its membership is removed.
+            body.append(conditional([check(av(aid, "g_" + gid), 1)], addv(av(aid, "member_count"), 1)))
+            contribution: list[Block | str] = [addv(av(aid, "influence"), gv(gid, "effective_influence")),
                 setv("psf_weighted", ev(gid, "satisfaction"), True), mulv("psf_weighted", gv(gid, "effective_influence"), True), addv(av(aid, "satisfaction"), "psf_weighted")]
             if g["electoral"]:
                 contribution.append(addv(av(aid, "support"), ev(gid, "support")))
@@ -182,7 +225,9 @@ def refresh_effect(manifest: dict, p: dict) -> Block:
             setv("psf_satisfaction_bonus", "psf_government_satisfaction", True), subv("psf_satisfaction_bonus", 50, True), divv("psf_satisfaction_bonus", 100, True),
             addv("psf_legitimacy_change", "psf_satisfaction_bonus"),
             conditional([check("psf_caretaker", 1)], subv("psf_legitimacy_change", 1)),
-            "psf_refresh_modifiers = yes", "psf_update_charts_" + p["id"] + " = yes", addv("psf_ui_revision", 1)]
+            "psf_refresh_modifiers = yes", "psf_update_charts_" + p["id"] + " = yes", "psf_apply_identity = yes", addv("psf_ui_revision", 1)]
+    if manifest["settings"].get("mechanics_mode", "compat") == "strict":
+        out += ["psf_apply_native_policy = yes", "psf_export_government = yes"]
     return block("psf_refresh_" + p["id"], out)
 
 
@@ -209,6 +254,7 @@ def group_effects(manifest: dict, p: dict, g: dict) -> list[Block]:
             # opposition cooperation may continue in clandestine form.
             for a in p["alliances"]:
                 body.append(conditional([check("psf_governing_alliance", a["_index"])], setv(av(a["id"], "g_" + gid), 0)))
+            body.append(conditional([check("psf_governing_group", g["_index"])], setv("psf_governing_group", 0)))
         out.append(block(f"psf_{name}_{gid}", conditional([flag(p), *requirements], "psf_prepare_change = yes", f"custom_effect_tooltip = psf_effect_{name}_{gid}", body, finish())))
     for metric in ("support", "influence", "satisfaction"):
         out.append(block(f"psf_add_{gid}_{metric}", conditional([flag(p)], "psf_prepare_change = yes", f"custom_effect_tooltip = psf_effect_add_{gid}_{metric}", addv(gv(gid, metric), "psf_amount"), clamp(gv(gid, metric), 0, 100), finish())))
@@ -219,6 +265,18 @@ def group_effects(manifest: dict, p: dict, g: dict) -> list[Block]:
         out.append(block(f"psf_set_{gid}_position_{axis['id']}", conditional([flag(p)], "psf_prepare_change = yes",
                          f"custom_effect_tooltip = psf_effect_position_{gid}_{axis['id']}", setv(gv(gid, "position_" + axis["id"]), "psf_position"), clamp(gv(gid, "position_" + axis["id"]), -100, 100),
                          finish())))
+    cabinet: list[Block | str] = ["custom_effect_tooltip = psf_effect_govern_group_" + gid]
+    for member in p["groups"]:
+        if member["id"] != gid:
+            cabinet.append(conditional([check(gv(member["id"], "governing"), 1)], subv(gv(member["id"], "satisfaction"), 10)))
+    cabinet += [conditional([check(gv(gid, "governing"), 0)], addv(gv(gid, "satisfaction"), 20), clamp(gv(gid, "satisfaction"), 60, 100))]
+    for alliance in p["alliances"]:
+        cabinet.append(conditional([check(av(alliance["id"], "role"), 1)], setv(av(alliance["id"], "role"), 2)))
+    cabinet += [setv("psf_governing_alliance", 0), setv("psf_governing_group", g["_index"]),
+                "psf_refresh = yes", "psf_export_government = yes",
+                conditional(["NOT = { has_country_flag = psf_batch_update }"], "psf_export_popularity = yes")]
+    out.append(block("psf_govern_group_" + gid, conditional([flag(p)], "psf_prepare_change = yes", "psf_refresh = yes",
+                     conditional([legal(g), check(ev(gid, "influence"), 0, "greater_than")], cabinet))))
     return out
 
 
@@ -235,7 +293,7 @@ def alliance_effects(manifest: dict, p: dict, a: dict) -> list[Block]:
         ]
     for other in p["alliances"]:
         government_body.append(conditional([check(av(other["id"], "role"), 1)], setv(av(other["id"], "role"), 2)))
-    government_body += [setv("psf_governing_alliance", a["_index"]), setv(av(aid, "active"), 1), setv(av(aid, "role"), 1),
+    government_body += [setv("psf_governing_group", 0), setv("psf_governing_alliance", a["_index"]), setv(av(aid, "active"), 1), setv(av(aid, "role"), 1),
                         "psf_refresh = yes", "psf_export_government = yes",
                         conditional(["NOT = { has_country_flag = psf_batch_update }"], "psf_export_popularity = yes")]
     # Elections and native government imports may have just raised a winner's
@@ -265,10 +323,11 @@ def alliance_effects(manifest: dict, p: dict, a: dict) -> list[Block]:
 def initialize_effect(manifest: dict, p: dict) -> Block:
     regime_map = {r["id"]: r for r in manifest["regimes"]}
     body: list[Block | str] = ["set_country_flag = psf_initialized", "set_country_flag = psf_profile_" + p["id"],
-                             setv("psf_schema_version", 1), setv("psf_legitimacy", p["legitimacy"]),
+                             setv("psf_schema_version", 2), setv("psf_legitimacy", p["legitimacy"]),
                              setv("psf_regime", regime_map[p["regime"]]["_index"]), setv("psf_election_clock", p.get("election_months_elapsed", 0)),
                              setv("psf_election_term", p.get("election_term_months", manifest['settings']['term_months'])),
-                             setv("psf_election_count", 0), setv("psf_ui_open", 0), setv("psf_ui_page", 0)]
+                             setv("psf_election_count", 0), setv("psf_ui_open", 0), setv("psf_ui_page", 0), setv("psf_identity", 0),
+                             setv("psf_governing_alliance", 0), setv("psf_governing_group", 0)]
     for g in p["groups"]:
         body += modifiers.initialize_group(manifest, g)
         for metric in ("support", "influence", "satisfaction"):
@@ -282,8 +341,7 @@ def initialize_effect(manifest: dict, p: dict) -> Block:
         body += [setv(av(a["id"], "active"), int(bool(a["members"]))), setv(av(a["id"], "role"), ROLES[a["kind"]]), setv(av(a["id"], "electoral"), int(a["kind"] == "electoral")), setv(av(a["id"], "cohesion"), a["cohesion"])]
         for g in p["groups"]:
             body.append(setv(av(a["id"], "g_" + g["id"]), int(g["id"] in a["members"])))
-        if a["kind"] == "government":
-            body.append(setv("psf_governing_alliance", a["_index"]))
+    body += select_government(p, government_selection(p))
     for override in p.get("start_overrides", []):
         effects: list[Block | str] = []
         if "regime" in override:
@@ -313,7 +371,9 @@ def initialize_effect(manifest: dict, p: dict) -> Block:
                 effects.append(setv(av(alliance["id"], "electoral"), int(alliance["kind"] == "electoral")))
                 if alliance["kind"] == "government":
                     index = next(a["_index"] for a in p["alliances"] if a["id"] == alliance["id"])
-                    effects.append(setv("psf_governing_alliance", index))
+                    effects += [setv("psf_governing_group", 0), setv("psf_governing_alliance", index)]
+        if "government" in override:
+            effects += select_government(p, override["government"])
         previous_day = date(*map(int, override["date"].split('.'))) - timedelta(days=1)
         body.append(conditional([f"date > {previous_day.year}.{previous_day.month}.{previous_day.day}"], effects))
     body += [f"psf_refresh_{p['id']} = yes", "psf_export_popularity = yes", "psf_capture_engine_government = yes"]
@@ -363,12 +423,11 @@ def election_effect(manifest: dict, p: dict) -> list[Block]:
     count_votes += [setv("psf_election_clock", 0), addv("psf_election_count", 1), addv("psf_legitimacy", 3), f"psf_refresh_{p['id']} = yes",
                     conditional(["is_ai = no"], "country_event = { id = psf.1 }")]
     body.append(conditional([check("psf_ballot_total", 0, "greater_than")], count_votes))
-    cabinet = p["alliances"][-1]
-    cabinet_body: list[Block | str] = [setv(av(cabinet["id"], "g_" + g["id"]), 0) for g in p["groups"]]
-    cabinet_body += [setv(av(cabinet["id"], "cohesion"), 65)]
+    # Keep the public helper name, but a standalone winner does not need an
+    # invented empty alliance. Authored electoral pacts still govern jointly.
+    cabinet_body: list[Block | str] = []
     for g in p["groups"]:
-        cabinet_body.append(conditional([check("psf_winning_group", g["_index"]), legal(g)], setv(av(cabinet["id"], "g_" + g["id"]), 1)))
-    cabinet_body += ["psf_govern_" + cabinet["id"] + " = yes"]
+        cabinet_body.append(conditional([check("psf_winning_group", g["_index"]), legal(g)], "psf_govern_group_" + g["id"] + " = yes"))
     # A caller can change support, sources or the regime inside a transaction.
     # Eligibility and ballots must use the resulting values, not the cache from
     # before the transaction began; the caller still owns the batch flag.
@@ -505,6 +564,32 @@ def effects(manifest: dict) -> str:
         condition = "tag = " + p["tag"] if "tag" in p else "has_government = " + p["engine_ideology"]
         initialize.append(conditional([condition], "psf_init_" + p["id"] + " = yes", kind="if" if index == 0 else "else_if"))
     out.append(block("psf_initialize", conditional(["NOT = { has_country_flag = psf_initialized }"], initialize)))
+    migration: list[Block | str] = [
+        conditional(["NOT = { has_variable = psf_governing_group }"], setv("psf_governing_group", 0)),
+        conditional(["NOT = { has_variable = psf_identity }"], setv("psf_identity", 0)),
+    ]
+    for p in all_profiles:
+        valid = [check("psf_governing_alliance", 0)] + [check("psf_governing_alliance", a["_index"]) for a in p["alliances"]]
+        recover: list[Block | str] = [setv("psf_governing_alliance", 0), setv("psf_migration_weight", -1, True)]
+        for g in p["groups"]:
+            recover.append(conditional([check(gv(g["id"], "governing"), 1), legal(g),
+                                        check(gv(g["id"], "effective_influence"), "psf_migration_weight", "greater_than")],
+                                       setv("psf_governing_group", g["_index"]),
+                                       setv("psf_migration_weight", gv(g["id"], "effective_influence"), True)))
+        migration.append(conditional([flag(p), block("NOT", block("OR", valid))], recover))
+    migration.append(setv("psf_schema_version", 2))
+    out.append(block("psf_upgrade_runtime", conditional([check("psf_schema_version", 2, "less_than")], migration)))
+    # History and GUI entrypoints can rebuild immediately, without applying a
+    # day of drift, expiring sources or reinitializing an existing campaign.
+    out.append(block("psf_bootstrap",
+        conditional(["has_country_flag = psf_initialized"], "psf_upgrade_runtime = yes", "psf_import_popularity = yes", "psf_refresh = yes", "psf_export_popularity = yes"),
+        block("else", "psf_initialize = yes"), "psf_finish_frontend = yes"))
+    # Only generated country-history files call this resettable entry point.
+    # Date blocks can replace native politics after a root initialization; the
+    # last applicable history block must therefore select its own fallback.
+    out.append(block("psf_history_bootstrap", "clr_country_flag = psf_initialized",
+                     ["clr_country_flag = psf_profile_" + p["id"] for p in all_profiles],
+                     "psf_initialize = yes"))
     for action in ("refresh", "monthly", "hold_election", "import_popularity", "export_popularity", "import_government"):
         body = [conditional([flag(p)], f"psf_{action}_{p['id']} = yes", kind="if" if i == 0 else "else_if") for i, p in enumerate(all_profiles)]
         if action == "import_popularity" and manifest["settings"]["bridge_mode"] != "bidirectional":
@@ -513,13 +598,20 @@ def effects(manifest: dict) -> str:
             body = ["# Disabled by the manifest's bridge_mode."]
         out.append(block("psf_" + action, body))
     out.append(block("psf_commit_transaction", "clr_country_flag = psf_batch_update", "psf_refresh = yes", "psf_export_popularity = yes"))
+    clear_body: list[Block | str] = ["psf_prepare_change = yes", "custom_effect_tooltip = psf_effect_clear_government",
+                                   setv("psf_governing_group", 0), setv("psf_governing_alliance", 0)]
+    for p in all_profiles:
+        if p["alliances"]:
+            clear_body.append(conditional([flag(p)], [conditional([check(av(a["id"], "role"), 1)], setv(av(a["id"], "role"), 2)) for a in p["alliances"]]))
+    clear_body.append(finish())
+    out.append(block("psf_clear_government", conditional(["psf_is_initialized = yes"], clear_body)))
     capture: list[Block | str] = []
     for i, engine in enumerate(ENGINE_IDEOLOGIES, 1):
         capture.append(conditional(["has_government = " + engine], setv("psf_last_engine_government", i)))
     out.append(block("psf_capture_engine_government", capture))
     bridge = ["set_country_flag = psf_bridge_busy"]
     for ideology in manifest["ideologies"]:
-        bridge.append(conditional([check("psf_government_ideology", ideology["_index"])], block("set_politics", "ruling_party = " + ideology["engine_ideology"])))
+        bridge.append(conditional([check("psf_government_ideology", ideology["_index"]), "NOT = { has_government = " + ideology["engine_ideology"] + " }"], block("set_politics", "ruling_party = " + ideology["engine_ideology"])))
     bridge += ["psf_capture_engine_government = yes", "clr_country_flag = psf_bridge_busy"]
     out.append(block("psf_export_government", bridge if manifest["settings"]["bridge_mode"] != "none" else ["# Engine government projection disabled."]))
     generic_actions = {"ban": "ban", "legalize": "legalize", "activate": "activate", "underground": "underground", "deactivate": "deactivate",
@@ -531,7 +623,12 @@ def effects(manifest: dict) -> str:
                 target = f"psf_add_{g['id']}_{action.removeprefix('add_')}" if action.startswith("add_") else f"psf_{action}_{g['id']}"
                 nodes.append(conditional([flag(p), check("psf_group", g["_index"])], target + " = yes"))
         out.append(block("psf_" + action + "_group", nodes))
+    out.append(block("psf_govern_group", [conditional([flag(p), check("psf_group", g["_index"])], "psf_govern_group_" + g["id"] + " = yes")
+                                         for p in all_profiles for g in p["groups"]]))
     out.extend(modifiers.effects(manifest))
+    out.extend(identity.definitions(manifest))
+    out.extend(mechanics.definitions(manifest))
+    out.extend(frontend.runtime_effects(manifest))
     return emit(out) + "\n"
 
 

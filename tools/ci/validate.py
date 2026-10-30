@@ -11,7 +11,7 @@ import argparse
 import hashlib
 import json
 import os
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 import platform
 import re
 import shutil
@@ -21,8 +21,10 @@ import tempfile
 
 try:
     from .engine_safety import MAX_SCRIPT_BYTES, inspect_build
+    from . import native_history
 except ImportError:  # Direct `python tools/ci/validate.py` invocation.
     from engine_safety import MAX_SCRIPT_BYTES, inspect_build
+    import native_history
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parent.parent
@@ -135,6 +137,57 @@ def add_declared_stock_imports(staged: Path) -> int:
     return len(imports)
 
 
+def declared_stock_textures() -> dict[str, list[dict]]:
+    """Load pinned native declarations, not fabricated texture payloads.
+
+    The script-only archive has no DDS bytes. Keep that limitation explicit:
+    these imports classify CW113 dependency diagnostics only when validating
+    with the same script-only cache. A real --vanilla run uses no imports.
+    """
+    manifest = json.loads((HERE / "stock-texture-imports.json").read_text(encoding="utf-8"))
+    if manifest.get("format") != 1:
+        raise ValidationFailure("Unknown stock texture evidence format")
+    textures = manifest["textures"]
+    for texture, sources in textures.items():
+        path = PurePosixPath(texture)
+        if (not path.parts or path.is_absolute() or ".." in path.parts or path.parts[0] != "gfx"
+                or path.suffix != ".dds" or "psf" in texture.lower() or not sources):
+            raise ValidationFailure(f"Invalid external stock texture declaration: {texture}")
+        for source in sources:
+            source_path = PurePosixPath(source["source"])
+            digest = manifest["source_files"].get(source["source"], "")
+            declaration = re.fullmatch(r'texturefile\s*=\s*"([^"\n]+)"',
+                                       source["declaration"], re.IGNORECASE)
+            if (not source_path.parts or source_path.is_absolute() or ".." in source_path.parts
+                    or source_path.parts[0] != "interface" or source_path.suffix != ".gfx"
+                    or not re.fullmatch(r"[a-f0-9]{64}", digest)
+                    or not isinstance(source["line"], int) or source["line"] < 1
+                    or not source["sprite"] or not declaration or declaration[1] != texture):
+                raise ValidationFailure(f"Incomplete native evidence for stock texture: {texture}")
+    return textures
+
+
+def classify_stock_texture_dependencies(diagnostics: list[dict], *,
+                                        enabled: bool) -> tuple[list[dict], list[dict]]:
+    """Separate exact, evidenced imports while preserving raw engine errors."""
+    if not enabled:
+        return diagnostics, []
+    imports = declared_stock_textures()
+    checked, dependencies = [], []
+    for diagnostic in diagnostics:
+        match = re.fullmatch(r"File (.+) not found, this is case sensitive",
+                             diagnostic.get("message", ""))
+        if (diagnostic.get("code") == "CW113"
+                and diagnostic.get("severity", "").lower() == "error"
+                and Path(diagnostic.get("file", "")).suffix.lower() == ".gfx"
+                and match and match[1] in imports):
+            dependencies.append({"diagnostic": diagnostic, "texture": match[1],
+                                 "evidence": imports[match[1]]})
+        else:
+            checked.append(diagnostic)
+    return checked, dependencies
+
+
 def invoke(binary: Path, mod: Path, report: Path, vanilla: Path | None = None) -> tuple[int, list[dict]]:
     command = [
         str(binary), "validate", "--config", str(HERE / "cwtools.toml"),
@@ -175,6 +228,8 @@ def self_test(binary: Path, output: Path) -> None:
         "scripted_localisation_trigger": ("common/scripted_localisation/probe.txt", 'defined_text = { name = PSFCIText text = { trigger = { psf_ci_unknown_trigger = yes } localization_key = "Literal string" } }\n', "CW263"),
         "wrong_trigger_value": ("common/scripted_triggers/probe.txt", "psf_ci_bad_trigger = { always = perhaps }\n", "CW240"),
         "known_equipment_category": ("common/scripted_triggers/probe.txt", "psf_ci_category = { infantry > 0.5 }\n", None),
+        "declared_stock_texture": ("interface/probe.gfx", 'spriteTypes = { spriteType = { name = "GFX_psf_ci_external" texturefile = "gfx/interface/ideologies/democratic_group.dds" } }\n', "CW113"),
+        "misspelled_stock_texture": ("interface/probe.gfx", 'spriteTypes = { spriteType = { name = "GFX_psf_ci_external" texturefile = "gfx/interface/ideologies/democratic_groupp.dds" } }\n', "CW113"),
     }
     summary = {}
     with tempfile.TemporaryDirectory(prefix="psf-cwtools-selftest-") as temp:
@@ -196,9 +251,81 @@ def self_test(binary: Path, output: Path) -> None:
                     raise ValidationFailure(f"Positive CWTools control failed: {diagnostics}")
             elif not failures or (expected_code and expected_code not in codes) or (name != "missing_localisation" and result == 0):
                 raise ValidationFailure(f"CWTools failed to reject {name}: exit={result}, diagnostics={diagnostics}")
+            checked, dependencies = classify_stock_texture_dependencies(diagnostics, enabled=True)
+            if name == "declared_stock_texture":
+                if checked or len(dependencies) != 1:
+                    raise ValidationFailure("Declared stock texture did not produce exactly one external dependency")
+                strict, strict_dependencies = classify_stock_texture_dependencies(diagnostics, enabled=False)
+                if not strict or strict_dependencies:
+                    raise ValidationFailure("Full-install validation must retain missing stock textures")
+            elif name == "misspelled_stock_texture" and (dependencies or not checked):
+                raise ValidationFailure("A misspelled stock texture escaped the CWTools error gate")
             summary[name] = {"engine_exit_code": result, "gate_exit_code": result or int(bool(failures)), "diagnostic_codes": sorted(codes), "passed": True}
+            if name in {"declared_stock_texture", "misspelled_stock_texture"}:
+                summary[name]["external_stock_texture_dependencies"] = len(dependencies)
+                summary[name]["remaining_diagnostics"] = len(checked)
+                if name == "declared_stock_texture":
+                    summary[name]["gate_exit_code"] = 0
+    summary.update(self_test_native_history(binary, output))
     (output / "selftest.json").write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
     print("CWTools positive and negative semantic controls passed.")
+
+
+def self_test_native_history(binary: Path, output: Path) -> dict:
+    """Real source/engine controls, including a new effect outside the baseline."""
+    source = native_history.bootstrap.ASSETS / "PRC - ComChina.txt"
+    relative = "history/countries/" + source.name
+    raw = source.read_bytes()
+    expected = native_history.bootstrap.patch_history(raw.decode("utf-8"))[0].encode("utf-8")
+    history = native_history.reconstruct(relative, raw, expected)
+    summary = {}
+    with tempfile.TemporaryDirectory(prefix="psf-history-control-") as temporary:
+        staged = Path(temporary)
+        path = staged / relative
+        path.parent.mkdir(parents=True)
+        path.write_bytes(expected)
+        effects = staged / "common/scripted_effects/bootstrap.txt"
+        effects.parent.mkdir(parents=True)
+        effects.write_text("psf_history_bootstrap = { add_political_power = 0 }\n"
+                           "psf_prepare_frontend = { add_political_power = 0 }\n", encoding="utf-8")
+        baseline_result, baseline = native_history.run_baseline(
+            invoke, binary, staged, output / "selftest-native-history-baseline.json", {relative: history})
+        generated_result, generated = invoke(binary, staged, output / "selftest-native-history-generated.json")
+        checked, inherited = native_history.classify(generated, baseline, staged, {relative: history})
+        if not inherited or any(item.get("severity", "").lower() in {"error", "warning"} for item in checked):
+            raise ValidationFailure("Exact original history + bootstrap did not match its genuine engine baseline")
+        summary["native_history_exact_source"] = {"engine_exit_code": generated_result,
+            "baseline_engine_exit_code": baseline_result, "gate_exit_code": 0,
+            "inherited_diagnostics": len(inherited), "passed": True}
+        # A recognized effect with an altered value is not a syntax failure,
+        # but it is still unauthorized history drift and must fail byte proof.
+        mutations = {
+            "native_history_bootstrap_tamper": expected.replace(b"psf_history_bootstrap = yes", b"psf_history_bootstrap = no", 1),
+            "native_history_source_tamper": expected.replace(b"state = 622", b"state = 623", 1),
+        }
+        for name, tampered in mutations.items():
+            if tampered == expected:
+                raise ValidationFailure(f"Native-history negative control did not mutate its target: {name}")
+            try:
+                native_history.reconstruct(relative, raw, tampered)
+            except ValueError:
+                summary[name] = {"gate_exit_code": 2, "rejected_before_engine": True, "passed": True}
+            else:
+                raise ValidationFailure(f"Native history reconstruction accepted {name}")
+        # Even if byte proof were bypassed, a new effect on a PSF insertion
+        # line cannot inherit an original source diagnostic. Run the real CLI.
+        tampered = expected.replace(b"psf_history_bootstrap = yes", b"psf_ci_new_invalid_history_effect = yes", 1)
+        path.write_bytes(tampered)
+        result, diagnostics = invoke(binary, staged, output / "selftest-native-history-new-effect.json")
+        checked, inherited = native_history.classify(diagnostics, baseline, staged, {relative: history})
+        new_errors = [item for item in checked if item.get("severity", "").lower() == "error"
+                      and "psf_ci_new_invalid_history_effect" in item.get("message", "")]
+        if result == 0 or not new_errors:
+            raise ValidationFailure("New PSF history effect escaped the exact-source diagnostic baseline")
+        summary["native_history_new_effect"] = {"engine_exit_code": result, "gate_exit_code": result,
+            "new_diagnostic_codes": sorted({item["code"] for item in new_errors}),
+            "inherited_diagnostics": len(inherited), "passed": True}
+    return summary
 
 
 def write_annotations(diagnostics: list[dict], staged: Path, root: Path) -> None:
@@ -233,7 +360,8 @@ def main(argv: list[str] | None = None) -> int:
     args.reports.mkdir(parents=True, exist_ok=True)
     # A failed rerun must not leave an older successful report beside it.
     if not args.self_test_only:
-        for filename in ("summary.json", "cwtools.json", "engine-preflight.json"):
+        for filename in ("summary.json", "cwtools.json", "stock-texture-dependencies.json", "engine-preflight.json",
+                         "native-history-baseline.json", "inherited-native-history-diagnostics.json"):
             (args.reports / filename).unlink(missing_ok=True)
     try:
         preflight = None
@@ -256,22 +384,52 @@ def main(argv: list[str] | None = None) -> int:
             staged = Path(temp)
             count = merge_mods(args.root.resolve(), staged)
             imports = 0 if args.vanilla else add_declared_stock_imports(staged)
+            # Full byte reconstruction precedes both engine runs and every
+            # inherited-diagnostic decision. A tampered insertion cannot earn
+            # the source file's baseline merely by living in history/countries.
+            verified_history = native_history.prepare(staged, args.root.resolve(), args.vanilla)
             result, diagnostics = invoke(binary, staged, args.reports / "cwtools.json", args.vanilla)
+            # Keep the engine's complete unmodified report, including CW113.
             (args.reports / "cwtools.json").write_text(json.dumps(diagnostics, indent=2) + "\n", encoding="utf-8")
-            write_annotations(diagnostics, staged, args.root.resolve())
-            errors = sum(d.get("severity", "").lower() == "error" for d in diagnostics)
-            warnings = sum(d.get("severity", "").lower() == "warning" for d in diagnostics)
+            checked, dependencies = classify_stock_texture_dependencies(diagnostics, enabled=args.vanilla is None)
+            (args.reports / "stock-texture-dependencies.json").write_text(json.dumps(dependencies, indent=2) + "\n", encoding="utf-8")
+            inherited, baseline_result, baseline_diagnostics = [], None, []
+            if verified_history:
+                baseline_result, baseline_diagnostics = native_history.run_baseline(
+                    invoke, binary, staged, args.reports / "native-history-baseline.json", verified_history, args.vanilla)
+                checked, inherited = native_history.classify(checked, baseline_diagnostics, staged, verified_history)
+            (args.reports / "inherited-native-history-diagnostics.json").write_text(json.dumps(inherited, indent=2) + "\n", encoding="utf-8")
+            write_annotations(checked, staged, args.root.resolve())
+            errors = sum(d.get("severity", "").lower() == "error" for d in checked)
+            warnings = sum(d.get("severity", "").lower() == "warning" for d in checked)
+            raw_errors = sum(d.get("severity", "").lower() == "error" for d in diagnostics)
+            # Exit 1 means ordinary diagnostics. Crashes/empty discovery/other
+            # nonzero statuses cannot be recategorized as dependency-only.
+            dependency_only = result == 1 and bool(dependencies or inherited) and not errors and not warnings
+            gate_exit = 0 if dependency_only else result or int(bool(errors or warnings))
             summary = {
                 "engine": "cwtools 2.3.0", "generated_files": count,
                 "declared_stock_localisation_imports": imports,
-                "errors": errors, "warnings": warnings, "exit_code": result,
+                "errors": errors, "warnings": warnings, "exit_code": gate_exit,
+                "validation_errors": errors, "validation_warnings": warnings,
+                "raw_engine_errors": raw_errors, "raw_engine_exit_code": result,
+                "raw_engine_warnings": sum(d.get("severity", "").lower() == "warning" for d in diagnostics),
+                "external_stock_texture_dependencies": len(dependencies),
+                "external_stock_texture_paths": len({item["texture"] for item in dependencies}),
+                "stock_texture_payloads_bundled": False,
+                "native_history_verified_files": len(verified_history),
+                "native_history_baseline_exit_code": baseline_result,
+                "inherited_native_history_diagnostics": len(inherited),
+                "inherited_native_history_errors": sum(item["diagnostic"].get("severity", "").lower() == "error" for item in inherited),
+                "inherited_native_history_warnings": sum(item["diagnostic"].get("severity", "").lower() == "warning" for item in inherited),
+                "inherited_native_history_info": sum(item["diagnostic"].get("severity", "").lower() in {"info", "information"} for item in inherited),
                 "engine_preflight": {key: preflight[key] for key in ("checked_files", "native_gui_files", "errors")},
                 "runtime_launch_tested": False,
             }
             (args.reports / "summary.json").write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
             print(json.dumps(summary))
-            if result != 0 or errors or warnings:
-                return result if result != 0 else 1
+            if gate_exit:
+                return gate_exit
         return 0
     except (OSError, KeyError, ValueError, subprocess.SubprocessError, ValidationFailure) as exc:
         (args.reports / "summary.json").write_text(json.dumps({

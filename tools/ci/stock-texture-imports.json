@@ -1,0 +1,158 @@
+{
+  "format": 1,
+  "purpose": "Explicit external base-game texture dependencies. The user-provided script archive declares these paths but contains no DDS payloads; declarations are not a game asset or rendering test.",
+  "source_files": {
+    "interface/_dynamic_modifiers.gfx": "d84c56b15e515e355081546f6e3fd20170ffb5ea9da5c705ee1992d8422b8077",
+    "interface/countrypoliticsview.gfx": "83d3e5b5b88c373921c732d627fc6adce61f46e8ea1c3c866ef32a99bcc3932f",
+    "interface/ideas.gfx": "73b5be871c2e1d1df14b4bf8b6456c5231f5305742dcd41051074b56c330544f",
+    "interface/texticons.gfx": "e0349b22f05affe550e755fc2e1f3a2ad3749fb016b5c9031b3672d9656304b5"
+  },
+  "textures": {
+    "gfx/interface/ideas/generic_democratic_drift_bonus.dds": [
+      {
+        "source": "interface/ideas.gfx",
+        "line": 596,
+        "sprite": "GFX_idea_generic_democratic_drift_bonus",
+        "declaration": "texturefile = \"gfx/interface/ideas/generic_democratic_drift_bonus.dds\""
+      }
+    ],
+    "gfx/interface/ideas/generic_manpower_bonus.dds": [
+      {
+        "source": "interface/_dynamic_modifiers.gfx",
+        "line": 39,
+        "sprite": "GFX_idea_SOV_red_army_alt",
+        "declaration": "texturefile = \"gfx/interface/ideas/generic_manpower_bonus.dds\""
+      },
+      {
+        "source": "interface/_dynamic_modifiers.gfx",
+        "line": 101,
+        "sprite": "GFX_idea_SOV_red_army_alt_ccp_2d_sov_compatibility",
+        "declaration": "texturefile = \"gfx/interface/ideas/generic_manpower_bonus.dds\""
+      },
+      {
+        "source": "interface/ideas.gfx",
+        "line": 626,
+        "sprite": "GFX_idea_generic_manpower_bonus",
+        "declaration": "texturefile = \"gfx/interface/ideas/generic_manpower_bonus.dds\""
+      },
+      {
+        "source": "interface/ideas.gfx",
+        "line": 9040,
+        "sprite": "GFX_idea_SOV_honest_serfdom_idea_ccp_sov_compatibility",
+        "declaration": "texturefile = \"gfx/interface/ideas/generic_manpower_bonus.dds\""
+      }
+    ],
+    "gfx/interface/ideas/idea_generic_army_war_college.dds": [
+      {
+        "source": "interface/ideas.gfx",
+        "line": 536,
+        "sprite": "GFX_idea_generic_army_war_college",
+        "declaration": "texturefile = \"gfx/interface/ideas/idea_generic_army_war_college.dds\""
+      }
+    ],
+    "gfx/interface/ideas/idea_generic_constitutional_guarantee.dds": [
+      {
+        "source": "interface/ideas.gfx",
+        "line": 566,
+        "sprite": "GFX_idea_generic_constitutional_guarantees",
+        "declaration": "texturefile = \"gfx/interface/ideas/idea_generic_constitutional_guarantee.dds\""
+      }
+    ],
+    "gfx/interface/ideas/idea_generic_industrial_concern_1.dds": [
+      {
+        "source": "interface/ideas.gfx",
+        "line": 1096,
+        "sprite": "GFX_idea_generic_industrial_concern_1",
+        "declaration": "texturefile = \"gfx/interface/ideas/idea_generic_industrial_concern_1.dds\""
+      }
+    ],
+    "gfx/interface/ideologies/anarchism.dds": [
+      {
+        "source": "interface/countrypoliticsview.gfx",
+        "line": 519,
+        "sprite": "GFX_ideology_anarchism",
+        "declaration": "texturefile = \"gfx/interface/ideologies/anarchism.dds\""
+      }
+    ],
+    "gfx/interface/ideologies/communism_group.dds": [
+      {
+        "source": "interface/countrypoliticsview.gfx",
+        "line": 504,
+        "sprite": "GFX_ideology_communism_group",
+        "declaration": "texturefile = \"gfx/interface/ideologies/communism_group.dds\""
+      }
+    ],
+    "gfx/interface/ideologies/democratic_group.dds": [
+      {
+        "source": "interface/countrypoliticsview.gfx",
+        "line": 514,
+        "sprite": "GFX_ideology_democratic_group",
+        "declaration": "texturefile = \"gfx/interface/ideologies/democratic_group.dds\""
+      }
+    ],
+    "gfx/interface/ideologies/fascism_group.dds": [
+      {
+        "source": "interface/countrypoliticsview.gfx",
+        "line": 509,
+        "sprite": "GFX_ideology_fascism_group",
+        "declaration": "texturefile = \"gfx/interface/ideologies/fascism_group.dds\""
+      }
+    ],
+    "gfx/interface/ideologies/neutrality_group.dds": [
+      {
+        "source": "interface/countrypoliticsview.gfx",
+        "line": 499,
+        "sprite": "GFX_ideology_neutrality_group",
+        "declaration": "texturefile = \"gfx/interface/ideologies/neutrality_group.dds\""
+      }
+    ],
+    "gfx/interface/ideologies/unknown.dds": [
+      {
+        "source": "interface/countrypoliticsview.gfx",
+        "line": 524,
+        "sprite": "GFX_ideology_unknown",
+        "declaration": "texturefile = \"gfx/interface/ideologies/unknown.dds\""
+      }
+    ],
+    "gfx/texticons/army_experience_20x20.dds": [
+      {
+        "source": "interface/texticons.gfx",
+        "line": 227,
+        "sprite": "GFX_army_experience",
+        "declaration": "texturefile = \"gfx/texticons/army_experience_20x20.dds\""
+      }
+    ],
+    "gfx/texticons/industry.dds": [
+      {
+        "source": "interface/texticons.gfx",
+        "line": 287,
+        "sprite": "GFX_industry_texticon",
+        "declaration": "texturefile = \"gfx/texticons/industry.dds\""
+      }
+    ],
+    "gfx/texticons/manpower_texticon.dds": [
+      {
+        "source": "interface/texticons.gfx",
+        "line": 112,
+        "sprite": "GFX_manpower_texticon",
+        "declaration": "texturefile = \"gfx/texticons/manpower_texticon.dds\""
+      }
+    ],
+    "gfx/texticons/pol_power_20x20.dds": [
+      {
+        "source": "interface/texticons.gfx",
+        "line": 263,
+        "sprite": "GFX_pol_power",
+        "declaration": "texturefile = \"gfx/texticons/pol_power_20x20.dds\""
+      }
+    ],
+    "gfx/texticons/stability_texticon.dds": [
+      {
+        "source": "interface/texticons.gfx",
+        "line": 106,
+        "sprite": "GFX_stability_texticon",
+        "declaration": "texturefile = \"gfx/texticons/stability_texticon.dds\""
+      }
+    ]
+  }
+}

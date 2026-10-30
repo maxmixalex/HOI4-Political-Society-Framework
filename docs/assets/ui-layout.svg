@@ -14,55 +14,59 @@
 <text class="small" x="31" y="541">Existing ideas, laws, advisers, autonomy</text>
 <rect x="42" y="396" width="512" height="80" fill="#273e34" stroke="#82918b"/>
 <rect x="42" y="396" width="72" height="17" fill="#304e40" stroke="#456250"/>
-<text class="small" x="49" y="413">psf_political_support_label</text>
-<rect x="42" y="413" width="63" height="63" fill="#426354" stroke="#82918b"/>
-<text class="small" x="49" y="430">Support</text>
+<text class="small" x="49" y="413">Government</text>
+<rect x="45" y="413" width="63" height="63" fill="#5b5b43" stroke="#82918b"/>
+<text class="small" x="52" y="430">Party icon</text>
 <rect x="116" y="396" width="72" height="17" fill="#304e40" stroke="#456250"/>
-<text class="small" x="123" y="413">psf_political_influence_label</text>
-<rect x="116" y="413" width="63" height="63" fill="#426354" stroke="#82918b"/>
-<text class="small" x="123" y="430">Influence</text>
-<rect x="192" y="396" width="226" height="20" fill="#304e40" stroke="#456250"/>
-<text class="small" x="199" y="413">Actual regime</text>
-<rect x="192" y="416" width="226" height="20" fill="#304e40" stroke="#456250"/>
-<text class="small" x="199" y="433">Governing alliance</text>
-<rect x="192" y="436" width="226" height="20" fill="#304e40" stroke="#456250"/>
-<text class="small" x="199" y="453">Support / effective influence</text>
-<rect x="192" y="456" width="226" height="19" fill="#304e40" stroke="#456250"/>
-<text class="small" x="199" y="473">Legitimacy / active groups</text>
-<rect x="424" y="396" width="123" height="34" fill="#5b5b43" stroke="#82918b"/>
-<text class="small" x="431" y="413">Groups</text>
-<rect x="424" y="432" width="123" height="34" fill="#5b5b43" stroke="#82918b"/>
-<text class="small" x="431" y="449">Spectrum</text>
+<text class="small" x="123" y="413">Ideology</text>
+<rect x="119" y="413" width="63" height="63" fill="#5b5b43" stroke="#82918b"/>
+<text class="small" x="126" y="430">Ideology</text>
+<rect x="190" y="396" width="72" height="17" fill="#304e40" stroke="#456250"/>
+<text class="small" x="197" y="413">Support</text>
+<rect x="190" y="413" width="63" height="63" fill="#426354" stroke="#82918b"/>
+<text class="small" x="197" y="430">Support</text>
+<rect x="264" y="396" width="72" height="17" fill="#304e40" stroke="#456250"/>
+<text class="small" x="271" y="413">Influence</text>
+<rect x="264" y="413" width="63" height="63" fill="#426354" stroke="#82918b"/>
+<text class="small" x="271" y="430">Influence</text>
+<rect x="340" y="396" width="212" height="20" fill="#304e40" stroke="#456250"/>
+<text class="small" x="347" y="413">Actual regime</text>
+<rect x="340" y="416" width="212" height="20" fill="#304e40" stroke="#456250"/>
+<text class="small" x="347" y="433">Governing party</text>
+<rect x="340" y="436" width="212" height="20" fill="#304e40" stroke="#456250"/>
+<text class="small" x="347" y="453">Support / influence</text>
+<rect x="340" y="456" width="212" height="19" fill="#304e40" stroke="#456250"/>
+<text class="small" x="347" y="473">Legitimacy / groups</text>
 <rect x="576" y="94" width="414" height="590" fill="#273331" stroke="#82918b"/>
 <text class="small" x="583" y="111">Optional sidebar; opens on request</text>
-<rect x="588" y="152" width="123" height="34" fill="#5b5b43" stroke="#82918b"/>
-<text class="small" x="595" y="169">Groups</text>
-<rect x="716" y="152" width="123" height="34" fill="#5b5b43" stroke="#82918b"/>
-<text class="small" x="723" y="169">Spectrum</text>
-<rect x="844" y="152" width="123" height="34" fill="#5b5b43" stroke="#82918b"/>
-<text class="small" x="851" y="169">Alliances</text>
-<rect x="584" y="194" width="396" height="478" fill="#202b29" stroke="#82918b"/>
-<text class="small" x="591" y="211">Native scroll viewport; one page visible</text>
-<rect x="965" y="218" width="10" height="448" fill="#44524a" stroke="#82918b"/>
-<rect x="965" y="218" width="10" height="115" fill="#b4b29a" stroke="#82918b"/>
-<rect x="592" y="222" width="370" height="44" fill="#354138" stroke="#82918b"/>
-<text class="small" x="599" y="239">Group 1: name, support / influence / satisfaction</text>
-<rect x="592" y="268" width="370" height="44" fill="#354138" stroke="#82918b"/>
-<text class="small" x="599" y="285">Group 2: name, support / influence / satisfaction</text>
-<rect x="592" y="314" width="370" height="44" fill="#354138" stroke="#82918b"/>
-<text class="small" x="599" y="331">Group 3: name, support / influence / satisfaction</text>
-<rect x="592" y="360" width="370" height="44" fill="#354138" stroke="#82918b"/>
-<text class="small" x="599" y="377">Group 4: name, support / influence / satisfaction</text>
-<rect x="592" y="406" width="370" height="44" fill="#354138" stroke="#82918b"/>
-<text class="small" x="599" y="423">Group 5: name, support / influence / satisfaction</text>
-<rect x="592" y="452" width="370" height="44" fill="#354138" stroke="#82918b"/>
-<text class="small" x="599" y="469">Group 6: name, support / influence / satisfaction</text>
-<rect x="592" y="498" width="370" height="44" fill="#354138" stroke="#82918b"/>
-<text class="small" x="599" y="515">Group 7: name, support / influence / satisfaction</text>
-<rect x="592" y="544" width="370" height="44" fill="#354138" stroke="#82918b"/>
-<text class="small" x="599" y="561">Group 8: name, support / influence / satisfaction</text>
-<rect x="592" y="590" width="370" height="44" fill="#354138" stroke="#82918b"/>
-<text class="small" x="599" y="607">Group 9: name, support / influence / satisfaction</text>
+<rect x="588" y="143" width="123" height="34" fill="#5b5b43" stroke="#82918b"/>
+<text class="small" x="595" y="160">Groups</text>
+<rect x="716" y="143" width="123" height="34" fill="#5b5b43" stroke="#82918b"/>
+<text class="small" x="723" y="160">Spectrum</text>
+<rect x="844" y="143" width="123" height="34" fill="#5b5b43" stroke="#82918b"/>
+<text class="small" x="851" y="160">Alliances</text>
+<rect x="584" y="186" width="396" height="486" fill="#202b29" stroke="#82918b"/>
+<text class="small" x="591" y="203">Native scroll viewport; one page visible</text>
+<rect x="965" y="210" width="10" height="456" fill="#44524a" stroke="#82918b"/>
+<rect x="965" y="210" width="10" height="115" fill="#b4b29a" stroke="#82918b"/>
+<rect x="592" y="214" width="370" height="44" fill="#354138" stroke="#82918b"/>
+<text class="small" x="599" y="231">Group 1: name, support / influence / satisfaction</text>
+<rect x="592" y="260" width="370" height="44" fill="#354138" stroke="#82918b"/>
+<text class="small" x="599" y="277">Group 2: name, support / influence / satisfaction</text>
+<rect x="592" y="306" width="370" height="44" fill="#354138" stroke="#82918b"/>
+<text class="small" x="599" y="323">Group 3: name, support / influence / satisfaction</text>
+<rect x="592" y="352" width="370" height="44" fill="#354138" stroke="#82918b"/>
+<text class="small" x="599" y="369">Group 4: name, support / influence / satisfaction</text>
+<rect x="592" y="398" width="370" height="44" fill="#354138" stroke="#82918b"/>
+<text class="small" x="599" y="415">Group 5: name, support / influence / satisfaction</text>
+<rect x="592" y="444" width="370" height="44" fill="#354138" stroke="#82918b"/>
+<text class="small" x="599" y="461">Group 6: name, support / influence / satisfaction</text>
+<rect x="592" y="490" width="370" height="44" fill="#354138" stroke="#82918b"/>
+<text class="small" x="599" y="507">Group 7: name, support / influence / satisfaction</text>
+<rect x="592" y="536" width="370" height="44" fill="#354138" stroke="#82918b"/>
+<text class="small" x="599" y="553">Group 8: name, support / influence / satisfaction</text>
+<rect x="592" y="582" width="370" height="44" fill="#354138" stroke="#82918b"/>
+<text class="small" x="599" y="599">Group 9: name, support / influence / satisfaction</text>
 <text class="title" x="24" y="737">Diplomatic view</text>
 <rect x="24" y="749" width="550" height="590" fill="#242e32" stroke="#82918b"/>
 <text class="small" x="31" y="766">Existing native view (widgets and ancestry retained)</text>
@@ -70,51 +74,53 @@
 <text class="small" x="44" y="926">Native leader</text>
 <rect x="168" y="997" width="376" height="76" fill="#564b32" stroke="#82918b"/>
 <text class="small" x="175" y="1014">Existing national focus</text>
+<rect x="182" y="799" width="72" height="68" fill="#426354" stroke="#82918b"/>
+<text class="small" x="189" y="816">Party icon</text>
 <rect x="168" y="909" width="376" height="86" fill="#273e34" stroke="#82918b"/>
+<rect x="316" y="909" width="72" height="17" fill="#304e40" stroke="#456250"/>
+<text class="small" x="323" y="926">Ideology</text>
+<rect x="319" y="926" width="63" height="63" fill="#5b5b43" stroke="#82918b"/>
+<text class="small" x="326" y="943">Ideology</text>
 <rect x="168" y="909" width="72" height="17" fill="#304e40" stroke="#456250"/>
-<text class="small" x="175" y="926">psf_diplomatic_support_label</text>
+<text class="small" x="175" y="926">Support</text>
 <rect x="168" y="926" width="63" height="63" fill="#426354" stroke="#82918b"/>
 <text class="small" x="175" y="943">Support</text>
 <rect x="242" y="909" width="72" height="17" fill="#304e40" stroke="#456250"/>
-<text class="small" x="249" y="926">psf_diplomatic_influence_label</text>
+<text class="small" x="249" y="926">Influence</text>
 <rect x="242" y="926" width="63" height="63" fill="#426354" stroke="#82918b"/>
 <text class="small" x="249" y="943">Influence</text>
-<rect x="314" y="909" width="228" height="20" fill="#304e40" stroke="#456250"/>
-<text class="small" x="321" y="926">Actual regime</text>
-<rect x="314" y="932" width="228" height="20" fill="#304e40" stroke="#456250"/>
-<text class="small" x="321" y="949">Governing alliance</text>
-<rect x="314" y="959" width="110" height="30" fill="#5b5b43" stroke="#82918b"/>
-<text class="small" x="321" y="976">Groups</text>
-<rect x="430" y="959" width="110" height="30" fill="#5b5b43" stroke="#82918b"/>
-<text class="small" x="437" y="976">Spectrum</text>
+<rect x="390" y="909" width="152" height="38" fill="#304e40" stroke="#456250"/>
+<text class="small" x="397" y="926">Actual regime</text>
+<rect x="390" y="951" width="152" height="40" fill="#304e40" stroke="#456250"/>
+<text class="small" x="397" y="968">Governing party</text>
 <rect x="576" y="749" width="414" height="590" fill="#273331" stroke="#82918b"/>
 <text class="small" x="583" y="766">Optional sidebar; opens on request</text>
-<rect x="588" y="807" width="123" height="34" fill="#5b5b43" stroke="#82918b"/>
-<text class="small" x="595" y="824">Groups</text>
-<rect x="716" y="807" width="123" height="34" fill="#5b5b43" stroke="#82918b"/>
-<text class="small" x="723" y="824">Spectrum</text>
-<rect x="844" y="807" width="123" height="34" fill="#5b5b43" stroke="#82918b"/>
-<text class="small" x="851" y="824">Alliances</text>
-<rect x="584" y="849" width="396" height="478" fill="#202b29" stroke="#82918b"/>
-<text class="small" x="591" y="866">Native scroll viewport; one page visible</text>
-<rect x="965" y="873" width="10" height="448" fill="#44524a" stroke="#82918b"/>
-<rect x="965" y="873" width="10" height="115" fill="#b4b29a" stroke="#82918b"/>
-<rect x="592" y="877" width="370" height="44" fill="#354138" stroke="#82918b"/>
-<text class="small" x="599" y="894">Group 1: name, support / influence / satisfaction</text>
-<rect x="592" y="923" width="370" height="44" fill="#354138" stroke="#82918b"/>
-<text class="small" x="599" y="940">Group 2: name, support / influence / satisfaction</text>
-<rect x="592" y="969" width="370" height="44" fill="#354138" stroke="#82918b"/>
-<text class="small" x="599" y="986">Group 3: name, support / influence / satisfaction</text>
-<rect x="592" y="1015" width="370" height="44" fill="#354138" stroke="#82918b"/>
-<text class="small" x="599" y="1032">Group 4: name, support / influence / satisfaction</text>
-<rect x="592" y="1061" width="370" height="44" fill="#354138" stroke="#82918b"/>
-<text class="small" x="599" y="1078">Group 5: name, support / influence / satisfaction</text>
-<rect x="592" y="1107" width="370" height="44" fill="#354138" stroke="#82918b"/>
-<text class="small" x="599" y="1124">Group 6: name, support / influence / satisfaction</text>
-<rect x="592" y="1153" width="370" height="44" fill="#354138" stroke="#82918b"/>
-<text class="small" x="599" y="1170">Group 7: name, support / influence / satisfaction</text>
-<rect x="592" y="1199" width="370" height="44" fill="#354138" stroke="#82918b"/>
-<text class="small" x="599" y="1216">Group 8: name, support / influence / satisfaction</text>
-<rect x="592" y="1245" width="370" height="44" fill="#354138" stroke="#82918b"/>
-<text class="small" x="599" y="1262">Group 9: name, support / influence / satisfaction</text>
+<rect x="588" y="798" width="123" height="34" fill="#5b5b43" stroke="#82918b"/>
+<text class="small" x="595" y="815">Groups</text>
+<rect x="716" y="798" width="123" height="34" fill="#5b5b43" stroke="#82918b"/>
+<text class="small" x="723" y="815">Spectrum</text>
+<rect x="844" y="798" width="123" height="34" fill="#5b5b43" stroke="#82918b"/>
+<text class="small" x="851" y="815">Alliances</text>
+<rect x="584" y="841" width="396" height="486" fill="#202b29" stroke="#82918b"/>
+<text class="small" x="591" y="858">Native scroll viewport; one page visible</text>
+<rect x="965" y="865" width="10" height="456" fill="#44524a" stroke="#82918b"/>
+<rect x="965" y="865" width="10" height="115" fill="#b4b29a" stroke="#82918b"/>
+<rect x="592" y="869" width="370" height="44" fill="#354138" stroke="#82918b"/>
+<text class="small" x="599" y="886">Group 1: name, support / influence / satisfaction</text>
+<rect x="592" y="915" width="370" height="44" fill="#354138" stroke="#82918b"/>
+<text class="small" x="599" y="932">Group 2: name, support / influence / satisfaction</text>
+<rect x="592" y="961" width="370" height="44" fill="#354138" stroke="#82918b"/>
+<text class="small" x="599" y="978">Group 3: name, support / influence / satisfaction</text>
+<rect x="592" y="1007" width="370" height="44" fill="#354138" stroke="#82918b"/>
+<text class="small" x="599" y="1024">Group 4: name, support / influence / satisfaction</text>
+<rect x="592" y="1053" width="370" height="44" fill="#354138" stroke="#82918b"/>
+<text class="small" x="599" y="1070">Group 5: name, support / influence / satisfaction</text>
+<rect x="592" y="1099" width="370" height="44" fill="#354138" stroke="#82918b"/>
+<text class="small" x="599" y="1116">Group 6: name, support / influence / satisfaction</text>
+<rect x="592" y="1145" width="370" height="44" fill="#354138" stroke="#82918b"/>
+<text class="small" x="599" y="1162">Group 7: name, support / influence / satisfaction</text>
+<rect x="592" y="1191" width="370" height="44" fill="#354138" stroke="#82918b"/>
+<text class="small" x="599" y="1208">Group 8: name, support / influence / satisfaction</text>
+<rect x="592" y="1237" width="370" height="44" fill="#354138" stroke="#82918b"/>
+<text class="small" x="599" y="1254">Group 9: name, support / influence / satisfaction</text>
 </svg>

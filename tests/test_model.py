@@ -101,12 +101,62 @@ class ManifestTests(unittest.TestCase):
         with self.assertRaisesRegex(ManifestError, "invalid calendar date"):
             validate(self.data)
 
-    def test_generated_cabinet_collision_cannot_change_saved_id(self):
-        cabinet_id = self.data["profiles"][0]["id"] + "_transition_cabinet"
-        self.data["profiles"][0]["alliances"][0]["numeric_id"] = stable_id(cabinet_id)
+    def test_government_can_be_a_single_group_with_no_alliances(self):
+        p = self.data["profiles"][0]
+        p["alliances"] = []
+        p["government"] = {"group": p["groups"][0]["id"]}
+        self.data["scenarios"] = [s for s in self.data["scenarios"] if s["profile"] != p["id"]]
         validate(self.data)
-        with self.assertRaisesRegex(ManifestError, "collision including generated"):
-            normalize(self.data)
+        actual = normalize(self.data)["profiles"][0]
+        self.assertEqual(actual["alliances"], [])
+        self.assertEqual(actual["government"], p["government"])
+
+    def test_caretaker_and_nonruling_alliances_do_not_need_a_government_alliance(self):
+        p = self.data["profiles"][1]
+        p["government"] = None
+        for a in p["alliances"]:
+            a["kind"] = "opposition"
+        validate(self.data)
+        actual = normalize(self.data)["profiles"][1]
+        self.assertIsNone(actual["government"])
+        self.assertEqual(len(actual["alliances"]), len(p["alliances"]))
+
+    def test_legacy_initial_alliance_normalizes_without_synthetic_cabinet(self):
+        validate(self.data)
+        actual = normalize(self.data)["profiles"][0]
+        self.assertEqual(actual["government"], {"alliance": "ger_government"})
+        self.assertEqual(actual["alliances"], [dict(a, _index=stable_id(a["id"])) for a in self.data["profiles"][0]["alliances"]])
+
+    def test_explicit_government_does_not_require_legal_members_in_a_former_cabinet(self):
+        profile = self.data["profiles"][0]
+        former = next(a for a in profile["alliances"] if a["kind"] == "government")
+        former["members"] = ["ger_spd"]  # A banned opposition member may keep its pact.
+        for selection in (None, {"group": "ger_nsdap"}):
+            with self.subTest(selection=selection):
+                profile["government"] = selection
+                validate(self.data)
+        profile.pop("government")
+        with self.assertRaisesRegex(ManifestError, "initial government needs at least one legal group"):
+            validate(self.data)
+
+    def test_government_rejects_foreign_banned_or_ambiguous_group(self):
+        p = self.data["profiles"][0]
+        for government in ({"group": "eng_conservative"}, {"group": "ger_spd"},
+                           {"group": "ger_nsdap", "alliance": "ger_government"},
+                           {"alliance": "eng_government"}):
+            with self.subTest(government=government):
+                p["government"] = government
+                with self.assertRaises(ManifestError):
+                    validate(self.data)
+
+    def test_bookmark_government_checks_post_override_group_status(self):
+        p = self.data["profiles"][0]
+        p["start_overrides"] = [{"date": "1937.1.1", "government": {"group": "ger_spd"},
+                                  "groups": [{"id": "ger_spd", "status": "legal"}]}]
+        validate(self.data)
+        p["start_overrides"][0]["groups"] = []
+        with self.assertRaisesRegex(ManifestError, "government group must be legal"):
+            validate(self.data)
 
     def test_scenario_numeric_collisions_rejected(self):
         original = stable_id
@@ -133,6 +183,15 @@ class ManifestTests(unittest.TestCase):
         self.data["id"] = "psf"
         with self.assertRaisesRegex(ManifestError, "reserved"):
             validate(self.data)
+
+    def test_strict_mode_defaults_to_export_and_rejects_native_import(self):
+        self.data["settings"] = {"mechanics_mode": "strict"}
+        validate(self.data)
+        self.assertEqual(normalize(self.data)["settings"]["bridge_mode"], "export")
+        for mode in ("bidirectional", "none"):
+            self.data["settings"]["bridge_mode"] = mode
+            with self.assertRaisesRegex(ManifestError, "strict mechanics require"):
+                validate(self.data)
 
 
 if __name__ == "__main__":

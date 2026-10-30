@@ -1,4 +1,8 @@
-# Keep supplied game snapshots byte-for-byte, including original whitespace.
+# Keep supplied game snapshots and pinned import metadata byte-for-byte.
 # Their recorded hashes must also survive checkouts with core.autocrlf enabled.
 psf/assets/native_gui/*.gui -text -whitespace
 psf/assets/native_bookmarks/*.txt -text -whitespace
+psf/assets/native_history/*.txt -text -whitespace
+psf/assets/native_ideologies/*.txt -text -whitespace
+tools/ci/native-history-imports.json -text -whitespace
+tools/ci/stock-texture-imports.json -text -whitespace

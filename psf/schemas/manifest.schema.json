@@ -199,6 +199,17 @@
         },
         "engine_ideology": {
           "$ref": "#/$defs/engine"
+        },
+        "small_icon": {
+          "type": "string",
+          "pattern": "^GFX_[A-Za-z0-9_]+$"
+        },
+        "large_icon": {
+          "type": "string",
+          "pattern": "^GFX_[A-Za-z0-9_]+$"
+        },
+        "color": {
+          "$ref": "#/$defs/organization_color"
         }
       },
       "required": [
@@ -415,7 +426,7 @@
           "items": {
             "$ref": "#/$defs/alliance"
           },
-          "minItems": 1
+          "minItems": 0
         },
         "start_overrides": {
           "type": "array",
@@ -520,6 +531,9 @@
                 "type": "integer",
                 "minimum": 6,
                 "maximum": 120
+              },
+              "government": {
+                "$ref": "#/$defs/government"
               }
             },
             "required": [
@@ -548,6 +562,15 @@
           "type": "integer",
           "minimum": 6,
           "maximum": 120
+        },
+        "government": {
+          "$ref": "#/$defs/government"
+        },
+        "identities": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/country_identity"
+          }
         }
       },
       "required": [
@@ -581,7 +604,9 @@
             "position",
             "cohesion",
             "add_modifier",
-            "remove_modifier"
+            "remove_modifier",
+            "govern_group",
+            "clear_government"
           ]
         },
         "group": {
@@ -744,6 +769,12 @@
         },
         "scenarios_enabled": {
           "type": "boolean"
+        },
+        "mechanics_mode": {
+          "enum": [
+            "strict",
+            "compat"
+          ]
         }
       },
       "required": [],
@@ -872,6 +903,107 @@
           "maxItems": 3
         }
       ]
+    },
+    "government": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "group": {
+              "$ref": "#/$defs/id"
+            }
+          },
+          "required": [
+            "group"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "alliance": {
+              "$ref": "#/$defs/id"
+            }
+          },
+          "required": [
+            "alliance"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "country_identity": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "name": {
+          "$ref": "#/$defs/loc"
+        },
+        "adjective": {
+          "$ref": "#/$defs/loc"
+        },
+        "definite_name": {
+          "$ref": "#/$defs/loc"
+        },
+        "when": {
+          "type": "object",
+          "properties": {
+            "regime": {
+              "$ref": "#/$defs/id"
+            },
+            "group": {
+              "$ref": "#/$defs/id"
+            },
+            "alliance": {
+              "$ref": "#/$defs/id"
+            },
+            "ideology": {
+              "$ref": "#/$defs/id"
+            }
+          },
+          "additionalProperties": false
+        },
+        "cosmetic_tag": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+        },
+        "flags": {
+          "type": "object",
+          "properties": {
+            "large": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^[^\\\\:]+\\.tga$"
+            },
+            "medium": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^[^\\\\:]+\\.tga$"
+            },
+            "small": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^[^\\\\:]+\\.tga$"
+            }
+          },
+          "required": [
+            "large",
+            "medium",
+            "small"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ],
+      "additionalProperties": false
     }
   }
 }

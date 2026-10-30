@@ -7,7 +7,7 @@ from pathlib import Path
 import unittest
 
 from hoi4_interpreter import Interpreter, State, entries, parse
-from psf import model, runtime
+from psf import frontend, mechanics, model, runtime
 
 
 REPO = Path(__file__).resolve().parents[1]
@@ -27,6 +27,7 @@ class GeneratedRuntimeTests(unittest.TestCase):
         cls.manifest = model.load(REPO / "examples/vanilla/manifest.json")
         cls.profile_map = {p["id"]: p for p in model.profiles(cls.manifest)}
         cls.effects, cls.triggers = {}, {}
+        cls.dynamic_definitions = {node.key: node.value for node in entries(parse(mechanics.dynamic_modifiers(cls.manifest)))}
         sources = (
             (runtime.core_effects(), cls.effects), (runtime.effects(cls.manifest), cls.effects),
             (runtime.core_triggers(), cls.triggers), (runtime.triggers(cls.manifest), cls.triggers),
@@ -42,6 +43,7 @@ class GeneratedRuntimeTests(unittest.TestCase):
         vm = Interpreter(State(tag=definition.get("tag", "ZZZ"), date=date))
         vm.effects = self.effects
         vm.triggers = self.triggers
+        vm.dynamic_definitions = self.dynamic_definitions
         vm.state.engine["ruling_party"] = definition.get("engine_ideology", "neutrality")
         vm.run_effect("psf_init_" + profile)
         return vm
@@ -72,6 +74,151 @@ class GeneratedRuntimeTests(unittest.TestCase):
         before = copy.deepcopy(vm.state.variables)
         vm.run_effect("psf_init_eng")
         self.assertEqual(vm.state.variables, before)
+
+    def test_bootstrap_refreshes_immediately_without_advancing_time_or_resetting_state(self):
+        vm = self.vm()
+        vm.run_effect("psf_add_eng_labour_support", {"psf_amount": 7})
+        baseline = {key: value for key, value in vm.state.variables.items()
+                    if key.endswith(("_days", "_support", "_influence", "_satisfaction"))
+                    or key in {"psf_legitimacy", "psf_election_clock", "psf_election_count"}}
+        revision = vm.state.variables["psf_ui_revision"]
+        for _ in range(3):
+            vm.run_effect("psf_bootstrap")
+        self.assertEqual({key: vm.state.variables[key] for key in baseline}, baseline)
+        self.assertGreater(vm.state.variables["psf_ui_revision"], revision)
+        self.assertEqual(vm.state.date, (1936, 1, 1))
+
+    def test_group_government_and_caretaker_preserve_coexisting_alliances(self):
+        vm = self.vm()
+        stored = {key: value for key, value in vm.state.variables.items()
+                  if key.startswith("psf_a_") and ("_g_" in key or key.endswith("_active"))}
+        labour = next(g for g in self.profile_map["eng"]["groups"] if g["id"] == "eng_labour")
+        vm.run_effect("psf_govern_group_eng_labour")
+        self.assertEqual(vm.state.variables["psf_governing_group"], labour["_index"])
+        self.assertEqual(vm.state.variables["psf_government_leader_group"], labour["_index"])
+        self.assertEqual(vm.state.variables["psf_governing_alliance"], 0)
+        self.assertEqual(vm.state.variables[group_var("eng_labour", "governing")], 1)
+        self.assertEqual(vm.state.variables[alliance_var("eng_government", "role")], 2)
+        self.assertEqual({key: vm.state.variables[key] for key in stored}, stored)
+        vm.run_effect("psf_clear_government")
+        self.assertEqual(vm.state.variables["psf_caretaker"], 1)
+        self.assertEqual(vm.state.variables["psf_governing_group"], 0)
+        self.assertEqual(vm.state.variables["psf_government_leader_group"], 0)
+        self.assertEqual({key: vm.state.variables[key] for key in stored}, stored)
+
+    def test_government_leader_prefers_party_over_stronger_army_and_has_organization_fallback(self):
+        vm = self.vm("ger")
+        party = next(g for g in self.profile_map["ger"]["groups"] if g["id"] == "ger_nsdap")
+        army = next(g for g in self.profile_map["ger"]["groups"] if g["id"] == "ger_officers")
+        vm.state.variables[group_var("ger_nsdap", "influence")] = 2
+        vm.state.variables[group_var("ger_officers", "influence")] = 100
+        vm.run_effect("psf_refresh")
+        self.assertEqual(vm.state.variables["psf_government_leader_group"], party["_index"])
+        self.assertEqual(vm.state.variables[group_var("ger_officers", "governing")], 1)
+        vm.run_effect("psf_leave_ger_government_ger_nsdap")
+        self.assertEqual(vm.state.variables["psf_government_leader_group"], army["_index"])
+        vm.run_effect("psf_govern_group_ger_officers")
+        self.assertEqual(vm.state.variables["psf_government_leader_group"], army["_index"])
+        self.assertEqual(vm.state.variables["psf_governing_alliance"], 0)
+
+    def test_alliance_with_dormant_members_remains_in_existence(self):
+        vm = self.vm()
+        alliance = next(a for a in self.profile_map["eng"]["alliances"] if a["id"] == "eng_labour_movement")
+        for gid in alliance["members"]:
+            vm.state.variables[group_var(gid, "status")] = 0
+        vm.run_effect("psf_refresh")
+        self.assertEqual(vm.state.variables[alliance_var(alliance["id"], "active")], 1)
+        self.assertEqual(vm.state.variables[alliance_var(alliance["id"], "member_count")], len(alliance["members"]))
+        self.assertEqual(vm.state.variables[alliance_var(alliance["id"], "influence")], 0)
+
+    def test_government_leader_ties_are_stable_and_agree_with_frontend(self):
+        from psf.script import emit
+        profile = copy.deepcopy(self.profile_map["eng"])
+        cabinet = next(a for a in profile["alliances"] if a["id"] == "eng_government")
+        candidates = [g for g in profile["groups"] if g["id"] in cabinet["members"]
+                      and (g["electoral"] or g["kind"] == "party") and g["status"] == "legal"]
+        expected = min(g["_index"] for g in candidates)
+        vm = self.vm()
+        for group in profile["groups"]:
+            group["influence"] = 10
+            vm.state.variables[group_var(group["id"], "influence")] = 10
+        vm.run_effect("psf_refresh")
+        self.assertEqual(vm.state.variables["psf_government_leader_group"], expected)
+        profile["groups"].reverse()
+        refresh = entries(parse(emit([runtime.refresh_effect(self.manifest, profile)])))[0]
+        vm.effects = {**self.effects, refresh.key: refresh.value}
+        vm.run_effect("psf_refresh")
+        self.assertEqual(vm.state.variables["psf_government_leader_group"], expected)
+        self.assertEqual(frontend.snapshot(self.manifest, profile, None)["ruling_group"]["_index"], expected)
+
+    def test_profiles_without_any_alliance_can_govern_and_hold_elections(self):
+        profile = next(p for p in self.profile_map.values() if not p["alliances"] and p["engine_ideology"] == "democratic")
+        vm = self.vm(profile["id"])
+        self.assertEqual(vm.state.variables["psf_caretaker"], 0)
+        self.assertGreater(vm.state.variables["psf_governing_group"], 0)
+        self.assertEqual(vm.state.variables["psf_governing_alliance"], 0)
+        vm.run_effect("psf_hold_election")
+        self.assertEqual(vm.state.variables["psf_election_count"], 1)
+        self.assertGreater(vm.state.variables["psf_governing_group"], 0)
+
+    def test_explicit_government_selection_overrides_legacy_alliance_kind(self):
+        from psf.script import emit
+        for selection in (None, {"group": "eng_labour"}):
+            with self.subTest(selection=selection):
+                changed = copy.deepcopy(self.profile_map["eng"])
+                changed["government"] = selection
+                init = entries(parse(emit([runtime.initialize_effect(self.manifest, changed)])))[0]
+                vm = Interpreter(State(tag="ENG"))
+                vm.effects, vm.triggers = {**self.effects, init.key: init.value}, self.triggers
+                vm.run_effect("psf_init_eng")
+                self.assertEqual(vm.state.variables["psf_governing_alliance"], 0)
+                self.assertEqual(vm.state.variables["psf_caretaker"], int(selection is None))
+                self.assertEqual(vm.state.variables[alliance_var("eng_government", "role")], 2)
+                self.assertEqual(vm.state.variables[alliance_var("eng_government", "active")], 1)
+
+    def test_old_transition_cabinet_save_migrates_without_losing_political_state(self):
+        vm = self.vm()
+        vm.state.variables["psf_schema_version"] = 1
+        vm.state.variables.pop("psf_governing_group")
+        vm.state.variables.pop("psf_identity")
+        vm.state.variables["psf_governing_alliance"] = model.stable_id("removed_transition_cabinet")
+        before = {g["id"]: vm.state.variables[group_var(g["id"], "support")] for g in self.profile_map["eng"]["groups"]}
+        vm.run_effect("psf_bootstrap")
+        self.assertEqual(vm.state.variables["psf_schema_version"], 2)
+        self.assertEqual(vm.state.variables["psf_governing_alliance"], 0)
+        self.assertGreater(vm.state.variables["psf_governing_group"], 0)
+        self.assertEqual(vm.state.variables["psf_caretaker"], 0)
+        self.assertEqual({gid: vm.state.variables[group_var(gid, "support")] for gid in before}, before)
+
+    def test_strict_popularity_stability_offset_tracks_external_sources_without_oscillation(self):
+        vm = self.vm()
+        for external in (0.2, 0.2, 0.35, 0.35, 0.0, 0.0, -0.15, -0.15):
+            vm.state.modifier_values["party_popularity_stability_factor"] = external
+            vm.run_effect("psf_refresh")
+            self.assertAlmostEqual(vm.state.variables["psf_native_popularity_stability_offset"], -external)
+            self.assertAlmostEqual(vm.number("modifier@party_popularity_stability_factor"), 0)
+
+    def test_strict_policy_uses_actual_institutions_and_disables_native_election_clock(self):
+        vm = self.vm()
+        self.assertFalse(vm.state.engine["elections_allowed"])
+        self.assertEqual(vm.state.variables["psf_elections_enabled"], 1)
+        self.assertAlmostEqual(vm.number("modifier@generate_wargoal_tension"), 1.0)
+        unelected = next(r for r in self.manifest["regimes"] if not r.get("elections", False))
+        vm.run_effect("psf_set_regime_" + unelected["id"])
+        self.assertEqual(vm.state.variables["psf_elections_enabled"], 0)
+        self.assertAlmostEqual(vm.number("modifier@generate_wargoal_tension"), 0.5)
+        self.assertFalse(vm.state.rules["can_only_justify_war_on_threat_country"])
+
+    def test_strict_bootstrap_discards_native_slot_drift_without_changing_psf_support(self):
+        vm = self.vm()
+        before = {g["id"]: vm.state.variables[group_var(g["id"], "support")] for g in self.profile_map["eng"]["groups"]}
+        projected = dict(vm.state.popularities)
+        vm.state.popularities = {"democratic": 0, "communism": 100, "fascism": 0, "neutrality": 0}
+        vm.state.engine["ruling_party"] = "communism"
+        vm.run_effect("psf_bootstrap")
+        self.assertEqual({gid: vm.state.variables[group_var(gid, "support")] for gid in before}, before)
+        self.assertEqual(vm.state.popularities, projected)
+        self.assertNotEqual(vm.state.engine["ruling_party"], "communism")
 
     def test_legitimacy_change_refreshes_ui_and_native_modifier_without_a_daily_tick(self):
         vm = self.vm()
@@ -371,6 +518,9 @@ class GeneratedRuntimeTests(unittest.TestCase):
 
     def test_engine_percentage_point_swing_is_imported_at_correct_scale(self):
         vm = self.vm()
+        compatible = copy.deepcopy(self.manifest)
+        compatible["settings"].update(mechanics_mode="compat", bridge_mode="bidirectional")
+        vm.effects = {**self.effects, **{node.key: node.value for node in entries(parse(runtime.effects(compatible)))}}
         ideologies = {i["_index"]: i["engine_ideology"] for i in self.manifest["ideologies"]}
         democratic_groups = [g for g in self.profile_map["eng"]["groups"] if g["electoral"] and ideologies[vm.state.variables[group_var(g["id"], "ideology")]] == "democratic"]
         before = sum(vm.state.variables[group_var(g["id"], "support")] for g in democratic_groups)
@@ -388,8 +538,7 @@ class GeneratedRuntimeTests(unittest.TestCase):
         reordered["regimes"].reverse()
         for profile in model.profiles(reordered):
             profile["groups"].reverse()
-            # The last alliance is the reserved transition cabinet; retain it.
-            profile["alliances"][:-1] = reversed(profile["alliances"][:-1])
+            profile["alliances"].reverse()
         changed_effects = {node.key: node.value for node in entries(parse(runtime.effects(reordered)))}
         vm = self.vm()
         other = Interpreter(State(tag="ENG"))

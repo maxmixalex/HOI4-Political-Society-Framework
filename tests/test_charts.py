@@ -121,8 +121,11 @@ class ChartRuntimeTests(unittest.TestCase):
                             pixel = data[offset:offset + 4]
                             if pixel[3]:
                                 opaque.append(pixel)
-                    self.assertTrue(opaque)
-                    self.assertEqual(set(opaque), {bytes((b, g, r, 255))})
+                    if charts.sector_pixels()[index]:
+                        self.assertTrue(opaque)
+                        self.assertEqual(set(opaque), {bytes((b, g, r, 255))})
+                    else:
+                        self.assertEqual(opaque, [])
             for group, (r, g, b) in zip(groups, expected[1:]):
                 data = (root / f"gfx/interface/psf/colors/{group['id']}.tga").read_bytes()
                 self.assertEqual(struct.unpack_from("<HH", data, 12), (8, 8))
@@ -168,16 +171,32 @@ class ChartRuntimeTests(unittest.TestCase):
             for first in sorted((root / "hex").rglob("*.tga")):
                 self.assertEqual(first.read_bytes(), (root / "rgb" / first.relative_to(root / "hex")).read_bytes())
 
-    def test_generated_identity_badges_use_the_same_color_as_chart_frames(self):
+    def test_native_identity_icons_keep_the_exact_independent_chart_color_key(self):
         from psf.ui import _artwork
+        from psf.icons import generate_icons
 
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            _artwork(root, [{"id": "alpha", "color": "#01ABFF", "icon": "party"}])
-            for size, suffix in ((24, "small"), (64, "large")):
-                data = (root / f"gfx/interface/psf/alpha_{suffix}.tga").read_bytes()
-                offset = 18 + (size // 2 * size + size // 2) * 4
-                self.assertEqual(data[offset:offset + 4], bytes((255, 171, 1, 255)))
+            groups = [{"id": "alpha", "color": "#01ABFF", "icon": "party"}]
+            _artwork(root, groups)
+            report = generate_icons({"profiles": [{"groups": groups}]}, root)
+            self.assertIn("large", report["groups"]["alpha"])
+            self.assertIn("small", report["groups"]["alpha"])
+            data = (root / "gfx/interface/psf/colors/alpha.tga").read_bytes()
+            self.assertEqual(data[18:], bytes((255, 171, 1, 255)) * 64)
+
+    def test_colored_pixels_cannot_overpaint_the_native_bezel(self):
+        buckets = charts.sector_pixels()
+        pixels = [pixel for bucket in buckets for pixel in bucket]
+        self.assertEqual(len(pixels), len(set(pixels)))
+        center = (charts.SIZE - 1) / 2
+        expected = {(x, y) for y in range(charts.SIZE) for x in range(charts.SIZE)
+                    if (x-center)**2 + (y-center)**2 <= charts.RADIUS**2}
+        self.assertEqual(set(pixels), expected)
+        self.assertTrue(all(charts.INSET <= x < charts.SIZE - charts.INSET
+                            and charts.INSET <= y < charts.SIZE - charts.INSET for x, y in pixels))
+        self.assertEqual(charts.SIZE, 63)
+        self.assertEqual(len(charts.geometry()), charts.SECTORS)
 
 
 if __name__ == "__main__":

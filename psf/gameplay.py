@@ -19,6 +19,10 @@ def op_effect(op: dict) -> list[Block | str]:
         return [f"psf_{name}_{op['alliance']}_{op['group']} = yes"]
     if name in ("govern", "dissolve"):
         return [f"psf_{name}_{op['alliance']} = yes"]
+    if name == "govern_group":
+        return [f"psf_govern_group_{op['group']} = yes"]
+    if name == "clear_government":
+        return ["psf_clear_government = yes"]
     if name == "regime":
         return [f"psf_set_regime_{op['regime']} = yes"]
     if name == "legitimacy":
@@ -69,14 +73,18 @@ def on_actions(manifest: dict) -> str:
                            "psf_import_government = yes", "psf_capture_engine_government = yes")]
     # on_daily already runs in country scope: wrapping every_country here would
     # apply N days of drift per day in a world containing N countries.
-    out = [block("on_startup", block("effect", block("every_country", "psf_initialize = yes"))),
+    out = [block("on_startup", block("effect", block("every_country", "psf_bootstrap = yes"))),
            block("on_daily", block("effect", "psf_initialize = yes", "psf_daily_modifiers = yes")),
            block("on_weekly", block("effect", weekly)),
            block("on_monthly", block("effect", "psf_initialize = yes", "psf_monthly = yes", "psf_ai_governance = yes")),
-           block("on_release_as_free", block("effect", "psf_initialize = yes")),
-           block("on_release_as_puppet", block("effect", "psf_initialize = yes"))]
+           block("on_release_as_free", block("effect", "psf_bootstrap = yes")),
+           block("on_release_as_puppet", block("effect", "psf_bootstrap = yes"))]
     if manifest["settings"]["bridge_mode"] == "bidirectional":
         out.append(block("on_government_change", block("effect", changed)))
+    elif manifest["settings"].get("mechanics_mode", "compat") == "strict":
+        out.append(block("on_government_change", block("effect", conditional(
+            ["has_country_flag = psf_initialized", "NOT = { has_country_flag = psf_bridge_busy }"],
+            "psf_export_government = yes"))))
     return emit([block("on_actions", out)]) + "\n"
 
 
@@ -122,6 +130,7 @@ def decisions(manifest: dict) -> str:
     government: list[Block | str] = [
         decision("psf_public_consultation", [], [check("psf_legitimacy", 95, "less_than")], ["psf_rebuild_public_confidence = yes"], 50, 60),
         decision("psf_snap_election", ["psf_has_elections = yes"], [check("psf_election_clock", 6, "greater_than_or_equals")], ["psf_hold_election = yes"], 100, 180),
+        decision("psf_appoint_caretaker", [], [check("psf_caretaker", 0)], ["psf_clear_government = yes"], 50, 90),
         decision("psf_open_society_view", [], [], [setv("psf_ui_open", 1), setv("psf_ui_page", 0)], 0, 1),
     ]
     groups: list[Block | str] = []
@@ -138,6 +147,7 @@ def decisions(manifest: dict) -> str:
                 ("negotiate", [active(g), check(ev(gid, "satisfaction"), 95, "less_than"), check(gv(gid, "satisfaction"), 100, "less_than")], [setv("psf_amount", 10, True), f"psf_add_{gid}_satisfaction = yes"], 35, 60),
                 ("campaign", [legal(g)], [setv("psf_amount", 4, True), f"psf_add_{gid}_support = yes"], 40, 60),
                 ("empower", [legal(g)], [setv("psf_amount", 4, True), f"psf_add_{gid}_influence = yes"], 45, 90),
+                ("govern_group", [legal(g), check(gv(gid, "effective_influence"), 0, "greater_than"), block("NOT", check("psf_governing_group", g["_index"]))], [f"psf_govern_group_{gid} = yes"], 100, 90),
             ]
             for action, requirements, effects, cost, cooldown in entries:
                 groups.append(decision(f"psf_policy_{action}_{gid}", selected, requirements, effects, cost, cooldown))

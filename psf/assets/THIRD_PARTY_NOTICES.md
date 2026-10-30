@@ -2,7 +2,7 @@
 
 The repository's [MIT license](LICENSE) applies to original PSF work. Materials listed below retain their own copyright and licensing. The inclusion of a dependency or game-derived definition does not place that material under PSF's license.
 
-## Hearts of Iron IV interface and bookmark definitions
+## Hearts of Iron IV interface, bookmark and political-history definitions
 
 The following source snapshots derive from the user-supplied Hearts of Iron IV script archive:
 
@@ -11,8 +11,12 @@ The following source snapshots derive from the user-supplied Hearts of Iron IV s
 - `psf/assets/native_gui/frontendgamesetupview.gui`
 - `psf/assets/native_bookmarks/the_gathering_storm.txt`
 - `psf/assets/native_bookmarks/blitzkrieg.txt`
+- `psf/assets/native_history/*.txt` (364 original country-history files)
+- `psf/assets/native_ideologies/00_ideologies.txt`
 
 Their original game interface definitions remain Paradox Interactive material and are **not licensed under this repository's MIT grant**. The compiler preserves the native widget hierarchy and produces mod overrides with PSF-specific changes. Those additions do not relicense the underlying game definitions. A licensed installation of Hearts of Iron IV is required to use the generated game mod. No game executable, audio, original texture archive, character portrait collection or localization corpus is included here.
+
+The country-history and ideology definitions also remain Paradox Interactive material. Strict mode preserves original history filenames and statements while inserting PSF initialization calls; its ideology adapter retains original subtype identities and replaces political mechanics. These snapshots were supplied by the user and have no reliable game-build version marker. They are not represented as universally compatible with other game versions or total conversions. The build report records exact input hashes; an explicit vanilla installation supplies matching originals instead. The complete source archive is not committed.
 
 The generated `psf_ui_manifest.json` records interface input hashes and modification paths. The bookmark adapter records its exact input hashes and changed history references in the build manifest; `psf/assets/native_bookmarks/sources.json` records the bundled source provenance. Bookmark previews preserve the installed game's original historical prose through localization-key substitution; they do not distribute that prose. The complete original script archive is not committed to this repository.
 

@@ -121,6 +121,10 @@ class State:
     global_flags: set[str] = field(default_factory=set)
     dynamic_modifiers: set[str] = field(default_factory=set)
     modifier_values: dict[str, float] = field(default_factory=dict)
+    applied_dynamic_values: dict[str, dict[str, float]] = field(default_factory=dict)
+    cosmetic_tag: str | None = None
+    rules: dict[str, bool] = field(default_factory=dict)
+    party_names: dict[str, dict[str, str]] = field(default_factory=dict)
     popularities: dict[str, float] = field(default_factory=lambda: {
         "democratic": 0.0, "fascism": 0.0, "communism": 0.0, "neutrality": 100.0,
     })
@@ -136,8 +140,8 @@ class State:
 class Interpreter:
     RECORDED_CALLBACKS = {
         "add_dynamic_modifier", "remove_dynamic_modifier", "force_update_dynamic_modifier", "country_event", "news_event",
-        "custom_effect_tooltip", "log", "set_country_leader_ideology", "set_party_name",
-        "set_country_name", "set_cosmetic_tag", "remove_ideas", "add_ideas", "set_rule",
+        "custom_effect_tooltip", "log", "set_country_leader_ideology",
+        "set_country_name", "remove_ideas", "add_ideas",
         "set_oob", "set_capital", "set_country_leader_name", "set_country_leader_portrait",
     }
 
@@ -145,6 +149,7 @@ class Interpreter:
         self.state = state or State()
         self.effects: dict[str, Body] = {}
         self.triggers: dict[str, Body] = {}
+        self.dynamic_definitions: dict[str, Body] = {}
         self.stack: list[str] = []
         self.executed = 0
         self.max_steps = 2_000_000
@@ -153,7 +158,8 @@ class Interpreter:
 
     def load(self, roots: Iterable[Path]) -> "Interpreter":
         for root in roots:
-            for folder, registry in (("scripted_effects", self.effects), ("scripted_triggers", self.triggers)):
+            for folder, registry in (("scripted_effects", self.effects), ("scripted_triggers", self.triggers),
+                                     ("dynamic_modifiers", self.dynamic_definitions)):
                 for path in sorted((root / "common" / folder).glob("*.txt")):
                     for node in entries(parse(path.read_text(encoding="utf-8-sig"))):
                         if not isinstance(node.value, tuple):
@@ -191,6 +197,7 @@ class Interpreter:
                 if not re.fullmatch(r"[A-Za-z_][\w]*", modifier):
                     raise ScriptError(f"Invalid modifier reference {name!r}")
                 amount = float(self.state.modifier_values.get(modifier, 0.0))
+                amount += sum(values.get(modifier, 0.0) for values in self.state.applied_dynamic_values.values())
                 if not math.isfinite(amount):
                     raise ScriptError(f"Non-finite modifier value {name!r}")
                 return amount
@@ -302,6 +309,10 @@ class Interpreter:
             return self.compare(tag, scalar(value), node.operator)
         if key == "has_government":
             return self.state.engine["ruling_party"] == scalar(value)
+        if key == "has_cosmetic_tag":
+            return self.state.cosmetic_tag == scalar(value)
+        if key == "has_elections":
+            return bool(self.state.engine.get("elections_allowed", False)) == (scalar(value) == "yes")
         if key in {"is_ai", "exists", "has_war"}:
             return bool(self.state.engine.get(key, False)) == (scalar(value) == "yes")
         if key in {"has_political_power", "stability", "war_support"}:
@@ -522,6 +533,21 @@ class Interpreter:
                 self.state.engine[name] = (scalar(raw) == "yes") if name == "elections_allowed" else scalar(raw)
             self.state.callbacks.append((key, value))
             return
+        if key in {"set_cosmetic_tag", "drop_cosmetic_tag"}:
+            self.state.cosmetic_tag = scalar(value) if key == "set_cosmetic_tag" else None
+            self.state.callbacks.append((key, value))
+            return
+        if key == "set_rule":
+            self.state.rules.update({name: scalar(raw) == "yes" for name, raw in mapping(value).items()})
+            self.state.callbacks.append((key, value))
+            return
+        if key == "set_party_name":
+            data = mapping(value)
+            ideology = scalar(data["ideology"])
+            self.state.party_names.setdefault(ideology, {}).update(
+                {name: scalar(raw) for name, raw in data.items() if name != "ideology"})
+            self.state.callbacks.append((key, value))
+            return
         if key == "set_popularities":
             values = {name: self.number(raw) for name, raw in mapping(value).items()}
             total = sum(values.values())
@@ -536,6 +562,21 @@ class Interpreter:
                 self.state.dynamic_modifiers.add(name)
             else:
                 self.state.dynamic_modifiers.discard(name)
+                self.state.applied_dynamic_values.pop(name, None)
+            self.state.callbacks.append((key, value))
+            return
+        if key == "force_update_dynamic_modifier":
+            updates = {}
+            for name in self.state.dynamic_modifiers:
+                definition = self.dynamic_definitions.get(name)
+                if definition is None:
+                    continue
+                data = mapping(definition)
+                if "enable" in data and not self.condition(data["enable"]):
+                    continue
+                updates[name] = {modifier: self.number(raw) for modifier, raw in data.items()
+                                 if modifier not in {"enable", "icon", "remove_trigger"}}
+            self.state.applied_dynamic_values = updates
             self.state.callbacks.append((key, value))
             return
         if key == "add_popularity":

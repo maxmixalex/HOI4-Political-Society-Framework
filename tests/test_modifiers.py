@@ -28,6 +28,9 @@ class OrganizationModifierTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.raw = json.loads((ROOT / "examples/vanilla/manifest.json").read_text())
+        # Exercise the supported external-drift bridge independently from the
+        # vanilla pack's authoritative strict/export configuration.
+        cls.raw["settings"].update(mechanics_mode="compat", bridge_mode="bidirectional")
         cls.raw["scenarios"] = []
         cls.raw["modifiers"] = [
             source("temporary_campaign", duration=3, groups=["eng_labour"], attributes={"support": {"add": 20, "daily": 2}, "influence": {"factor": 0.1}}),

@@ -172,13 +172,23 @@ FRA = {
 | --- | --- |
 | `psf_join_<alliance>_<group>` | Add an active group; joining the current governing alliance requires legal status |
 | `psf_leave_<alliance>_<group>` | Remove this membership only |
+| `psf_govern_group_<group>` | Appoint a legal organization directly; preserve all alliance memberships |
+| `psf_clear_government` | Clear the current government without dissolving independent alliances |
 | `psf_govern_<alliance>` | Form a government with at least one legal member possessing influence; previous government role becomes opposition |
 | `psf_dissolve_<alliance>` | Deactivate the agreement and clear its membership; a governing dissolution costs eight legitimacy |
 | `psf_add_<alliance>_cohesion` | Add `psf_amount`, clamped 0…100 |
 
-Joining an inactive alliance reactivates it and restores its declared initial cohesion. A group can participate in more than one agreement. Governing membership is derived from the one selected governing alliance, not from a party's name or compatibility ideology.
+Joining an inactive alliance reactivates it and restores its declared initial cohesion. A group can participate in more than one agreement. Governing membership is derived from either the selected independent group or the selected alliance. `psf_governing_group` and `psf_governing_alliance` are mutually exclusive; neither is required during a caretaker period. A party's name and compatibility ideology do not select it automatically.
 
 Taking office raises newly governing legal members' satisfaction; leaving office through a government replacement reduces departing members' satisfaction. An explicit government formation projects the resulting government classification to the native compatibility state when the bridge permits it.
+
+`psf_government_leader_group` is the derived display representative. For an
+alliance it prefers legal governing electoral organizations or parties, then
+selects the strongest effective influence; stable numeric IDs break ties.
+Only a government with no such party falls back to another organization.
+It is zero for a caretaker. This does not change coalition identity or appoint
+an engine character. The main political, diplomatic and country-selection
+displays use the same rule.
 
 ```text
 FRA = {
@@ -338,3 +348,7 @@ Defined text `[PSFUIRegime]` resolves the current actual regime and `[PSFUIGover
 Use organization/alliance effects when your story identifies a particular organization. A native ideology change carries less information and cannot express which of several similarly classified parties should gain support or govern. See [ARCHITECTURE.md](ARCHITECTURE.md) for bridge modes and their limits.
 
 A companion mod may call the named APIs from events, focuses, decisions or on-actions. It should not redefine the generated `psf_*` dispatchers. Keep political story conditions in that mod and let PSF maintain the declared political state.
+
+## Country appearance
+
+`psf_apply_identity`, `psf_set_identity_<id>`, `psf_suspend_identity`, `psf_resume_identity` and `psf_release_identity` manage an opt-in country cosmetic identity in country scope. Full ownership and flag rules are documented in [IDENTITY](IDENTITY.md).

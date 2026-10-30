@@ -114,7 +114,7 @@ An organization can be declared before it is politically active. The following c
 
 Add that record to the Germany profile's `groups`, not the top level. Its independent support score can represent a latent constituency while inactive status prevents effective influence. Activation and the later assignment of institutional resources are separate content choices.
 
-`kind` is an extensible identifier. The standard badges support `party`, `union`, `business`, `military`, `religious`, `civic` and `faction` as icon categories. A group's `kind` and icon category need not be the same string; the example uses `trade_union` with `icon: union`.
+`kind` is an extensible identifier. Native icon defaults support parties, unions, business associations, military organizations, religious bodies and civic organizations. A group's `kind` and icon category need not be the same string; the example uses `trade_union` with `icon: union`.
 
 `electoral` controls ballot participation independently of type. A union can have public support without receiving its own additional electoral votes. Avoid normalizing party and association support together.
 
@@ -122,19 +122,21 @@ Add that record to the Germany profile's `groups`, not the top level. Its indepe
 
 Optional `small_icon` and `large_icon` values name existing `GFX_...` sprites. Provide the corresponding `.gfx` definitions and textures in a hand-written companion mod or your own packaging integration. The compiler references these identifiers; it does not read a filesystem image path from the manifest or copy arbitrary assets automatically.
 
-The default small badge uses a 24×24 logical canvas and the large one 64×64. A chart scales the small badge for its organization lane. If custom icons are omitted, original badges are generated from the organization color and icon category. See [UI.md](UI.md).
+Both groups and ideology archetypes receive a large native-artwork sprite and a small texticon. Defaults alias stock game textures; the compiler does not draw geometric replacement badges or redistribute Paradox textures. Parties and archetypes follow the closest broad ideological family. Unions, businesses, military, religious and civic organizations use generic native idea artwork. These defaults describe political family or organization type; supply custom icons when a specific historical emblem is needed.
+
+Small defaults use native texticons, typically 20×20. For custom art, use 20×20 texticons and a 64×64 large canvas so both the campaign interface and country-selection presentation remain within their reserved regions. Custom artwork keeps its own colors. The compiler cannot infer an external sprite's texture size from a `GFX_` name; the companion mod owns that dimension contract. A spectrum lane scales small sprites to fit its marker. The generated registry records both sprite names and the exact `£texticon£` token. See [UI.md](UI.md) and [BOOKMARKS.md](BOOKMARKS.md).
 
 ### Custom organization colors
 
 Each organization can specify its own `color`. Use either a six-digit hexadecimal string such as `"color": "#C43B45"` or an RGB array such as `"color": [196, 59, 69]`. Both forms produce the same artwork. Keep hex strings quoted in YAML and TOML, where an unquoted `#` starts a comment. Channels are integers from 0 through 255; short hex notation, alpha channels, booleans and out-of-range values are rejected. This field belongs to the organization record, alongside `support` and `influence`.
 
-The specified color is used consistently in the support pie, influence pie, generated identity badges, list/detail color keys and the 1936/1939 country-selection snapshots. Custom `small_icon` or `large_icon` artwork retains its own appearance; a separate 8×8 key still identifies the organization's chart color. Two organizations may intentionally use the same RGB value, and colors are independent of engine ideology and coalition membership.
+The specified color is used consistently in the support pie, influence pie, list/detail color keys and the 1936/1939 country-selection snapshots. Custom `small_icon` or `large_icon` artwork retains its own appearance; a separate 8×8 key still identifies the organization's chart color. Two organizations may intentionally use the same RGB value, and colors are independent of engine ideology and coalition membership.
 
 Omitting `color` preserves the previous deterministic color derived from the organization's ID. Existing manifests therefore remain valid and keep their previous colors. Prefer explicit colors in authored country content so identity colors remain deliberate when IDs or organization names change. Colors are compiled into native textures: edit the source record and rebuild the mod to change them. They are not limited to a preset palette and do not rely on an unsupported scripted-GUI `color` property.
 
 ## Define alliances and institutions
 
-A profile needs exactly one initial government alliance with at least one legal member. Other alliances may start empty and be assembled during play. Multiple memberships are supported:
+A profile may have no alliances, one alliance or several independent alliances. Optional `government` selects `{"group":"organization_id"}`, `{"alliance":"alliance_id"}`, or `null` for a caretaker. If omitted, the legacy single `kind: government` alliance is selected; a profile without one starts as a caretaker. Governing groups must be legal, and a governing alliance needs a legal member. Starting-bookmark overrides support the same field. Other alliances may start empty and be assembled during play. Multiple memberships are supported:
 
 ```json
 {
@@ -315,3 +317,9 @@ Use stable readable and numeric IDs. Reordering records preserves hashed identit
 For a new campaign, rebuild and package. For an established save, write a versioned migration that initializes added variables, transfers renamed values if necessary, assigns required new-axis positions, then reclassifies and refreshes. Mark that migration with your own country flag and apply it once. There is no general automatic migration that can infer an author's intent from an edited manifest.
 
 Do not edit generated output as the long-term source. Compilation replaces owned directories, and `pack` verifies their hashes. Keep custom logic/assets in a companion integration or add a deliberate reproducible packaging step to your project.
+
+## Country identity and native icon artwork
+
+See [IDENTITY](IDENTITY.md) for country names, flags, conditional cosmetic tags and external-mod ownership. Both organizations and ideology prototypes accept independent `small_icon` and `large_icon` GFX references. Every declaration receives native-artwork defaults for both sizes and a registered texticon. Defaults represent the type or broad political family; they are not claimed to be historical party emblems. The registry exposes the exact two sprites and texticon token.
+
+The vanilla example explicitly uses `mechanics_mode: strict` and `bridge_mode: export`; the reusable defaults remain `compat` and `bidirectional`. See [NATIVE_MECHANICS](NATIVE_MECHANICS.md) before changing these integration policies.

@@ -17,6 +17,8 @@ from .script import Block, addv, block, check, clamp, conditional, divv, mulv, s
 
 SECTORS = 180
 SIZE = 63
+INSET = 4
+RADIUS = (SIZE - 1) / 2 - INSET
 
 
 def groups(manifest: dict) -> list[dict]:
@@ -25,22 +27,26 @@ def groups(manifest: dict) -> list[dict]:
 
 
 def sector_pixels() -> list[list[tuple[int, int]]]:
-    """Return a nonoverlapping partition of the filled 63-pixel disk."""
+    """Partition the inner disk, leaving the native 63-pixel bezel unobstructed."""
     pixels: list[list[tuple[int, int]]] = [[] for _ in range(SECTORS)]
     center = (SIZE - 1) / 2
     for y in range(SIZE):
         for x in range(SIZE):
             dx, dy = x - center, y - center
-            if dx * dx + dy * dy <= center * center:
+            if dx * dx + dy * dy <= RADIUS * RADIUS:
                 angle = (math.atan2(dy, dx) + math.pi / 2) % math.tau
                 pixels[min(SECTORS - 1, int(angle / math.tau * SECTORS))].append((x, y))
     return pixels
 
 
 def geometry() -> list[tuple[int, int, int, int]]:
+    # A few angular sectors are narrower than a pixel at the smaller radius.
+    # Keep their frame slots as transparent one-pixel strips, preserving the
+    # deterministic 180-step allocation without inventing off-circle pixels.
     return [(min(x for x, _ in pixels), min(y for _, y in pixels),
              max(x for x, _ in pixels) - min(x for x, _ in pixels) + 1,
-             max(y for _, y in pixels) - min(y for _, y in pixels) + 1)
+             max(y for _, y in pixels) - min(y for _, y in pixels) + 1) if pixels
+            else (SIZE // 2, SIZE // 2, 1, 1)
             for pixels in sector_pixels()]
 
 
@@ -116,12 +122,10 @@ def bookmark_values(manifest: dict, profile: dict, date: str) -> dict:
 
 
 def bookmark_artwork(manifest: dict, profile: dict, date: str, output: Path) -> dict:
-    """Build an optional dual-pie snapshot, never embed it in a native text row.
+    """Build a 140×63 dual pie for the reserved frontend political image area.
 
-    The native history field does not reserve 63 pixels for an inline icon.
-    Front-end previews use ``bookmark_values`` and font-sized identity keys;
-    this complete image remains available for appropriately sized GUI widgets
-    or offline previews.
+    The country history textbox never receives this image. ``frontend`` owns
+    its independently bounded native party presentation and image spacing.
     """
     snapshot = bookmark_values(manifest, profile, date)
     colors = []
