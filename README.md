@@ -4,7 +4,7 @@
 
 框架以经过 JSON Schema 和语义检查的数据文件为源，生成原生 HOI4 脚本、界面、本地化及可复用接口。仓库同时提供适用于原版的政治社会示例内容。
 
-**直接安装：** [下载 PSF 0.4.1 安装包](distributions/psf-0.4.1.zip)。包内包含框架、原版示例、两个启动器描述文件和中英文安装说明；无需先安装 Python。
+**直接安装：** [下载 PSF 0.4.2 安装包](distributions/psf-0.4.2.zip)。包内包含框架、原版示例、两个启动器描述文件和中英文安装说明；无需先安装 Python。
 
 > **验证边界：** 这里提供实际生成的模组、HOI4 加载格式检查和执行真实 Rust CWTools 的 CI，并通过测试执行生成脚本的受支持语义。开发环境未运行 HOI4 游戏客户端，因此不将静态校验、脚本测试或界面结构检查描述为已完成的游戏内实测。原版界面快照具有版本依赖；其版本号未随脚本提供，因此默认省略可选的 `supported_version`。作者可用 `--supported-version 1.19.*` 指定自己核实的目标版本。
 
@@ -15,6 +15,8 @@
 **0.4.0 针对实机反馈修复：** 本国动态文本和饼图显式使用玩家作用域；外交页修正原生父窗口的坐标偏移，饼图收进原版覆盖层；侧栏采用原版框体、标题和滚动结构。选国政治区与历史简介分离，不再放置框架说明。新增严格原版机制隔离、国家历史阶段初始化、可选联盟政府、原版大小图标及由 PSF 政体驱动的国名／国旗接口。
 
 **0.4.1 继续修复与扩充：** 修正外交切国时修订号相同导致的缓存不更新，补齐选国大政党图标、组织政府角色及多联盟归属、制度与执政主张的光谱参考行。修复事务内成员变动和无影响力看守政府的残留数据；严格模式进一步中和 61 项原版 define、3 项党派关系和 13 项通用和平会议价格差异，并支持政体自行声明外交规则。新增十场授权协商、三十个选择和三种限时修正，演示独立执政、协议政府与看守状态。
+
+**0.4.2 本轮修复与扩充：** 重新整理选国政治区的文字层级和图标间距，加入双语彩色数值 tooltip。修复同一事务内月度结算、零支持率遗留原版分布与旧存档新增记录同步。严格模式再中和 14 项原版政治 modifier，并按 PSF 制度管理四项占领法门槛。新增可逆的联盟角色操作，以及包含四个组织、三个并存联盟、独立执政与联合政府事件的[联盟演示内容包](examples/coalitions/README.md)。本发行包含 0.4.0、0.4.1 的全部本地开发成果，保留这些提交的原始历史。
 
 ## 已实现的系统
 
@@ -144,6 +146,7 @@ python tools/ci/validate.py --root dist \
 | [AUTHORING](docs/AUTHORING.md) | Schema、完整 JSON/YAML/TOML 示例、定义组织与事件、图标与迁移规则 |
 | [API](docs/API.md) | 实际生成的 effects、triggers、变量与本地化示例 |
 | [MODIFIERS](docs/MODIFIERS.md) | 民族精神/特质接入、限时与永久修正、日变化、叠加与撤销 |
+| [联盟演示](examples/coalitions/README.md) | 四个组织、三个并存联盟、独立执政／联盟政府与可逆选举合作 |
 | [原生接入示例](examples/native_modifiers/README.md) | 经真实 CWTools 验证的民族精神、人物特质与动态修正文件 |
 | [EXAMPLE](docs/EXAMPLE.md) | 国家覆盖、场景、设计解释和历史资料 |
 | [UI](docs/UI.md) | 政治/外交侧栏、原版控件保留、作用域与分辨率 |
@@ -158,4 +161,4 @@ python tools/ci/validate.py --root dist \
 
 PSF models political organizations independently of HOI4's native ideology slots. Declarative JSON, YAML or TOML manifests compile into a reusable framework mod and one dependent content mod, including generated effects, triggers, bilingual localization and native scripted UI. Organizations have multidimensional positions, independent support and influence, government satisfaction, legal status and multiple alliance memberships. Actual institutions remain separate from the governing coalition's political preferences.
 
-The vanilla example supplies ten authored country profiles, four generic fallback templates, 125 organizations, forty alternative-choice scenarios, twenty named modifier sources and 4,500 native organization modifier keys. The repository includes loader-byte/root-window checks, real pinned Rust CWTools validation and semantic negative controls. Native ideology categories remain as a compatibility projection; the game executable has not been run in the development environment, so static validation is not represented as an in-game rendering or playtest result.
+The vanilla example supplies ten authored country profiles, four generic fallback templates, 125 organizations, fifty alternative-choice scenarios, twenty-three named modifier sources and 4,500 native organization modifier keys. The repository includes loader-byte/root-window checks, real pinned Rust CWTools validation and semantic negative controls. Native ideology categories remain as a compatibility projection; the game executable has not been run in the development environment, so static validation is not represented as an in-game rendering or playtest result.

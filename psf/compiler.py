@@ -128,7 +128,8 @@ Source and authoring documentation: https://github.com/maxmixalex/HOI4-Political
                             directory="common/modifier_definitions", prefix="psf_organization_modifiers")
         write(content, "common/on_actions/psf_on_actions.txt", gameplay.on_actions(manifest))
         write(content, "common/decisions/categories/psf_categories.txt", gameplay.categories())
-        write(content, "common/decisions/psf_society_decisions.txt", gameplay.decisions(manifest))
+        write_effect_chunks(content, gameplay.decisions(manifest),
+                            directory="common/decisions", prefix="psf_society_decisions")
         write(content, "common/game_rules/psf_rules.txt", gameplay.rules(manifest))
         write(content, "events/psf_events.txt", gameplay.events(manifest))
         write(content, "common/scripted_localisation/psf_events.txt", localization.dynamic_localization(manifest))

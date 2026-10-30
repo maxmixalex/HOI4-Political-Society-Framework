@@ -1,60 +1,65 @@
-# Installable build
+# Installable builds
 
-[`psf-0.4.1.zip`](psf-0.4.1.zip) contains the reusable framework, vanilla political
-societies, both launcher descriptors, bilingual installation instructions,
-licenses and the generated API registry. Unpack into the HOI4 user-data `mod`
-directory and enable both mods in one playset. Move the previous `psf/` and
-`psf_vanilla_example/` folders aside before copying the new folders; overlaying
-files can leave obsolete GUI chunks loaded. Start a new campaign.
-
-## 0.4.1 changes
-
-- Immediate foreign-country refresh even when revision numbers match.
-- Independent large party and ideology images in both country-selection routes,
-  with historical descriptions kept separate.
-- Colored government roles, all current alliance memberships, and institution
-  versus government reference rows in the scrollable sidebar.
-- Live government membership in transactions, cleared caretaker summaries and
-  stable election tie-breaking.
-- Strict neutralization of 61 political defines, three generic party-opinion
-  differences and thirteen generic ideological peace-price rules.
-- Per-regime diplomacy policy and coalition-leader identity conditions.
-- Ten fictional negotiations, thirty choices, ten optional agreements and three
-  timed sources, preserving all existing organization baselines and governments.
-
-The example now has 125 organizations, 27 declared alliances, 50 scenarios,
-120 choices and 23 named sources. Native story conditions and some hardcoded
-mechanics still inspect the compatibility projection. Authored identity flags
-are independent of native ideology; without artwork, installed-game flags remain.
-
-## Artifact and verification
-
-| Field | Value |
+| Package | Intended use |
 | --- | --- |
-| Version | 0.4.1 |
-| Size | 3,405,066 bytes |
-| Entries | 795 |
-| Uncompressed size | 64,873,707 bytes |
-| SHA-256 | `f36806a02a8bb0af7e047cbb2265d805de36e82e96def5a7c1f16512961d6523` |
+| [psf-0.4.2.zip](psf-0.4.2.zip) | Framework plus the vanilla political-society example |
+| [psf-coalition-workshop-0.4.2.zip](psf-coalition-workshop-0.4.2.zip) | Separate fictional coalition workshop: four organizations and three simultaneous pacts |
 
-All **244 tests**, **20 real validation controls** and **32,461 geometry/binding
-checks** passed. The installed-wheel build matched all 795 files and reproduced
-the installer byte for byte. CRC checks passed.
+**Choose one package.** Each ZIP contains the reusable framework, one complete
+content registry, both launcher descriptors, bilingual installation notes and
+licenses. Do not enable the vanilla and workshop content packs together.
 
-The final gate has **0 new errors and 0 new warnings**. Raw CWTools still reports
-**367 errors and 117 warnings**: 272 declared stock-texture dependencies,
-94 errors and 117 warnings matched on original histories, plus one error on
-unchanged original generic peace code. See [VALIDATION.md](../docs/VALIDATION.md)
-for exact source proof and limits. No HOI4 launch or game rendering was available.
+Unpack into the HOI4 user-data `mod` directory and enable the framework and its
+chosen content pack in one playset. Move previous `psf/` and old PSF content
+folders aside first; overlaying files can leave obsolete GUI chunks loaded.
+Start a new campaign. The workshop is intended for the 1936 start and is a
+fictional example, not a reconstruction of German history.
 
-```sh
-python -m psf compile examples/vanilla/manifest.json --output dist
-python tools/ci/validate.py --root dist --self-test
-python -m psf pack --root dist --output build/psf-0.4.1.zip
-cmp distributions/psf-0.4.1.zip build/psf-0.4.1.zip
-```
+## 0.4.2 changes
 
-安装包包含框架、原版示例、两个启动器描述文件和双语说明。升级时先移走旧的
-`psf/`、`psf_vanilla_example/`，复制新目录及 `.mod`，启用两个模组并新开战役。
-已完成代码、脚本执行、原生布局结构与安装包校验；没有将它们等同于实机运行。
-原始诊断与残余原版机制均已明确记录。
+This distribution includes all retained 0.4.0/0.4.1 development work, including
+immediate country data, separate selection politics, native scrolling UI,
+custom organization colors, optional government alliances and cosmetic identity.
+
+The current release refines selection typography and large/small icon contracts,
+adds scoped colored tooltips, repairs same-transaction monthly membership and
+empty-electorate projection, and seeds newly introduced records without resetting
+saved political state. Strict mode cancels fourteen native political modifier
+channels and replaces four occupation-law ideology gates with PSF institution
+conditions. Complete decision categories are split within the file-size budget.
+
+Alliance decisions can switch opposition/electoral cooperation while preserving
+members. The separate [workshop](../examples/coalitions/README.md) supplies real
+playable government/event/identity transitions. The default vanilla example
+retains 125 organizations, 27 alliances, 50 scenarios, 120 choices and 23 named
+sources. Original national story conditions and unexposed hardcoded mechanics
+still inspect the compatibility projection.
+
+## Artifacts
+
+| Field | Vanilla example | Coalition workshop |
+| --- | --- | --- |
+| Version | 0.4.2 | 0.4.2 |
+| ZIP bytes | 3,584,938 | 872,349 |
+| Entries | 803 | 614 |
+| Uncompressed bytes | 67,643,404 | 5,455,333 |
+| SHA-256 | `0eeb8692c03abedac8352b99e3837d364cf2fe06b9e7a60387f091ea0c742dc4` | `78ba5222a4f6fd1c6dca83cffa32edc53656298a49286d784afbc6100231aa21` |
+
+All 264 distinct final regression tests passed, together with twenty real
+validation controls and 34,372 native geometry/binding checks. CRC passed for
+both ZIPs. An independently installed compiler wheel reproduced every file and
+both installers byte for byte; the new occupation-law snapshot is included in
+that installed compiler.
+
+The script gates report **zero new errors and zero new warnings**. Raw CWTools
+still reports 367 errors/123 warnings for the vanilla/native-integration builds
+and 119 errors/123 warnings for the workshop. Exact original-source and declared
+texture dependencies account for these diagnostics; their raw records remain.
+See [VALIDATION](../docs/VALIDATION.md) for proof, commands and boundaries.
+**No HOI4 executable launch, actual UI rendering or mouse-interaction test was
+available.**
+
+安装包二选一。每个包内含框架、对应内容模组、两个启动器描述文件和双语说明。
+请先移走旧的 `psf/` 与旧 PSF 内容目录，复制所选包并启用其中两个模组，随后新开
+战役。联盟实践包含虚构组织、三个并存联盟和真实事件，不会混入默认原版内容包。
+静态检查、生成脚本执行和真实 CWTools 验证均已完成，但没有将它们等同于实机运行。

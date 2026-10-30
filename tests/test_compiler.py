@@ -95,6 +95,23 @@ class CompilerTests(unittest.TestCase):
         for path in self.output.glob("*/localisation/**/*.yml"):
             self.assertLess(path.stat().st_size, 1_000_000, path)
 
+    def test_decision_chunks_preserve_every_category_and_decision(self):
+        from hoi4_interpreter import entries, parse
+        from psf import gameplay, model
+
+        paths = sorted((self.output / "psf_vanilla_example/common/decisions").glob("psf_society_decisions_*.txt"))
+        self.assertGreater(len(paths), 1)
+        actual = entries(parse("\n".join(path.read_text() for path in paths)))
+        expected = entries(parse(gameplay.decisions(model.load(ROOT / "examples/vanilla/manifest.json"))))
+        self.assertEqual(actual, expected, "Chunking must preserve complete decision effects, triggers and ordering")
+        self.assertCountEqual([entry.key for entry in actual], [
+            "psf_government_category", "psf_groups_category", "psf_alliances_category", "psf_institutions_category",
+        ])
+        identifiers = [decision.key for category in actual for decision in entries(category.value)]
+        self.assertEqual(len(identifiers), len(set(identifiers)), "A decision must not be duplicated across chunks")
+        self.assertIn("psf_policy_eng_government_role_electoral", identifiers)
+        self.assertIn("psf_policy_eng_government_role_opposition", identifiers)
+
     def test_archive_rejects_changed_build_and_has_launcher_entries(self):
         archive = self.base / "pack.zip"
         pack(self.output, archive)

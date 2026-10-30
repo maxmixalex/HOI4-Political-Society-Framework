@@ -1,5 +1,48 @@
 # Release notes
 
+## 0.4.2 — runtime recovery, native isolation and coalition authoring
+
+This consolidated release includes the retained 0.4.0 and 0.4.1 development
+commits and their complete changes. The original commit history is preserved.
+
+Country-selection panels restore native label/value typography and separate
+large organization/ideology artwork from the selected country's PSF charts.
+Political tooltips use explicit country scopes and colored values. Sidebar
+scrolling, independent small/large icon contracts and exact native geometry
+remain checked against the supplied interface scripts.
+
+Runtime bootstrap seeds newly introduced organizations, alliances and spectrum
+coordinates without resetting an existing campaign. Structural revision flags
+avoid rescanning unchanged records each day. Saved zero support, inactive
+organizations, dissolved pacts, government choices and source timers survive.
+Monthly helpers preserve an outer transaction and read its current membership.
+An empty PSF electorate clears stale native popularity; a hidden engine-only
+placeholder does not create visible support or a strict-mode stability bonus.
+
+Strict mode now cancels fourteen external native political modifier channels,
+including restoration when an external script removes the cancellation dynamic
+modifier. Four original occupation-law ideology gates follow PSF institutions.
+The three exact original political-source transforms are reconstructed and
+checked before inherited diagnostics are accepted. Original story conditions,
+country-specific peace logic and unexposed engine branches remain documented
+compatibility boundaries.
+
+Alliance authors and players can switch opposition/electoral cooperation
+without replacing members. A separate playable workshop adds four fictional
+organizations and three simultaneous alliances, an independent-party cabinet,
+a negotiated coalition/caretaker event and cosmetic identities. The vanilla
+example retains 125 organizations, 27 alliances, 50 scenarios, 120 choices and
+23 named modifier sources.
+
+Expanded decisions are split at complete category boundaries to retain the
+existing file-size budget. Installed compiler wheels now include the new
+occupation-law snapshot, with a native-asset packaging regression.
+
+Generated-script execution, real Rust CWTools controls, native layout checks
+and an isolated installed-wheel reproduction form the release gates. The exact
+results and raw diagnostic accounting are recorded in [VALIDATION](VALIDATION.md).
+No HOI4 engine launch or in-game rendering result is inferred from those gates.
+
 ## 0.4.1 — immediate foreign refresh, government transitions and deeper native isolation
 
 Foreign summaries no longer use a data-only dirty value: switching between two
