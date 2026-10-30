@@ -34,7 +34,8 @@ Set an input immediately before the call; nested effects may reuse temporary nam
 
 | Effect | Behavior |
 | --- | --- |
-| `psf_initialize` | Initialize a country once, selecting its authored tag or fallback profile |
+| `psf_initialize` | Initialize a country once, or synchronize newly added records in its existing profile |
+| `psf_bootstrap` | Initialize/upgrade, rebuild derived values and restore campaign labels immediately without advancing timers |
 | `psf_refresh` | Recompute current profile's effective influence, memberships, government positions, classification, mismatch and UI revision |
 | `psf_refresh_modifiers` | Update the legitimacy dynamic-modifier inputs |
 | `psf_begin_transaction` | Suppress routine intermediate full refreshes |
@@ -45,7 +46,11 @@ Set an input immediately before the call; nested effects may reuse temporary nam
 
 Initialization is idempotent. It does not reapply starting scores to an existing save. Directly calling a specific `psf_init_<profile>` is available in the generated registry but should be reserved for deliberate integrations; it still refuses a country already initialized.
 
+An existing profile gains newly declared organizations, alliances and spectrum coordinates when `psf_initialize` or `psf_bootstrap` next runs. The structural revision is saved as a country flag, so unchanged content does not rescan every field each day. Only absent records are seeded, using applicable dated starting overrides. Existing zero scores, inactive groups, alliance memberships, dissolved alliances, government selection and modifier durations remain intact. Newly introduced members are not implicitly added to an existing alliance. Renamed IDs, deleted profiles and intentional changes to existing scores still need an author's explicit migration. The country-scoped daily hook provides automatic recovery; a caller can use `psf_bootstrap` in the same effect to make the update visible immediately.
+
 Transactions do not provide rollback, nesting or security. Commit in the same branch. A change of government deliberately refreshes immediately because it changes ownership of derived governing state. Organization government/ban triggers and the ban/deactivate effects read the current membership bits, including changes made earlier in the same transaction. Leaving a cabinet and then banning the former member works within one event; joining a cabinet immediately protects that member. Display aggregates still refresh at commit.
+
+The election and monthly lifecycle helpers retain an outer caller's batch flag. Monthly satisfaction uses the current cabinet membership, including departures made earlier in that transaction, and the compatibility popularity export waits for the outer commit.
 
 ```text
 GER = {

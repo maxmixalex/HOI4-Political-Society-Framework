@@ -322,7 +322,9 @@ The [architecture document](ARCHITECTURE.md) explains the formulas that consume 
 
 Use stable readable and numeric IDs. Reordering records preserves hashed identities but can change tie-breaking between equally distant ideology prototypes, so even a reorder can alter classification in a tie. Renaming an organization changes generated API and variable names. Changing axes alters the state schema.
 
-For a new campaign, rebuild and package. For an established save, write a versioned migration that initializes added variables, transfers renamed values if necessary, assigns required new-axis positions, then reclassifies and refreshes. Mark that migration with your own country flag and apply it once. There is no general automatic migration that can infer an author's intent from an edited manifest.
+For a new campaign, rebuild and package. In an established profile, `psf_initialize` and `psf_bootstrap` can seed newly introduced organizations, alliances and missing axis coordinates without replaying existing starting scores. They use a structural revision flag and only write absent records, preserving deliberate zero scores, inactive organizations, dissolved alliances, current governments and active modifier durations. A new organization is not automatically joined to an existing alliance; add that membership explicitly when your story requires it. The next country daily hook invokes this synchronization, and calling `psf_bootstrap` applies it immediately without advancing time.
+
+Renaming records, removing or replacing profiles, transferring existing values or changing current memberships still require an author's versioned migration. Mark it with your own country flag and apply it once. A structural addition can be recognized automatically; the intended meaning of a renamed record or a political story change cannot.
 
 Do not edit generated output as the long-term source. Compilation replaces owned directories, and `pack` verifies their hashes. Keep custom logic/assets in a companion integration or add a deliberate reproducible packaging step to your project.
 

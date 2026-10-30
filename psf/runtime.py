@@ -6,6 +6,7 @@ variables; declaration-specific wrappers save authors from numeric registry IDs.
 from __future__ import annotations
 
 from datetime import date, timedelta
+import hashlib
 import math
 
 from .model import ENGINE_IDEOLOGIES, ROLES, STATUS, profiles
@@ -345,6 +346,15 @@ def alliance_effects(manifest: dict, p: dict, a: dict) -> list[Block]:
     return out
 
 
+def records_marker(p: dict) -> str:
+    """A structural revision avoids rescanning every saved field every day."""
+    fields = ["group:" + group["id"] for group in p["groups"]]
+    fields += ["axis:" + group["id"] + ":" + axis for group in p["groups"] for axis in group["positions"]]
+    fields += ["alliance:" + alliance["id"] for alliance in p["alliances"]]
+    digest = hashlib.sha256("\n".join(sorted(fields)).encode("utf-8")).hexdigest()[:16]
+    return "psf_records_v1_" + p["id"] + "_" + digest
+
+
 def initialize_effect(manifest: dict, p: dict) -> Block:
     regime_map = {r["id"]: r for r in manifest["regimes"]}
     body: list[Block | str] = ["set_country_flag = psf_initialized", "set_country_flag = psf_profile_" + p["id"],
@@ -401,12 +411,88 @@ def initialize_effect(manifest: dict, p: dict) -> Block:
             effects += select_government(p, override["government"])
         previous_day = date(*map(int, override["date"].split('.'))) - timedelta(days=1)
         body.append(conditional([f"date > {previous_day.year}.{previous_day.month}.{previous_day.day}"], effects))
-    body += [f"psf_refresh_{p['id']} = yes", "psf_export_popularity = yes", "psf_capture_engine_government = yes"]
+    body += ["set_country_flag = " + records_marker(p), f"psf_refresh_{p['id']} = yes", "psf_export_popularity = yes", "psf_capture_engine_government = yes"]
     for scenario in manifest["scenarios"]:
         if scenario["profile"] == p["id"]:
             # Do not replay historical 1936 events when a 1939 bookmark loads.
             body.append(conditional(["date > " + scenario["date"]], "set_country_flag = psf_scenario_" + scenario["id"]))
     return block("psf_init_" + p["id"], conditional(["NOT = { has_country_flag = psf_initialized }"], body))
+
+
+def sync_profile_records(manifest: dict, p: dict) -> Block:
+    """Seed newly introduced records without replaying an existing campaign.
+
+    Saved zero values and dissolved alliances are deliberate state. Presence,
+    rather than truthiness, identifies a new organization/alliance. Existing
+    memberships never acquire newly authored members implicitly.
+    """
+    body: list[Block | str] = []
+    for group in p["groups"]:
+        gid = group["id"]
+        initial = modifiers.initialize_group(manifest, group)
+        initial += [setv(gv(gid, metric), group[metric]) for metric in ("support", "influence", "satisfaction")]
+        initial += [setv(gv(gid, "status"), STATUS[group["status"]]),
+                    setv(gv(gid, "prohibited"), int(group["status"] in ("banned", "underground"))),
+                    setv(gv(gid, "vote_share"), 0)]
+        initial += [setv(gv(gid, "position_" + axis), value) for axis, value in group["positions"].items()]
+        for override in p.get("start_overrides", []):
+            update = next((item for item in override.get("groups", []) if item["id"] == gid), None)
+            if update is None:
+                continue
+            values: list[Block | str] = []
+            for field in ("support", "influence", "satisfaction", "status"):
+                if field in update:
+                    values.append(setv(gv(gid, field), STATUS[update[field]] if field == "status" else update[field]))
+                    if field == "status":
+                        values.append(setv(gv(gid, "prohibited"), int(update[field] in ("banned", "underground"))))
+            values += [setv(gv(gid, "position_" + axis), value) for axis, value in update.get("positions", {}).items()]
+            previous = date(*map(int, override["date"].split("."))) - timedelta(days=1)
+            initial.append(conditional([f"date > {previous.year}.{previous.month}.{previous.day}"], values))
+        body.append(conditional(["NOT = { has_variable = " + gv(gid, "status") + " }"],
+                                initial, setv("psf_records_changed", 1, True)))
+        # An expanded spectrum requires new coordinates, but existing axes,
+        # supports and active/timed modifier sources must retain their values.
+        for axis, value in group["positions"].items():
+            coordinate: list[Block | str] = [setv(gv(gid, "position_" + axis), value)]
+            for override in p.get("start_overrides", []):
+                update = next((item for item in override.get("groups", []) if item["id"] == gid), None)
+                if update is not None and axis in update.get("positions", {}):
+                    previous = date(*map(int, override["date"].split("."))) - timedelta(days=1)
+                    coordinate.append(conditional([f"date > {previous.year}.{previous.month}.{previous.day}"],
+                                                  setv(gv(gid, "position_" + axis), update["positions"][axis])))
+            body.append(conditional(["NOT = { has_variable = " + gv(gid, "position_" + axis) + " }"],
+                                    coordinate, setv("psf_records_changed", 1, True)))
+        body.append(conditional(["NOT = { has_variable = " + gv(gid, "prohibited") + " }"],
+                    setv(gv(gid, "prohibited"), 0),
+                    conditional([check(gv(gid, "status"), 1, "greater_than")], setv(gv(gid, "prohibited"), 1)),
+                    setv("psf_records_changed", 1, True)))
+    for alliance in p["alliances"]:
+        aid = alliance["id"]
+        initial = [setv(av(aid, "active"), int(bool(alliance["members"]))),
+                   setv(av(aid, "role"), ROLES[alliance["kind"]]),
+                   setv(av(aid, "electoral"), int(alliance["kind"] == "electoral")),
+                   setv(av(aid, "cohesion"), alliance["cohesion"])]
+        initial += [setv(av(aid, "g_" + group["id"]), int(group["id"] in alliance["members"])) for group in p["groups"]]
+        for override in p.get("start_overrides", []):
+            update = next((item for item in override.get("alliances", []) if item["id"] == aid), None)
+            if update is None:
+                continue
+            values = []
+            if "members" in update:
+                values += [setv(av(aid, "g_" + group["id"]), int(group["id"] in update["members"])) for group in p["groups"]]
+                values.append(setv(av(aid, "active"), int(bool(update["members"]))))
+            if "cohesion" in update:
+                values.append(setv(av(aid, "cohesion"), update["cohesion"]))
+            if "kind" in update:
+                values += [setv(av(aid, "role"), ROLES[update["kind"]]),
+                           setv(av(aid, "electoral"), int(update["kind"] == "electoral"))]
+            previous = date(*map(int, override["date"].split("."))) - timedelta(days=1)
+            initial.append(conditional([f"date > {previous.year}.{previous.month}.{previous.day}"], values))
+        body.append(conditional(["NOT = { has_variable = " + av(aid, "role") + " }"],
+                                initial, setv("psf_records_changed", 1, True)))
+    body.append("set_country_flag = " + records_marker(p))
+    return block("psf_sync_records_" + p["id"], conditional(
+        ["NOT = { has_country_flag = " + records_marker(p) + " }"], body))
 
 
 def election_effect(manifest: dict, p: dict) -> list[Block]:
@@ -463,7 +549,9 @@ def election_effect(manifest: dict, p: dict) -> list[Block]:
 
 def monthly_effect(manifest: dict, p: dict) -> Block:
     settings = manifest["settings"]
-    out: list[Block | str] = ["psf_begin_transaction = yes"]
+    out: list[Block | str] = [setv("psf_monthly_was_batched", 0, True),
+        conditional(["has_country_flag = psf_batch_update"], setv("psf_monthly_was_batched", 1, True)),
+        "psf_begin_transaction = yes", "psf_refresh = yes"]
     for g in p["groups"]:
         gid = g["id"]
         body: list[Block | str] = [
@@ -489,7 +577,7 @@ def monthly_effect(manifest: dict, p: dict) -> Block:
                                     setv(av(aid, "g_" + g["id"]), 0), setv("psf_coalition_changed", 1)))
         body.append(conditional([check(av(aid, "cohesion"), 5, "less_than")], "psf_dissolve_" + aid + " = yes", setv("psf_coalition_changed", 1)))
         out.append(conditional([check(av(aid, "active"), 1)], body))
-    out += ["clr_country_flag = psf_batch_update", f"psf_refresh_{p['id']} = yes",
+    out += [conditional([check("psf_monthly_was_batched", 0)], "clr_country_flag = psf_batch_update"), f"psf_refresh_{p['id']} = yes",
             setv("psf_legitimacy_change", settings["monthly_legitimacy_recovery"]),
             setv("psf_alignment_loss", "psf_alignment_gap", True), mulv("psf_alignment_loss", settings["alignment_penalty"], True),
             subv("psf_legitimacy_change", "psf_alignment_loss"),
@@ -500,7 +588,8 @@ def monthly_effect(manifest: dict, p: dict) -> Block:
             conditional([check("psf_elections_enabled", 1)], addv("psf_election_clock", 1),
                         conditional([check("psf_election_clock", "psf_election_term", "greater_than_or_equals")], "psf_hold_election_" + p["id"] + " = yes")),
             conditional(["is_ai = no", check("psf_coalition_changed", 1)], "country_event = { id = psf.2 }"),
-            "psf_refresh_modifiers = yes", "psf_export_popularity = yes"]
+            "psf_refresh_modifiers = yes",
+            conditional(["NOT = { has_country_flag = psf_batch_update }"], "psf_export_popularity = yes")]
     return block("psf_monthly_" + p["id"], out)
 
 
@@ -520,11 +609,21 @@ def bridge_effects(manifest: dict, p: dict) -> list[Block]:
     normalise: list[Block | str] = []
     for engine in ENGINE_IDEOLOGIES:
         normalise += [divv("psf_engine_" + engine, "psf_engine_total"), mulv("psf_engine_" + engine, 100)]
-    normalise += [block("set_popularities", [f"{i} = var:psf_engine_{i}" for i in ENGINE_IDEOLOGIES])]
-    # Store the engine's post-normalization result, including engine rounding.
-    for engine in ENGINE_IDEOLOGIES:
-        normalise.append(setv("psf_last_" + engine, "party_popularity_100@" + engine))
     export.append(conditional([check("psf_engine_total", 0, "greater_than")], normalise))
+    # The engine's four slots cannot represent an empty electorate. Leaving
+    # them untouched would retain yesterday's party split (or a native event's
+    # new split) after every PSF party has zero support or becomes inactive.
+    # Keep the engine government as a deterministic compatibility placeholder;
+    # PSF's support values and its empty pie remain zero.
+    empty: list[Block | str] = [setv("psf_engine_neutrality", 100)]
+    for engine in ENGINE_IDEOLOGIES:
+        if engine != "neutrality":
+            empty.append(conditional(["has_government = " + engine],
+                                     setv("psf_engine_neutrality", 0), setv("psf_engine_" + engine, 100)))
+    export.append(block("else", empty))
+    export.append(block("set_popularities", [f"{i} = var:psf_engine_{i}" for i in ENGINE_IDEOLOGIES]))
+    # Store the engine's post-normalization result, including engine rounding.
+    export += [setv("psf_last_" + engine, "party_popularity_100@" + engine) for engine in ENGINE_IDEOLOGIES]
     out.append(block("psf_export_popularity_" + p["id"], "psf_import_popularity = yes", export))
     imported: list[Block | str] = [setv("psf_import_was_batched", 0, True),
         conditional(["has_country_flag = psf_batch_update"], setv("psf_import_was_batched", 1, True)),
@@ -574,7 +673,7 @@ def effects(manifest: dict) -> str:
                              classify(manifest, "psf_gov_", "psf_government_ideology")]
     # Correct public classifier name is psf_classify_government.
     for p in all_profiles:
-        out += [initialize_effect(manifest, p), refresh_effect(manifest, p), monthly_effect(manifest, p), charts.refresh_effect(manifest, p)]
+        out += [initialize_effect(manifest, p), sync_profile_records(manifest, p), refresh_effect(manifest, p), monthly_effect(manifest, p), charts.refresh_effect(manifest, p)]
         for g in p["groups"]:
             out.extend(group_effects(manifest, p, g))
         for a in p["alliances"]:
@@ -588,7 +687,8 @@ def effects(manifest: dict) -> str:
     for index, p in enumerate(all_profiles):
         condition = "tag = " + p["tag"] if "tag" in p else "has_government = " + p["engine_ideology"]
         initialize.append(conditional([condition], "psf_init_" + p["id"] + " = yes", kind="if" if index == 0 else "else_if"))
-    out.append(block("psf_initialize", conditional(["NOT = { has_country_flag = psf_initialized }"], initialize)))
+    out.append(block("psf_initialize", conditional(["NOT = { has_country_flag = psf_initialized }"], initialize),
+                     block("else", "psf_upgrade_runtime = yes")))
     migration: list[Block | str] = [
         conditional(["NOT = { has_variable = psf_governing_group }"], setv("psf_governing_group", 0)),
         conditional(["NOT = { has_variable = psf_identity }"], setv("psf_identity", 0)),
@@ -603,7 +703,12 @@ def effects(manifest: dict) -> str:
                                        setv("psf_migration_weight", gv(g["id"], "effective_influence"), True)))
         migration.append(conditional([flag(p), block("NOT", block("OR", valid))], recover))
     migration.append(setv("psf_schema_version", 2))
-    out.append(block("psf_upgrade_runtime", conditional([check("psf_schema_version", 2, "less_than")], migration)))
+    out.append(block("psf_upgrade_runtime", conditional([check("psf_schema_version", 2, "less_than")], migration),
+                     setv("psf_records_changed", 0, True),
+                     [conditional([flag(p)], "psf_sync_records_" + p["id"] + " = yes",
+                                  kind="if" if index == 0 else "else_if") for index, p in enumerate(all_profiles)],
+                     conditional([check("psf_records_changed", 1)], "psf_refresh = yes",
+                                 conditional(["NOT = { has_country_flag = psf_batch_update }"], "psf_export_popularity = yes"))))
     # History and GUI entrypoints can rebuild immediately, without applying a
     # day of drift, expiring sources or reinitializing an existing campaign.
     out.append(block("psf_bootstrap",
