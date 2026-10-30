@@ -111,12 +111,13 @@ def _container(name: str, x: int, y: int, width: int, height: int,
 
 def _text(name: str, key: str, x: int, y: int, width: int, height: int = 22,
           *, font: str = "hoi_16mbs", tip: str | None = None,
-          transparent: bool = True, scroll: bool = False) -> str:
+          transparent: bool = True, scroll: bool = False,
+          align: str = "left") -> str:
     tooltip = f'\npdx_tooltip = "{tip}"' if tip else ""
     scrollbar = ' scrollbartype = "standardtext_slider"' if scroll else ""
     return (f'instantTextboxType = {{ name = "{name}" position = {{ x = {x} y = {y} }} '
             f'font = "{font}" text = "{key}" maxWidth = {width} maxHeight = {height} '
-            f'fixedsize = yes multiline = {"yes" if height > 24 else "no"} '
+            f'fixedsize = yes multiline = {"yes" if height > 24 else "no"} format = {align} '
             f'alwaystransparent = {"yes" if transparent else "no"}{tooltip}{scrollbar} }}\n')
 
 
@@ -324,9 +325,10 @@ def generate_ui(manifest: dict[str, Any], output: Path, vanilla_path: Path | Non
         "groups": ("Organizations", "政治团体"),
         "support": ("Support", "支持率"),
         "influence": ("Influence", "影响力"),
+        "satisfaction": ("Satisfaction", "满意度"),
         "spectrum": ("Spectrum", "政治光谱"),
         "ideology": ("Ideology", "意识形态"),
-        "government_party_label": ("Government", "执政团体"),
+        "government_party_label": ("Ruling", "执政团体"),
         "alliances": ("Alliances", "政治联盟"),
         "none": ("None", "无"),
         "empty": ("", ""),
@@ -336,7 +338,7 @@ def generate_ui(manifest: dict[str, Any], output: Path, vanilla_path: Path | Non
         "underground": ("§YUnderground§!", "§Y地下活动§!"),
         "underground_prohibited": ("§YUnderground; legally prohibited§!", "§Y地下活动（依法查禁）§!"),
         "banned": ("§RBanned§!", "§R已被查禁§!"),
-        "inactive": ("Inactive", "尚未活动"),
+        "inactive": ("§gInactive§!", "§g尚未活动§!"),
         "government": ("§GGovernment§!", "§G执政§!"),
         "outside_government": ("Outside government", "未参与执政"),
         "opposition": ("Opposition", "反对派"),
@@ -346,9 +348,9 @@ def generate_ui(manifest: dict[str, Any], output: Path, vanilla_path: Path | Non
         "ban": ("Ban (50 PP)", "查禁（50 政治点）"),
         "legalize": ("Legalize (25 PP)", "解禁（25 政治点）"),
         "activate": ("Activate (25 PP)", "开始活动（25 政治点）"),
-        "ban_tip": ("Ban this organization for 50 political power. It loses influence and may continue underground. A governing organization cannot be banned. Available only in your own country.", "花费 50 政治点查禁该团体，降低其影响力；它仍可能转入地下活动。不能查禁执政团体。只能操作本国团体。"),
-        "legalize_tip": ("Restore this organization's legal status for 25 political power, restoring legal access to institutions. Popular support remains independently recorded. Available only in your own country.", "花费 25 政治点恢复该团体的合法地位及制度资源。民众支持率仍单独记录。只能操作本国团体。"),
-        "activate_tip": ("Start this organization's political activity for 25 political power. Available only in your own country.", "花费 25 政治点，使该团体开始政治活动。只能操作本国团体。"),
+        "ban_tip": ("§YBan organization§!\\nCost: £pol_power£ §Y50§!\\n\\nIt loses influence and may continue underground. A governing organization cannot be banned. Available only in your own country.", "§Y查禁团体§!\\n花费：£pol_power£ §Y50§!\\n\\n降低其影响力；它仍可能转入地下活动。不能查禁执政团体。只能操作本国团体。"),
+        "legalize_tip": ("§YLegalize organization§!\\nCost: £pol_power£ §Y25§!\\n\\nRestores legal access to institutions. Popular support remains independently recorded. Available only in your own country.", "§Y恢复合法地位§!\\n花费：£pol_power£ §Y25§!\\n\\n恢复该团体的合法地位及制度资源，民众支持率仍单独记录。只能操作本国团体。"),
+        "activate_tip": ("§YStart political activity§!\\nCost: £pol_power£ §Y25§!\\n\\nAvailable only in your own country.", "§Y开始政治活动§!\\n花费：£pol_power£ §Y25§!\\n\\n只能操作本国团体。"),
         "support_tip": ("Support measures popular backing for an organization. Nonparty organizations can overlap in their supporters; their values are not extra slices of an election vote.", "支持率表示民众对团体的支持。非政党团体的支持者可能互相重叠，其数值不是额外的选票份额。"),
         "support_chart_tip": ("§YPopular support§!\\n[PSFUIPieSupport]\\n\\nActive electoral organizations, normalized to 100%. Civil organizations' overlapping approval is listed separately in their details.", "§Y民众支持率§!\\n[PSFUIPieSupport]\\n\\n活动中的参选团体按支持权重归一化为 100%。非参选社会团体的重叠支持单独列于详情。"),
         "influence_chart_tip": ("§YPolitical influence§!\\n[PSFUIPieInfluence]\\n\\nEach organization's effective influence after modifiers and legal-status restrictions, normalized to 100%.", "§Y政治影响力§!\\n[PSFUIPieInfluence]\\n\\n各团体施加修正与活动状态限制后的有效影响力，归一化为 100%。"),
@@ -363,7 +365,8 @@ def generate_ui(manifest: dict[str, Any], output: Path, vanilla_path: Path | Non
         "government_ideology_tip": ("§Y[PSFUIGovIdeology]§!\\nGovernment: [PSFUIGovernmentParty]\\n\\nThe governing program is classified from the legal government's current issue positions. The country's actual institutions are shown separately. Click to inspect the spectrum.", "§Y[PSFUIGovIdeology]§!\\n执政团体：[PSFUIGovernmentParty]\\n\\n政治倾向根据合法执政团体的实时议题立场判定，与国家实际制度分开记录。点击查看政治光谱。"),
         "government_line": ("Government: [PSFUIGovernment]", "执政：[PSFUIGovernment]"),
         "government_party_line": ("[PSFUIGovernmentParty]", "[PSFUIGovernmentParty]"),
-        "summary_metrics": ("Support §Y[?psf_government_support|0]%§!   Influence §Y[?psf_government_influence|0]%§!", "支持 §Y[?psf_government_support|0]%§!   影响力 §Y[?psf_government_influence|0]%§!"),
+        "summary_metrics": ("£population_texticon£ §Y[?psf_government_support|0]%§!   £pol_power£ §Y[?psf_government_influence|0]%§!", "£population_texticon£ §Y[?psf_government_support|0]%§!   £pol_power£ §Y[?psf_government_influence|0]%§!"),
+        "summary_metrics_tip": ("§YGovernment§!\\n£population_texticon£ Popular support: §Y[?psf_government_support|1]%§!\\n£pol_power£ Effective influence: §Y[?psf_government_influence|1]%§!", "§Y执政团体§!\\n£population_texticon£ 民众支持：§Y[?psf_government_support|1]%§!\\n£pol_power£ 有效影响力：§Y[?psf_government_influence|1]%§!"),
         "summary_legitimacy": ("Legitimacy §Y[?psf_legitimacy|0]§!   Groups §Y[?psf_group_count|0]§!", "合法性 §Y[?psf_legitimacy|0]§!   团体 §Y[?psf_group_count|0]§!"),
         "side_title": ("[This.GetName]", "[This.GetName]"),
         "list_help": ("Support / influence / satisfaction", "支持率 / 影响力 / 满意度"),
@@ -415,8 +418,28 @@ def generate_ui(manifest: dict[str, Any], output: Path, vanilla_path: Path | Non
         add_loc(f"psf_ui_detail_affiliations_{gid}", f"Alliances: [PSFUIAffiliations_{gid}]",
                 f"政治联盟：[PSFUIAffiliations_{gid}]")
         definitions.append(_defined(f"PSFUIIdeology_{gid}", [(f"check_variable = {{ psf_g_{gid}_ideology = {ideology.get('_index', i+1)} }}", f"psf_ideology_{ideology['id']}_name") for i, ideology in enumerate(manifest.get("ideologies", []))]))
-        add_loc(f"psf_ui_row_{gid}",
-                f"[?psf_g_{gid}_modified_support|0] / [?psf_g_{gid}_effective_influence|0] / [?psf_g_{gid}_modified_satisfaction|0]")
+        # Separate native textboxes keep all three metrics aligned across the
+        # roster. Satisfaction has an evaluative scale; support and influence
+        # stay neutral rather than implying that a larger opposition is good.
+        add_loc(f"psf_ui_row_support_{gid}", f"§Y[?psf_g_{gid}_modified_support|0]§!")
+        add_loc(f"psf_ui_row_influence_{gid}", f"§Y[?psf_g_{gid}_effective_influence|0]§!")
+        satisfaction = f"psf_g_{gid}_modified_satisfaction"
+        for tone, color in (("high", "G"), ("medium", "Y"), ("low", "R")):
+            add_loc(f"psf_ui_satisfaction_{gid}_{tone}", f"§{color}[?{satisfaction}|0]§!")
+        definitions.append(_defined(f"PSFUISatisfaction_{gid}", [
+            (f"check_variable = {{ var = {satisfaction} value = 60 compare = greater_than_or_equals }}", f"psf_ui_satisfaction_{gid}_high"),
+            (f"check_variable = {{ var = {satisfaction} value = 40 compare = greater_than_or_equals }}", f"psf_ui_satisfaction_{gid}_medium"),
+        ], f"psf_ui_satisfaction_{gid}_low"))
+        add_loc(f"psf_ui_row_satisfaction_{gid}", f"[PSFUISatisfaction_{gid}]")
+        for metric, variable in (("support", "modified_support"), ("influence", "effective_influence"),
+                                 ("satisfaction", "modified_satisfaction")):
+            extra_en = (f"\\nShare of electoral support: §Y[?psf_g_{gid}_support_share|1]%§!" if metric == "support" and group.get("electoral", group.get("kind", "party") == "party")
+                        else f"\\nShare of effective influence: §Y[?psf_g_{gid}_influence_share|1]%§!" if metric == "influence" else "")
+            extra_zh = (f"\\n参选团体支持份额：§Y[?psf_g_{gid}_support_share|1]%§!" if metric == "support" and group.get("electoral", group.get("kind", "party") == "party")
+                        else f"\\n有效影响力份额：§Y[?psf_g_{gid}_influence_share|1]%§!" if metric == "influence" else "")
+            add_loc(f"psf_ui_row_{metric}_{gid}_tip",
+                    f"§Y$psf_group_{gid}_name$§!\\n$psf_ui_{metric}$: §Y[?psf_g_{gid}_{variable}|1]§!\\nBase: [?psf_g_{gid}_{metric}|1]" + extra_en + f"\\n\\n$psf_ui_{metric}_tip$",
+                    f"§Y$psf_group_{gid}_name$§!\\n$psf_ui_{metric}$：§Y[?psf_g_{gid}_{variable}|1]§!\\n基础值：[?psf_g_{gid}_{metric}|1]" + extra_zh + f"\\n\\n$psf_ui_{metric}_tip$")
         definitions.append(_defined(f"PSFUIRowStatus_{gid}", [
             (f"check_variable = {{ psf_g_{gid}_governing = 1 }} check_variable = {{ psf_g_{gid}_status = 1 }}", "psf_ui_government")
         ] + [(f"check_variable = {{ psf_g_{gid}_status = {n} }}", f"psf_ui_{label}") for n, label in enumerate(("inactive", "legal", "underground", "banned"))]))
@@ -429,7 +452,7 @@ def generate_ui(manifest: dict[str, Any], output: Path, vanilla_path: Path | Non
         add_loc(f"psf_ui_detail_ideology_{gid}", f"[PSFUIIdeology_{gid}]")
         definitions.append(_defined(f"PSFUIIdeologyIcon_{gid}",
             [(f"check_variable = {{ psf_g_{gid}_ideology = {ideology.get('_index', i+1)} }}", f"psf_ui_ideology_sprite_{ideology['id']}") for i, ideology in enumerate(manifest.get("ideologies", []))],
-            f"psf_ui_ideology_sprite_{manifest['ideologies'][0]['id']}"))
+            "psf_ui_unknown_ideology_sprite"))
         kinds = {"party": ("Political party", "政党"), "trade_union": ("Trade union", "工会"), "union": ("Trade union", "工会"), "business": ("Business association", "工商团体"), "industrial_association": ("Industrial association", "产业联合会"), "corporation": ("Corporation", "法团"), "military": ("Military organization", "军人团体"), "military_clique": ("Military organization", "军人团体"), "religious": ("Religious organization", "宗教团体"), "church": ("Religious organization", "宗教团体"), "movement": ("Political movement", "政治运动"), "professional": ("Professional association", "职业团体"), "employers_association": ("Employers' association", "雇主协会"), "civic": ("Civic organization", "公民团体"), "faction": ("Political faction", "政治派系")}
         kind_en, kind_zh = kinds.get(group.get("kind", "party"), (group.get("kind", "Organization").replace("_", " "), "政治团体"))
         add_loc(f"psf_ui_kind_{gid}", kind_en, kind_zh)
@@ -502,8 +525,11 @@ def generate_ui(manifest: dict[str, Any], output: Path, vanilla_path: Path | Non
     pages: list[tuple[str, str, str, list[str], list[str], list[str]]] = []
     for profile in profiles:
         pid = profile["id"]
-        rows = _text("psf_list_help", "psf_ui_list_help", 10, 0, 366,
-                     tip="psf_ui_support_tip", transparent=False)
+        rows = ""
+        columns = (("support", 54, 100), ("influence", 154, 100), ("satisfaction", 254, 116))
+        for metric, x, width in columns:
+            rows += _text(f"psf_list_{metric}", f"psf_ui_{metric}", x, 0, width, 22,
+                          tip=f"psf_ui_{metric}_tip", transparent=False, align="center")
         row_effects = []
         for row, group in enumerate(profile.get("groups", [])):
             gid = group["id"]
@@ -513,12 +539,28 @@ def generate_ui(manifest: dict[str, Any], output: Path, vanilla_path: Path | Non
                             sprite="GFX_tiled_window_small_small", size=(370, 44))
             rows += _icon(f"psf_row_icon_{gid}", icons.sprite(group, "group", "small"), 16, y + 10)
             rows += _icon(f"psf_row_color_{gid}", f"GFX_psf_color_{gid}", 42, y + 28)
-            rows += _text(f"psf_row_name_{gid}", f"psf_group_{gid}_short_name", 54, y + 2, 315, 20, font="hoi_18mbs")
-            rows += _text(f"psf_row_values_{gid}", f"psf_ui_row_{gid}", 54, y + 23, 184, 20)
-            rows += _text(f"psf_row_status_{gid}", f"psf_ui_row_status_{gid}", 242, y + 23, 128, 20)
-            row_effects.append(f"psf_select_{gid}_click = {{ set_variable = {{ ROOT.psf_ui_group = {index} }} set_variable = {{ ROOT.psf_ui_page = 1 }} }}")
+            rows += _text(f"psf_row_name_{gid}", f"psf_group_{gid}_short_name", 54, y + 2, 208, 20,
+                          font="hoi_18mbs")
+            rows += _text(f"psf_row_status_{gid}", f"psf_ui_row_status_{gid}", 264, y + 2, 106, 20,
+                          align="right")
+            select = f"set_variable = {{ ROOT.psf_ui_group = {index} }} set_variable = {{ ROOT.psf_ui_page = 1 }}"
+            for metric, x, width in columns:
+                # Tooltip cells are real transparent buttons with the same
+                # selection effect, so hover targets cannot swallow row clicks.
+                name = f"psf_row_{metric}_{gid}"
+                rows += _button(name, f"psf_ui_row_{metric}_{gid}", x, y + 23,
+                                tip=f"psf_ui_row_{metric}_{gid}_tip",
+                                sprite="GFX_tiled_window_transparent", size=(width, 20))
+                row_effects.append(f"{name}_click = {{ {select} }}")
+            row_effects.append(f"psf_select_{gid}_click = {{ {select} }}")
             detail_triggers, detail_effects = [], []
             detail_properties = [f'psf_detail_ideology_icon_{gid} = {{ image = "[PSFUIIdeologyIcon_{gid}]" }}']
+            ideology_conditions = " ".join(f"check_variable = {{ psf_g_{gid}_ideology = {ideology.get('_index', i + 1)} }}"
+                                           for i, ideology in enumerate(manifest.get("ideologies", [])))
+            # An unclassified organization must not inherit the first
+            # registered ideology's emblem. The unknown large fallback stays
+            # hidden from this compact 24-pixel lane.
+            detail_triggers.append(f"psf_detail_ideology_icon_{gid}_visible = {{ OR = {{ {ideology_conditions} }} }}")
             # Vanilla idea entries reserve 60×68 (frontend spirit_idea_entry).
             # A separate clipped frame also bounds author-supplied artwork.
             detail = _container(f"psf_detail_icon_frame_{gid}", 8, 4, 72, 76,
@@ -536,10 +578,10 @@ def generate_ui(manifest: dict[str, Any], output: Path, vanilla_path: Path | Non
                             tip=f"psf_ui_group_tooltip_{gid}", transparent=False)
             detail += _text(f"psf_detail_metrics_{gid}", f"psf_ui_detail_metrics_{gid}", 8, 148, 362, 66,
                             tip=f"psf_ui_group_tooltip_{gid}", transparent=False)
-            affiliation_height = 48 if profile.get("alliances") else 0
+            affiliation_height = 70 if profile.get("alliances") else 0
             if affiliation_height:
-                detail += _text(f"psf_detail_affiliations_{gid}", f"psf_ui_detail_affiliations_{gid}", 8, 220, 362, 40,
-                                tip=f"psf_ui_group_tooltip_{gid}", transparent=False)
+                detail += _text(f"psf_detail_affiliations_{gid}", f"psf_ui_detail_affiliations_{gid}", 8, 220, 362, 62,
+                                tip=f"psf_ui_group_tooltip_{gid}", transparent=False, scroll=True)
             detail += _text(f"psf_detail_description_{gid}", f"psf_group_{gid}_desc", 8, 220 + affiliation_height, 362, 132,
                             scroll=True, transparent=False)
             detail += _text(f"psf_detail_positions_{gid}", f"psf_ui_positions_{gid}", 8, 360 + affiliation_height, 362, max(36, len(axes) * 22))
@@ -579,11 +621,11 @@ def generate_ui(manifest: dict[str, Any], output: Path, vanilla_path: Path | Non
                 gid = group["id"]
                 definitions.append(_defined(f"PSFUIMember_{aid}_{gid}", [(f"check_variable = {{ psf_a_{aid}_g_{gid} = 1 }}", f"psf_ui_member_{gid}")], "psf_ui_empty"))
                 for lang in LANGUAGES:
-                    loc[lang][f"psf_ui_member_{gid}"] = f"$psf_group_{gid}_short_name$  "
+                    loc[lang][f"psf_ui_member_{gid}"] = f"{icons.texticon(group)} $psf_group_{gid}_short_name$  "
             member_text = "".join(f"[PSFUIMember_{aid}_{g['id']}]" for g in profile.get("groups", []))
             add_loc(f"psf_ui_alliance_members_{aid}", member_text)
             alliance_rows += _text(f"psf_alliance_members_{aid}", f"psf_ui_alliance_members_{aid}", 20, ay + 80, 342, 40,
-                                   tip=f"psf_ui_alliance_tooltip_{aid}", transparent=False)
+                                   tip=f"psf_ui_alliance_tooltip_{aid}", transparent=False, scroll=True)
             ay += 134
         if not alliance_rows:
             alliance_rows = _text(f"psf_no_alliances_{pid}", "psf_ui_none", 8, 0, 362)
@@ -742,7 +784,7 @@ def generate_ui(manifest: dict[str, Any], output: Path, vanilla_path: Path | Non
                          tip="psf_ui_government_tip", transparent=False)
         if mode == "political":
             summary += _text(f"psf_{mode}_metrics", "psf_ui_summary_metrics", text_x, 40, text_width, 20,
-                             tip="psf_ui_influence_tip", transparent=False)
+                             tip="psf_ui_summary_metrics_tip", transparent=False)
             summary += _text(f"psf_{mode}_legitimacy", "psf_ui_summary_legitimacy", text_x, 60, text_width, 19,
                              tip="psf_ui_legitimacy_tip", transparent=False)
         summary_effects = [open_effect(name, page) for name, page in

@@ -314,14 +314,24 @@ class UIContractTests(unittest.TestCase):
                 self.assertEqual(swatch.properties["spritetype"][2], '"GFX_psf_color_beta"')
 
     def test_row_text_cells_and_detail_blocks_do_not_overlap(self):
-        from tools.ui.audit_layout import point
+        from tools.ui.audit_layout import point, size
         for mode in ("political", "diplomatic"):
             nodes = gui_nodes(self.gui)
             window = next(n for n in nodes if n.name == f"psf_{mode}_groups_test")
             children = {n.name: n for n in window.children if n.name}
-            title, values, status = (children[f"psf_row_{kind}_alpha"] for kind in ("name", "values", "status"))
-            self.assertLessEqual(point(title)[1] + int(title.properties["maxheight"][2]), point(values)[1])
-            self.assertLessEqual(point(values)[0] + int(values.properties["maxwidth"][2]), point(status)[0])
+            title, status = (children[f"psf_row_{kind}_alpha"] for kind in ("name", "status"))
+            self.assertLessEqual(point(title)[0] + int(title.properties["maxwidth"][2]), point(status)[0])
+            values = [children[f"psf_row_{metric}_alpha"] for metric in ("support", "influence", "satisfaction")]
+            for value, metric in zip(values, ("support", "influence", "satisfaction")):
+                heading = children[f"psf_list_{metric}"]
+                self.assertLessEqual(point(title)[1] + int(title.properties["maxheight"][2]), point(value)[1])
+                self.assertEqual(point(value)[0], point(heading)[0])
+                self.assertEqual(size(value)[0], int(heading.properties["maxwidth"][2]))
+                self.assertEqual(value.kind.lower(), "buttontype")
+                self.assertEqual(value.properties["quadtexturesprite"][2], '"GFX_tiled_window_transparent"')
+                self.assertIn(metric, value.properties["pdx_tooltip"][2])
+            for left, right in zip(values, values[1:]):
+                self.assertLessEqual(point(left)[0] + size(left)[0], point(right)[0])
             detail = next(n for n in nodes if n.name == f"psf_{mode}_detail_alpha")
             texts = [n for n in detail.children if n.kind == "instantTextboxType"]
             for first, second in combinations(texts, 2):
@@ -333,6 +343,48 @@ class UIContractTests(unittest.TestCase):
                                 f"{first.name} overlaps {second.name}")
             description = next(n for n in texts if n.name == "psf_detail_description_alpha")
             self.assertEqual(description.properties["scrollbartype"][2], '"standardtext_slider"')
+            affiliations = next(n for n in texts if n.name == "psf_detail_affiliations_alpha")
+            self.assertEqual(affiliations.properties["scrollbartype"][2], '"standardtext_slider"')
+            self.assertEqual(affiliations.properties["alwaystransparent"][2], "no")
+
+    def test_satisfaction_color_and_unknown_ideology_follow_live_values(self):
+        definitions = {mapping(node.value).get("name"): node for path in
+                       (self.root / "common/scripted_localisation").glob("psf_ui*.txt")
+                       for node in entries(parse(path.read_text()))}
+        vm = Interpreter(State())
+
+        def evaluate(name):
+            for option in entries(definitions[name].value):
+                if option.key == "text":
+                    fields = mapping(option.value)
+                    if "trigger" not in fields or vm.condition(fields["trigger"]):
+                        return fields["localization_key"]
+
+        for value, expected in ((0, "low"), (39.999, "low"), (40, "medium"),
+                                (59.999, "medium"), (60, "high"), (100, "high")):
+            vm.state.variables["psf_g_alpha_modified_satisfaction"] = value
+            self.assertEqual(evaluate("PSFUISatisfaction_alpha"), f"psf_ui_satisfaction_alpha_{expected}")
+        self.assertEqual(evaluate("PSFUIIdeologyIcon_alpha"), "psf_ui_unknown_ideology_sprite")
+        scripts = [entry for root in entries(parse(self.script)) for entry in entries(root.value)]
+        for mode in ("political", "diplomatic"):
+            detail = next(n for n in scripts if n.key == f"psf_{mode}_detail_alpha_gui")
+            visible = mapping(mapping(detail.value)["triggers"])["psf_detail_ideology_icon_alpha_visible"]
+            for ideology, expected in ((0, False), (88412, True), (88413, False)):
+                vm.state.variables["psf_g_alpha_ideology"] = ideology
+                self.assertEqual(vm.condition(visible), expected)
+                self.assertEqual(evaluate("PSFUIIdeologyIcon_alpha"),
+                                 "psf_ui_ideology_sprite_liberal" if expected else "psf_ui_unknown_ideology_sprite")
+
+    def test_metric_tooltips_keep_every_part_of_the_row_clickable(self):
+        scripts = [entry for root in entries(parse(self.script)) for entry in entries(root.value)]
+        for mode in ("political", "diplomatic"):
+            groups = next(n for n in scripts if n.key == f"psf_{mode}_groups_test_gui")
+            effects = mapping(mapping(groups.value)["effects"])
+            for name in ("psf_select_alpha", "psf_row_support_alpha", "psf_row_influence_alpha", "psf_row_satisfaction_alpha"):
+                vm = Interpreter(State())
+                vm.execute(effects[name + "_click"])
+                self.assertEqual(vm.state.variables["psf_ui_group"], 90117)
+                self.assertEqual(vm.state.variables["psf_ui_page"], 1)
 
     def test_pie_pixels_cover_the_disk_once_without_rotated_sector_seams(self):
         occupied = set()
