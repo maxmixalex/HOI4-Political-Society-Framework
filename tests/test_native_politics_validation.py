@@ -77,7 +77,8 @@ class NativePoliticsValidationTests(unittest.TestCase):
             text = history.generated.decode()
             changed = set(self.metadata["sources"][relative]["changed_definitions"])
             nodes = [node for node in gui_nodes(text)
-                     if node.parent is not None and node.parent.parent is None and node.kind in changed]
+                     if node.kind in changed and (node.parent is None or node.parent.parent is None)]
+            self.assertEqual({node.kind for node in nodes}, changed)
             for node in nodes:
                 first = text.count("\n", 0, node.start) + 1
                 last = text.count("\n", 0, node.end - 1) + 1

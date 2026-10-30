@@ -335,6 +335,20 @@ def alliance_effects(manifest: dict, p: dict, a: dict) -> list[Block]:
                      [setv(av(aid, "g_" + g["id"]), 0) for g in p["groups"]],
                      conditional([check("psf_governing_alliance", a["_index"])], setv("psf_governing_alliance", 0), subv("psf_legitimacy", 8)), finish())))
     out.append(block("psf_add_" + aid + "_cohesion", conditional([flag(p)], "psf_prepare_change = yes", "custom_effect_tooltip = psf_effect_cohesion_" + aid, addv(av(aid, "cohesion"), "psf_amount"), clamp(av(aid, "cohesion"), 0, 100), finish())))
+    # Agreements can change their purpose without destroying their member
+    # records. Government formation remains the explicit psf_govern_<id> API.
+    # A governing agreement must leave office before adopting an in-opposition
+    # role; changing another pact never clears the current government.
+    for role in ("opposition", "electoral"):
+        requirements: list[Block | str] = [flag(p), check(av(aid, "active"), 1),
+                                         block("NOT", check("psf_governing_alliance", a["_index"]))]
+        if role == "electoral":
+            requirements.append(block("OR", [block("AND", legal(g), check(av(aid, "g_" + g["id"]), 1))
+                                              for g in p["groups"] if g["electoral"]] or ["always = no"]))
+        out.append(block(f"psf_set_{aid}_role_{role}", conditional(requirements,
+                         "psf_prepare_change = yes", f"custom_effect_tooltip = psf_effect_{aid}_role_{role}",
+                         setv(av(aid, "role"), ROLES[role]), setv(av(aid, "electoral"), int(role == "electoral")),
+                         finish())))
     for g in p["groups"]:
         gid = g["id"]
         requirements = [flag(p), active(g), block("OR", block("NOT", check("psf_governing_alliance", a["_index"])), legal(g))]

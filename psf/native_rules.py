@@ -9,11 +9,58 @@ from .model import ManifestError
 ASSETS = Path(__file__).resolve().parent / "assets" / "native_politics"
 OPINIONS = "common/opinion_modifiers/00_opinion_modifiers.txt"
 PEACE = "common/peace_conference/cost_modifiers/00_generic_peace.txt"
+OCCUPATION = "common/occupation_laws/occupation_laws.txt"
 PARTY_OPINIONS = {"same_ruling_party", "similar_ruling_party", "different_party_types"}
+OCCUPATION_GATES = {
+    "no_garrison": ("ai_will_do/modifier/FROM", "democratic"),
+    "autonomous_occupation": ("visible", "democratic"),
+    "liberate_workers_occupation": ("visible", "communism"),
+    "brutally_oppressive_occupation": ("visible", "fascism"),
+}
+
+
+def neutralize_occupation(text: str) -> tuple[str, list[str]]:
+    """Remove exactly four native-classification gates, retaining all siblings.
+
+    Availability and AI preference are common to all countries in strict mode.
+    This does not change state bonuses, resource yields, resistance, occupation
+    requirements, DLC checks or country-specific laws in the same source file.
+    """
+    from .ui import gui_nodes
+
+    changes: list[tuple[int, int, str]] = []
+    changed: list[str] = []
+    nodes = gui_nodes(text)
+    for law in (node for node in nodes if node.parent is None):
+        if law.kind not in OCCUPATION_GATES:
+            continue
+        path, expected = OCCUPATION_GATES[law.kind]
+        candidates = [law]
+        for kind in path.split("/"):
+            candidates = [child for parent in candidates for child in parent.children
+                          if child.kind == kind]
+        gates = [node.properties["has_government"] for node in candidates
+                 if "has_government" in node.properties]
+        if len(gates) != 1 or gates[0][2] != expected:
+            raise ManifestError(f"Unexpected native occupation ideology gate: {law.kind}")
+        start, end, _ = gates[0]
+        changes.append((start, end, "always = yes"))
+        changed.append(law.kind)
+    if set(changed) != set(OCCUPATION_GATES):
+        raise ManifestError("Native occupation source is missing expected political laws")
+    if {node.properties["has_government"][0] for node in nodes if "has_government" in node.properties} != {start for start, _, _ in changes}:
+        raise ManifestError("Native occupation source has an unsupported additional ideology gate")
+    for start, end, replacement in sorted(changes, reverse=True):
+        text = text[:start] + replacement + text[end:]
+    return text, changed
 
 
 def neutralize(text: str, relative: str) -> tuple[str, list[str]]:
     """Edit only generic ideology fields; retain unrelated source statements."""
+    if relative == OCCUPATION:
+        return neutralize_occupation(text)
+    if relative not in (OPINIONS, PEACE):
+        raise ManifestError(f"Unsupported native politics source: {relative}")
     from .ui import gui_nodes
 
     root_name = "opinion_modifiers" if relative == OPINIONS else "peace_action_modifiers"
@@ -56,7 +103,7 @@ def neutralize(text: str, relative: str) -> tuple[str, list[str]]:
 def write(output: Path, vanilla_root: str | Path | None = None) -> dict:
     root = Path(vanilla_root) if vanilla_root else ASSETS
     sources = {}
-    for relative in (OPINIONS, PEACE):
+    for relative in (OPINIONS, PEACE, OCCUPATION):
         source = root / relative
         if not source.is_file():
             raise ManifestError(f"Strict native politics source is missing: {relative}")

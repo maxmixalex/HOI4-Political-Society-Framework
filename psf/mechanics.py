@@ -75,6 +75,18 @@ POLICY_RULES = {
     "can_create_collaboration_government": (False, True),
 }
 
+# These additive modifiers are independent of ideology definitions and the
+# global defines. Advisors, ideas and scripted dynamic modifiers can supply
+# them even after the native political UI and engine boosts are disabled.
+# Keep the original stability variable name for existing saved games.
+NATIVE_MODIFIER_OFFSETS = {
+    "party_popularity_stability_factor": "psf_native_popularity_stability_offset",
+    **{f"{ideology}_{suffix}": f"psf_native_{ideology}_{suffix}_offset"
+       for ideology in ENGINE_IDEOLOGIES
+       for suffix in ("acceptance", "drift", "drift_from_guarantees")},
+    "master_ideology_drift": "psf_native_master_ideology_drift_offset",
+}
+
 
 def regime_policy(regime: dict) -> dict:
     """Merge a regime's authored policy over the documented adapter defaults."""
@@ -101,14 +113,22 @@ def definitions(manifest: dict) -> list[Block]:
         # Disable the engine's four-slot election scheduler; PSF's independent
         # election clock and electoral regime trigger remain active.
         conditional(["has_elections = yes"], block("set_politics", "elections_allowed = no")),
-        conditional(["NOT = { has_variable = psf_native_popularity_stability_offset }"],
-                    setv("psf_native_popularity_stability_offset", 0)),
-        # The observed total includes our previous offset. Subtracting it from
-        # the previous offset cancels external sources without sign oscillation.
-        "force_update_dynamic_modifier = yes",
-        setv("psf_native_popularity_stability_total", "modifier@party_popularity_stability_factor", True),
-        subv("psf_native_popularity_stability_offset", "psf_native_popularity_stability_total"),
     ]
+    body += [conditional([f"NOT = {{ has_variable = {offset} }}"], setv(offset, 0))
+             for offset in NATIVE_MODIFIER_OFFSETS.values()]
+    # Install before sampling. A previous offset can survive in a saved game
+    # after another script removes our dynamic modifier. Sampling without
+    # reinstalling it would subtract that old offset twice on reattachment.
+    sampling: list[Block | str] = [
+        conditional(["NOT = { has_dynamic_modifier = { modifier = psf_native_political_policy } }"],
+                    block("add_dynamic_modifier", "modifier = psf_native_political_policy")),
+        "force_update_dynamic_modifier = yes"]
+    for modifier, offset in NATIVE_MODIFIER_OFFSETS.items():
+        # The observed total includes the prior PSF contribution. Subtracting
+        # the total from that contribution cancels external sources without
+        # sign oscillation. Temporary values stay in the current country scope.
+        sampling += [setv("psf_native_modifier_total", "modifier@" + modifier, True),
+                     subv(offset, "psf_native_modifier_total")]
     # Reset every field before applying a regime override, so changing regime
     # cannot leave an old collaboration rule or war threshold behind.
     body += [conditional([check("psf_elections_enabled", 1)],
@@ -118,9 +138,7 @@ def definitions(manifest: dict) -> list[Block]:
         if regime.get("native_policy"):
             body.append(conditional([check("psf_regime", regime["_index"])],
                                     _policy_effects(regime_policy(regime))))
-    body += [conditional(["NOT = { has_dynamic_modifier = { modifier = psf_native_political_policy } }"],
-                         block("add_dynamic_modifier", "modifier = psf_native_political_policy")),
-             "force_update_dynamic_modifier = yes"]
+    body += [*sampling, "force_update_dynamic_modifier = yes"]
     return [block("psf_apply_native_policy", body)]
 
 
@@ -128,7 +146,7 @@ def dynamic_modifiers(manifest: dict) -> str:
     if not strict(manifest):
         return ""
     return emit([block("psf_native_political_policy", block("enable", "has_country_flag = psf_initialized"),
-                       "party_popularity_stability_factor = psf_native_popularity_stability_offset",
+                       [modifier + " = " + offset for modifier, offset in NATIVE_MODIFIER_OFFSETS.items()],
                        [modifier + " = psf_native_" + modifier for modifier in POLICY])]) + "\n"
 
 

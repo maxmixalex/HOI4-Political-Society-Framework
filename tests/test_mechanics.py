@@ -41,7 +41,7 @@ class NativeMechanicsTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as folder:
             output = Path(folder)
             report = mechanics.write_native_mechanics(self.manifest, output)
-            self.assertEqual(len(report["files"]), 5)
+            self.assertEqual(len(report["files"]), 6)
             self.assertEqual(report["source"], "bundled/native_ideologies/00_ideologies.txt")
             self.assertTrue(all((output / name).is_file() for name in report["files"]))
             definitions = (output / "common/defines/zz_psf_native_politics.lua").read_text()
@@ -74,6 +74,78 @@ class NativeMechanicsTests(unittest.TestCase):
                     self.assertEqual(mechanics.DEFINES[f"NAI.{source}_{action}_{target}"], 0)
         self.assertEqual(mechanics.DEFINES["NOperatives.OPERATIVE_BASE_BOOST_IDEOLOGY"], 0)
         self.assertEqual(mechanics.DEFINES["NDiplomacy.MARKET_ACCESS_ACCEPTANCE_SCRIPTED_IDEOLOGY_ACCEPTANCE"], 0)
+
+    def policy_vm(self, manifest=None):
+        manifest = manifest or self.manifest
+        vm = Interpreter(State())
+        vm.state.flags.add("psf_initialized")
+        vm.state.variables.update(psf_elections_enabled=0, psf_regime=0)
+        vm.effects = {n.key: n.value for n in entries(parse(emit(mechanics.definitions(manifest))))}
+        vm.dynamic_definitions = {n.key: n.value for n in entries(parse(mechanics.dynamic_modifiers(manifest)))}
+        return vm
+
+    def test_native_modifier_sources_are_canceled_without_feedback_or_country_leaks(self):
+        first, second = self.policy_vm(), self.policy_vm()
+        for amount in (.2, .2, .35, 0, -.15, -.15):
+            for index, name in enumerate(mechanics.NATIVE_MODIFIER_OFFSETS):
+                first.state.modifier_values[name] = amount * (index + 1)
+                second.state.modifier_values[name] = -amount * (index + 2)
+            for vm in (first, second):
+                vm.run_effect("psf_apply_native_policy")
+                for name in mechanics.NATIVE_MODIFIER_OFFSETS:
+                    self.assertAlmostEqual(vm.number("modifier@" + name), 0, msg=name)
+                # Repeated refreshes must not manufacture a new source.
+                vm.run_effect("psf_apply_native_policy")
+                for name in mechanics.NATIVE_MODIFIER_OFFSETS:
+                    self.assertAlmostEqual(vm.number("modifier@" + name), 0, msg=name)
+        self.assertNotEqual(first.state.variables, second.state.variables)
+
+    def test_saved_offsets_recover_when_dynamic_policy_is_removed_or_upgraded(self):
+        vm = self.policy_vm()
+        vm.state.variables["psf_native_popularity_stability_offset"] = -.3
+        vm.state.modifier_values["party_popularity_stability_factor"] = .2
+        vm.state.modifier_values["fascism_drift"] = .1
+        # An old save has the stability offset but none of the new fields.
+        vm.run_effect("psf_apply_native_policy")
+        self.assertAlmostEqual(vm.number("modifier@party_popularity_stability_factor"), 0)
+        self.assertAlmostEqual(vm.number("modifier@fascism_drift"), 0)
+        vm.state.dynamic_modifiers.clear()
+        vm.state.applied_dynamic_values.clear()
+        vm.state.modifier_values["party_popularity_stability_factor"] = .45
+        vm.run_effect("psf_apply_native_policy")
+        self.assertAlmostEqual(vm.number("modifier@party_popularity_stability_factor"), 0)
+        self.assertAlmostEqual(vm.number("modifier@fascism_drift"), 0)
+        self.assertEqual(vm.state.undefined_reads, set())
+
+    def test_compat_does_not_cancel_native_modifier_sources(self):
+        manifest = copy.deepcopy(self.manifest)
+        manifest["settings"]["mechanics_mode"] = "compat"
+        vm = self.policy_vm(manifest)
+        vm.state.modifier_values.update(fascism_drift=.12, democratic_acceptance=25)
+        vm.run_effect("psf_apply_native_policy")
+        self.assertEqual(vm.number("modifier@fascism_drift"), .12)
+        self.assertEqual(vm.number("modifier@democratic_acceptance"), 25)
+        self.assertEqual(vm.state.dynamic_modifiers, set())
+
+    def test_occupation_adapter_changes_only_four_native_ideology_gates(self):
+        source = (native_rules.ASSETS / native_rules.OCCUPATION).read_text(encoding="utf-8-sig")
+        converted, changed = native_rules.neutralize(source, native_rules.OCCUPATION)
+        self.assertEqual(set(changed), set(native_rules.OCCUPATION_GATES))
+        # Exact source-preservation check independent of the adapter's paths.
+        import re
+        expected, count = re.subn(r"has_government\s*=\s*(?:democratic|communism|fascism)", "always = yes", source)
+        self.assertEqual(count, 4)
+        self.assertEqual(converted, expected)
+        self.assertNotIn("has_government", converted)
+        for before, after in zip(entries(parse(source)), entries(parse(converted))):
+            self.assertEqual(before.key, after.key)
+            if before.key not in native_rules.OCCUPATION_GATES:
+                self.assertEqual(before, after)
+        for altered in (source.replace("liberate_workers_occupation = {", "renamed_law = {"),
+                        source.replace("has_government = communism", "has_government = neutrality"),
+                        source + "\nnew_law = { visible = { has_government = fascism } }\n"):
+            with self.assertRaises(model.ManifestError):
+                native_rules.neutralize(altered, native_rules.OCCUPATION)
 
     def test_regime_policy_executes_and_clears_previous_overrides_on_transition(self):
         manifest = copy.deepcopy(self.manifest)

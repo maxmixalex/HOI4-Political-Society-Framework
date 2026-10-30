@@ -15,6 +15,7 @@ The following source snapshots derive from the user-supplied Hearts of Iron IV s
 - `psf/assets/native_ideologies/00_ideologies.txt`
 - `psf/assets/native_politics/common/opinion_modifiers/00_opinion_modifiers.txt`
 - `psf/assets/native_politics/common/peace_conference/cost_modifiers/00_generic_peace.txt`
+- `psf/assets/native_politics/common/occupation_laws/occupation_laws.txt`
 
 Their original game interface definitions remain Paradox Interactive material and are **not licensed under this repository's MIT grant**. The compiler preserves the native widget hierarchy and produces mod overrides with PSF-specific changes. Those additions do not relicense the underlying game definitions. A licensed installation of Hearts of Iron IV is required to use the generated game mod. No game executable, audio, original texture archive, character portrait collection or localization corpus is included here.
 

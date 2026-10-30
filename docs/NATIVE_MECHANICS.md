@@ -41,6 +41,24 @@ The supported modifier accessor and immediate update effect are in the pinned
 [effect rules](../tools/ci/vendor/rules/effects.cwt). The calculation tests
 execute emitted Clausewitz effects; they do not substitute for a game launch.
 
+The same cancellation now covers every native ideology's `acceptance`, `drift`
+and `drift_from_guarantees`, plus `master_ideology_drift`: fourteen additive
+political modifiers including the stability coefficient. These sources can
+come from ideas, advisors, national spirits or dynamic modifiers independently
+of the ideology definitions. They no longer change native diplomatic acceptance
+or produce native popularity drift after a strict-policy refresh. Adding,
+changing and removing a source, negative sources, repeated refreshes and
+separate country scopes are executed in regression tests.
+
+Before sampling, PSF restores its dynamic modifier if another script removed
+it and forces its saved offsets into the engine's modifier totals. This also
+handles older saves containing only the original stability offset. It prevents
+subtracting a surviving offset twice after the modifier itself was removed.
+The native update remains tied to PSF refreshes: an external script that adds
+a source can call `psf_apply_native_policy = yes` immediately; otherwise the
+scheduled PSF refresh applies it. Direct `add_popularity` effects are still
+handled by the export bridge rather than by continuous modifier cancellation.
+
 ### Native ideology definitions retain identities, share mechanics
 
 The adapter overrides the original `common/ideologies/00_ideologies.txt` under
@@ -169,6 +187,23 @@ uses the supplied originals or the matching `--vanilla` installation and records
 source hashes plus every changed definition. Unexpected source structure fails
 the build rather than silently patching a different rule.
 
+### Generic occupation laws
+
+Strict mode also preserves the supplied `common/occupation_laws/occupation_laws.txt`
+and replaces exactly four native ideology checks. Autonomous occupation,
+liberating workers and brutal oppression are available on equal terms rather
+than being unlocked by the democratic, communist or fascist compatibility slot.
+The no-garrison AI preference applies on equal terms when its original
+resistance condition is met. All other law requirements, DLC and country
+conditions, state modifiers and AI weights remain byte-for-byte unchanged.
+
+This removes native classification as the selector; it does not infer a new
+occupation doctrine from a PSF ideology. A content overhaul can impose its own
+institutional constraints. A missing, changed or additional ideology gate in
+the source fails compilation, requiring an explicit adapter update. Its source
+hash is independently pinned and its generated output is reconstructed during
+validation, like the opinion and peace-cost adapters.
+
 ## What remains native
 
 The four engine groups are compatibility identities. Strict mode projects the
@@ -183,7 +218,7 @@ choice into authored organization membership changes.
 The strict government-change hook restores PSF's projection, with a recursion
 guard. That protects the PSF government, but it does not undo all the other
 effects of a vanilla event. Country-specific peace-conference prices/AI (such as
-Yalta outcomes), occupation rules that directly inspect ideology, hard-coded
+Yalta outcomes), other scripted eligibility rules that directly inspect ideology, hard-coded
 native behavior not exposed by the
 available rules, and scripted ideology-dependent AI strategies also remain
 integration work. The export bridge prevents native popularity drift from

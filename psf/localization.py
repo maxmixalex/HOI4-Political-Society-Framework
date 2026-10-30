@@ -136,12 +136,22 @@ def content_localization(manifest: dict) -> dict[str, dict[str, str]]:
             add("psf_policy_dissolve_" + aid + "_desc", "End this agreement and remove all its memberships. Dissolving the governing alliance creates a caretaker government and costs 8 legitimacy.", "终止该联盟并清除其全部成员关系。解散执政联盟会进入看守状态，并降低8点合法性。")
             add("psf_policy_mediate_" + aid, "Mediate disputes: " + a["name"]["english"], "调解分歧：" + a["name"]["simp_chinese"])
             add("psf_policy_mediate_" + aid + "_desc", "Add 10 alliance cohesion; 60-day cooldown. Differences in political positions still matter on future monthly updates.", "联盟凝聚力提高10点；冷却60天。立场分歧仍会影响之后每月的凝聚力变化。")
+            for role, english, chinese, purpose_en, purpose_zh in (
+                    ("opposition", "Coordinate opposition", "协调在野行动", "Members contest elections separately.", "成员分别参加选举。"),
+                    ("electoral", "Form electoral pact", "缔结选举协约", "Legal electoral members pool their votes in the next election.", "合法参选成员在下一次选举中合计得票。")):
+                key = f"psf_policy_{aid}_role_{role}"
+                add(key, english + ": " + a["name"]["english"], chinese + "：" + a["name"]["simp_chinese"])
+                add(key + "_desc", "Keep the agreement's members and cohesion. " + purpose_en + " A governing alliance must leave office first. Costs §Y30§! political power; §Y30§!-day cooldown.",
+                    "保留联盟成员及凝聚力。" + purpose_zh + "执政联盟须先卸任。花费§Y30§!政治点；冷却§Y30§!天。")
+                add(f"psf_effect_{aid}_role_{role}", "§Y" + aname + "§!: " + purpose_en,
+                    "§Y" + aname + "§!：" + purpose_zh)
             for g in p["groups"]:
                 for action, english, chinese in (("join", "Join", "加入"), ("leave", "Leave", "退出")):
                     add(f"psf_effect_{action}_{aid}_{g['id']}", '$psf_group_' + g['id'] + '_short_name$: ' + english.lower() + ' ' + aname, '$psf_group_' + g['id'] + '_short_name$' + chinese + aname)
                     key = f"psf_policy_{action}_{aid}_{g['id']}"
                     add(key, g["short_name"]["english"] + ": " + english + " " + a["name"]["english"], g["short_name"]["simp_chinese"] + "：" + chinese + a["name"]["simp_chinese"])
                     add(key + "_desc", "Change this organization's membership of this alliance. Other memberships remain independent. An illegal organization cannot join the governing cabinet.", "改变该团体在此联盟中的成员身份，其他联盟成员关系独立保留。非法组织不能加入执政内阁。")
+    add("psf_alliance_must_leave_government", "This alliance is §Yout of government§!.", "该联盟§Y未参与执政§!。")
     for r in manifest["regimes"]:
         add('psf_effect_regime_' + r['id'], 'Actual institutions become $psf_regime_' + r['id'] + '_name$; organization positions are unchanged.', '实际制度调整为$psf_regime_' + r['id'] + '_name$；团体政治立场保留。')
         key = "psf_policy_regime_" + r["id"]

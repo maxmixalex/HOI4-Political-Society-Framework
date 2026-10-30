@@ -182,8 +182,22 @@ FRA = {
 | `psf_govern_<alliance>` | Form a government with at least one legal member possessing influence; previous government role becomes opposition |
 | `psf_dissolve_<alliance>` | Deactivate the agreement and clear its membership; a governing dissolution costs eight legitimacy |
 | `psf_add_<alliance>_cohesion` | Add `psf_amount`, clamped 0…100 |
+| `psf_set_<alliance>_role_opposition` | An active, non-governing agreement stops pooling votes; preserve members and cohesion |
+| `psf_set_<alliance>_role_electoral` | An active, non-governing agreement pools its legal electoral members' votes; requires at least one such member |
 
 Joining an inactive alliance reactivates it and restores its declared initial cohesion. A group can participate in more than one agreement. Governing membership is derived from either the selected independent group or the selected alliance. `psf_governing_group` and `psf_governing_alliance` are mutually exclusive; neither is required during a caretaker period. A party's name and compatibility ideology do not select it automatically.
+
+Role conversion changes only the agreement's role and electoral-pact bit. It
+does not remove members, reset cohesion or dismiss another government. A
+currently governing alliance must first leave office via an explicit government
+change. The generated decisions expose both conversions for 30 political power
+with a 30-day cooldown and explain that requirement in their tooltips. Effects
+remain free building blocks for authored events and update the normal UI cache
+immediately, or when the current transaction commits.
+
+The playable [coalition workshop](../examples/coalitions/README.md) begins with
+an independent party government and three simultaneous political agreements.
+It exercises conversion, elections, membership changes and cosmetic identities.
 
 Taking office raises newly governing legal members' satisfaction; leaving office through a government replacement reduces departing members' satisfaction. An explicit government formation projects the resulting government classification to the native compatibility state when the bridge permits it.
 

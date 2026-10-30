@@ -15,6 +15,7 @@ from psf import native_rules
 PINS = {
     native_rules.OPINIONS: "024c8c8ea5359b7af0e7b8659a1ab4d95d70ddcae711496a2c1e45438c01dc99",
     native_rules.PEACE: "9d518edba257f6704acdc79bd79a182117871a6280514f1557fef5308422c2e8",
+    native_rules.OCCUPATION: "b0e776a177eb7ceb186178d873cb6955fad5a9c56cd299292a62e00397f9c823",
 }
 
 
@@ -35,7 +36,7 @@ def reconstruct(relative: str, raw: bytes, generated: bytes) -> NativeHistory:
     def rewritten_lines(text: str) -> set[int]:
         lines: set[int] = set()
         for node in gui_nodes(text):
-            if node.parent is not None and node.parent.parent is None and node.kind in changed:
+            if node.kind in changed and (node.parent is None or node.parent.parent is None):
                 first = text.count("\n", 0, node.start) + 1
                 last = text.count("\n", 0, node.end - 1) + 1
                 lines.update(range(first, last + 1))

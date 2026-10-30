@@ -1,7 +1,7 @@
 """Playable policies, content events, AI and lifecycle integration."""
 from __future__ import annotations
 
-from .model import ENGINE_IDEOLOGIES, profiles, stable_id
+from .model import ENGINE_IDEOLOGIES, ROLES, profiles, stable_id
 from .runtime import active, av, ev, flag, gv, legal
 from .script import Block, addv, block, check, clamp, conditional, emit, setv, subv
 
@@ -160,6 +160,16 @@ def decisions(manifest: dict) -> str:
                           decision("psf_policy_dissolve_" + aid, a_visible, [check(av(aid, "active"), 1)], ["psf_dissolve_" + aid + " = yes"], 25, 60),
                           decision("psf_policy_mediate_" + aid, a_visible, [check(av(aid, "active"), 1), check(av(aid, "cohesion"), 95, "less_than")],
                                    [setv("psf_amount", 10, True), "psf_add_" + aid + "_cohesion = yes"], 40, 60)]
+            for role in ("opposition", "electoral"):
+                requirements: list[Block | str] = [check(av(aid, "active"), 1),
+                    block("custom_trigger_tooltip", "tooltip = psf_alliance_must_leave_government",
+                          block("NOT", check("psf_governing_alliance", a["_index"]))),
+                    block("NOT", check(av(aid, "role"), ROLES[role]))]
+                if role == "electoral":
+                    requirements.append(block("OR", [block("AND", legal(g), check(av(aid, "g_" + g["id"]), 1))
+                                                      for g in p["groups"] if g["electoral"]] or ["always = no"]))
+                alliances.append(decision(f"psf_policy_{aid}_role_{role}", a_visible,
+                                          requirements, [f"psf_set_{aid}_role_{role} = yes"], 30, 30))
             for g in p["groups"]:
                 gid = g["id"]
                 visibility = [flag(p), check("psf_ui_group", g["_index"])]
