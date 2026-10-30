@@ -54,6 +54,38 @@ class IdentityTests(unittest.TestCase):
         vm.run_effect("psf_resume_identity")
         self.assertEqual(vm.state.cosmetic_tag, "PSF_GER_NATIONAL_IDENTITY")
 
+    def test_external_selection_of_another_psf_tag_is_not_stolen_or_released(self):
+        vm = self.vm()
+        vm.run_effect("psf_apply_identity")
+        vm.state.cosmetic_tag = "PSF_GER_CONSTITUTIONAL_IDENTITY"
+        vm.run_effect("psf_apply_identity")
+        self.assertEqual(vm.state.cosmetic_tag, "PSF_GER_CONSTITUTIONAL_IDENTITY")
+        self.assertIn("psf_identity_external_override", vm.state.flags)
+        vm.run_effect("psf_release_identity")
+        self.assertEqual(vm.state.cosmetic_tag, "PSF_GER_CONSTITUTIONAL_IDENTITY")
+        vm.run_effect("psf_resume_identity")
+        self.assertEqual(vm.state.cosmetic_tag, "PSF_GER_NATIONAL_IDENTITY")
+
+    def test_identity_can_follow_leading_party_inside_a_coalition(self):
+        raw = copy.deepcopy(self.raw)
+        profile = raw["profiles"][0]
+        profile["identities"][0]["when"] = {"leader": profile["groups"][0]["id"],
+                                             "alliance": profile["alliances"][0]["id"]}
+        validate(raw)
+        manifest = normalize(raw)
+        profile = manifest["profiles"][0]
+        vm = Interpreter(State(tag=profile["tag"]))
+        vm.state.flags.add("psf_profile_" + profile["id"])
+        vm.state.variables.update(psf_governing_group=0,
+                                  psf_government_leader_group=profile["groups"][0]["_index"],
+                                  psf_governing_alliance=profile["alliances"][0]["_index"])
+        vm.effects = {n.key: n.value for n in entries(parse(emit(identity.definitions(manifest))))}
+        vm.run_effect("psf_apply_identity")
+        self.assertEqual(vm.state.cosmetic_tag, profile["identities"][0]["cosmetic_tag"])
+        vm.state.variables["psf_government_leader_group"] = profile["groups"][1]["_index"]
+        vm.run_effect("psf_apply_identity")
+        self.assertEqual(vm.state.cosmetic_tag, profile["identities"][-1]["cosmetic_tag"])
+
     def test_manual_identity_holds_until_resume_and_cannot_apply_to_wrong_profile(self):
         vm = self.vm()
         vm.run_effect("psf_set_identity_ger_constitutional_identity")
@@ -106,13 +138,15 @@ class IdentityTests(unittest.TestCase):
                 identity.write_assets(manifest, output, source)
 
     def test_identity_rejects_traversal_cross_country_and_shadowed_defaults(self):
-        for mutation in ("path", "group", "default", "duplicate_tag", "unreachable_government"):
+        for mutation in ("path", "group", "leader", "default", "duplicate_tag", "unreachable_government"):
             data = copy.deepcopy(self.raw)
             items = data["profiles"][0]["identities"]
             if mutation == "path":
                 items[0]["flags"] = dict.fromkeys(identity.FLAG_SIZES, "../secret.tga")
             elif mutation == "group":
                 items[0]["when"] = {"group": "eng_conservative"}
+            elif mutation == "leader":
+                items[0]["when"] = {"leader": "eng_conservative"}
             elif mutation == "default":
                 items[0].pop("when")
             elif mutation == "duplicate_tag":

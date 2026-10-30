@@ -35,7 +35,27 @@ DEFINES = {
     "NAI.PROPOSE_LEND_LEASE_AIDESIRE_SAME_IDEOLOGY_CIVIL_WAR": 0,
     "NAI.SEND_VOLUNTEER_AIDESIRE_SAME_IDEOLOGY": 0,
     "NAI.SEND_VOLUNTEER_AIDESIRE_SAME_IDEOLOGY_CIVIL_WAR": 0,
+    "NDiplomacy.EQUIPMENT_PURCHASE_ACCEPTANCE_SCRIPTED_IDEOLOGY_ACCEPTANCE": 0,
+    "NDiplomacy.MARKET_ACCESS_ACCEPTANCE_SCRIPTED_IDEOLOGY_ACCEPTANCE": 0,
+    "NDiplomacy.BASE_BOOST_PARTY_POPULARITY_DAILY_DRIFT": 0,
+    "NOperatives.OPERATIVE_BASE_BOOST_IDEOLOGY": 0,
+    "NOperatives.BOOST_IDEOLOGY_MAX_DRIFT_BY_OPERATIVE": 0,
+    "NAI.DIPLOMACY_FACTION_NEUTRALITY_PENALTY": 0,
+    "NAI.NEUTRAL_THREAT_PARANOIA": 0,
+    "NAI.DIPLOMACY_COMMUNIST_NOT_NEIGHBOUR": 0,
+    "NAI.ACCESS_SCORE_FOR_DEMOCRATIC_COUNTRIES": 0,
 }
+
+# The original AI also has a complete three-by-three ideology affinity matrix
+# and four distinct call/join ally weights. Neutralizing only keys containing
+# "IDEOLOGY" leaves these native party classifications mechanically active.
+for _action in ("CALL_ALLY", "JOIN_ALLY"):
+    for _ideology in ("DEMOCRATIC", "NEUTRAL", "FASCIST", "COMMUNIST"):
+        DEFINES[f"NAI.{_action}_{_ideology}_DESIRE"] = 0
+for _source in ("FASCISTS", "DEMOCRACIES", "COMMUNISTS"):
+    for _action in ("BEFRIEND", "ALLY", "ANTAGONIZE"):
+        for _target in ("FASCISTS", "DEMOCRACIES", "COMMUNISTS"):
+            DEFINES[f"NAI.{_source}_{_action}_{_target}"] = 0
 
 # These thresholds replace four different ideology bonuses with two explicit
 # institutional policies. Values are fractions of world tension, as in vanilla.
@@ -48,6 +68,26 @@ POLICY = {
     "send_volunteers_tension": (0.5, 0.4),
     "guarantee_tension": (0.25, 0.4),
 }
+
+POLICY_RULES = {
+    "can_only_justify_war_on_threat_country": (True, False),
+    "can_lower_tension": (True, False),
+    "can_create_collaboration_government": (False, True),
+}
+
+
+def regime_policy(regime: dict) -> dict:
+    """Merge a regime's authored policy over the documented adapter defaults."""
+    position = 0 if regime.get("elections", False) else 1
+    values = {name: pair[position] for name, pair in {**POLICY, **POLICY_RULES}.items()}
+    values.update(regime.get("native_policy", {}))
+    return values
+
+
+def _policy_effects(policy: dict) -> list[Block | str]:
+    return [*[setv("psf_native_" + modifier, policy[modifier]) for modifier in POLICY],
+            block("set_rule", [name + " = " + ("yes" if policy[name] else "no")
+                               for name in POLICY_RULES])]
 
 
 def strict(manifest: dict) -> bool:
@@ -69,14 +109,15 @@ def definitions(manifest: dict) -> list[Block]:
         setv("psf_native_popularity_stability_total", "modifier@party_popularity_stability_factor", True),
         subv("psf_native_popularity_stability_offset", "psf_native_popularity_stability_total"),
     ]
-    for electoral, kind in ((True, "if"), (False, "else")):
-        values: list[Block | str] = [setv("psf_native_" + modifier, pair[0 if electoral else 1])
-                                    for modifier, pair in POLICY.items()]
-        values.append(block("set_rule",
-                            "can_only_justify_war_on_threat_country = " + ("yes" if electoral else "no"),
-                            "can_lower_tension = " + ("yes" if electoral else "no"),
-                            "can_create_collaboration_government = " + ("no" if electoral else "yes")))
-        body.append(conditional([check("psf_elections_enabled", 1)], values) if kind == "if" else block("else", values))
+    # Reset every field before applying a regime override, so changing regime
+    # cannot leave an old collaboration rule or war threshold behind.
+    body += [conditional([check("psf_elections_enabled", 1)],
+                         _policy_effects(regime_policy({"elections": True}))),
+             block("else", _policy_effects(regime_policy({"elections": False})))]
+    for regime in manifest["regimes"]:
+        if regime.get("native_policy"):
+            body.append(conditional([check("psf_regime", regime["_index"])],
+                                    _policy_effects(regime_policy(regime))))
     body += [conditional(["NOT = { has_dynamic_modifier = { modifier = psf_native_political_policy } }"],
                          block("add_dynamic_modifier", "modifier = psf_native_political_policy")),
              "force_update_dynamic_modifier = yes"]
@@ -149,8 +190,12 @@ def write_native_mechanics(manifest: dict, output: Path, vanilla_path: str | Pat
     dynamic = Path(output) / "common/dynamic_modifiers/psf_native_political_policy.txt"
     dynamic.parent.mkdir(parents=True, exist_ok=True)
     dynamic.write_text(dynamic_modifiers(manifest), encoding="utf-8")
+    from . import native_rules
+    generic = native_rules.write(Path(output), vanilla_path)
     return {"enabled": True, "mode": "strict", "source": ("external_game_snapshot/common/ideologies/" if vanilla_path else "bundled/native_ideologies/") + source.name,
             "source_sha256": hashlib.sha256(raw).hexdigest(),
-            "files": [str(path.relative_to(output)) for path in (ideology_out, defines, dynamic)],
+            "files": [str(path.relative_to(output)) for path in (ideology_out, defines, dynamic)] + generic["files"],
+            "generic_adapters": generic,
             "native_groups_preserved": list(ENGINE_IDEOLOGIES), "neutralized_defines": len(DEFINES),
+            "regime_policies": {regime["id"]: regime_policy(regime) for regime in manifest["regimes"]},
             "remaining_native_script_projection": True}

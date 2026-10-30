@@ -1,6 +1,6 @@
 # Native politics and immediate initialization
 
-PSF 0.4 has two integration modes. `compat` keeps the installed game's native
+PSF 0.4.1 has two integration modes. `compat` keeps the installed game's native
 political mechanics and is the default for new integrations. The bundled
 vanilla example uses `mechanics_mode: "strict"` and `bridge_mode: "export"`:
 PSF support, influence, government and actual institutions are authoritative,
@@ -93,8 +93,31 @@ justification, permit lowering tension, and disallow creating collaboration
 governments. The other policy does the reverse. Other ideas or game rules can
 still impose their own restrictions. The values use the original democratic
 and neutral thresholds as a recognizable baseline; the selector is now PSF's
-actual constitution. Future content can add richer institutional policies
-without making a native party label authoritative again.
+actual constitution. Each regime may override individual values with
+`native_policy`; unspecified fields retain the documented defaults. The five
+threshold keys in the table accept fractions from 0 to 1, and the three rule
+keys accept Boolean values. Unknown keys, out-of-range thresholds and strings
+such as `"yes"` fail authoring validation. A regime change resets every policy
+field before applying its overrides, so old rules cannot leak into its successor.
+
+For example, a fictional electoral institution can declare:
+
+```json
+"native_policy": {
+  "generate_wargoal_tension": 0.75,
+  "join_faction_tension": 0.6,
+  "lend_lease_tension": 0.25,
+  "send_volunteers_tension": 0.25,
+  "guarantee_tension": 0.25,
+  "can_only_justify_war_on_threat_country": true,
+  "can_lower_tension": true,
+  "can_create_collaboration_government": false
+}
+```
+
+These are authored game rules, not historical claims or a fixed property of an
+ideological category. The vanilla example's fictional `workers_monarchy`
+demonstrates the override.
 
 The native election scheduler is disabled. PSF's election timer, electoral
 pacts, eligible organizations and legal ballots still operate according to the
@@ -118,10 +141,33 @@ original snapshot:
 | Wrong-ideology faction penalty and same-ideology major bonus | 0 |
 | Same-ideology lend-lease and volunteer AI desires, including civil wars | 0 |
 
-The exact 17 names and namespaces are enumerated in
+The adapter additionally clears the neutral-ideology faction penalty, neutral
+threat paranoia, communist non-neighbor preference, democratic military-access
+bonus, all eight ideology-specific call/join ally weights, and the complete
+27-entry befriend/ally/antagonize matrix. Both market scripted-ideology acceptance
+factors become zero. Diplomatic and operative native ideology boosting supplies
+no drift. The common base diplomatic and military calculations remain.
+
+The exact 61 names and namespaces are enumerated in
 [mechanics.py](../psf/mechanics.py). A build report records which source ideology
 definition was patched and its SHA-256. No claim is made that later game
 versions will retain every define unchanged.
+
+### Generic party opinion and peace-conference prices
+
+The strict adapter also overrides the original opinion and generic peace-cost
+files under their original filenames. `same_ruling_party`, `similar_ruling_party`
+and `different_party_types` all have zero value, removing the automatic +20,
++10 and -10 relationship differences. All thirteen original generic
+`category = ideology` peace-cost entries are disabled and their multiplier is
+neutralized. Annexation, liberation, puppeting and forced-government prices
+therefore no longer acquire these generic native ideology discounts or surcharges.
+
+Other original statements are preserved, including core-state rules,
+war-related prices and explicitly scripted diplomatic events. The compiler
+uses the supplied originals or the matching `--vanilla` installation and records
+source hashes plus every changed definition. Unexpected source structure fails
+the build rather than silently patching a different rule.
 
 ## What remains native
 
@@ -136,11 +182,16 @@ choice into authored organization membership changes.
 
 The strict government-change hook restores PSF's projection, with a recursion
 guard. That protects the PSF government, but it does not undo all the other
-effects of a vanilla event. Peace-conference scoring and occupation rules that
-directly inspect ideology, hard-coded native behavior not exposed by the
+effects of a vanilla event. Country-specific peace-conference prices/AI (such as
+Yalta outcomes), occupation rules that directly inspect ideology, hard-coded
+native behavior not exposed by the
 available rules, and scripted ideology-dependent AI strategies also remain
 integration work. The export bridge prevents native popularity drift from
 silently becoming PSF support; it does not remove those scripts from the game.
+For example, the original `NAI.DEMOCRATIC_AI_FACTION_KICKING_PLAYER_THREAT_DIFFERENCE`
+still belongs to a hardcoded democratic-faction/player-expulsion branch. It is
+not set to zero speculatively: zero could lower a threshold rather than disable
+the branch. Its behavior needs an engine-backed integration decision.
 
 For a curated story overhaul, call `psf_govern_group_<id>`,
 `psf_govern_<alliance>`, regime changes, and organization effects from the

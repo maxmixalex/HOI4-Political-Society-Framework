@@ -55,6 +55,24 @@ class FrontendPoliticsTests(unittest.TestCase):
         self.assertEqual(vm.state.party_names, {})
         self.assertNotIn("psf_frontend_preview_active", vm.state.flags)
 
+    def test_unknown_profile_does_not_claim_or_discard_a_pending_presentation(self):
+        vm = Interpreter(State(flags={"psf_initialized", "psf_profile_removed_content"}))
+        vm.effects = self.effects
+        vm.state.party_names["neutrality"] = {"name": "external_party", "long_name": "external_party_long"}
+        before = copy.deepcopy(vm.state)
+        vm.run_effect("psf_prepare_frontend")
+        self.assertEqual(vm.state, before)
+        vm.state.flags.add("psf_frontend_preview_active")
+        vm.run_effect("psf_finish_frontend")
+        self.assertIn("psf_frontend_preview_active", vm.state.flags)
+        self.assertEqual(vm.state.party_names, before.party_names)
+        # A temporarily unavailable profile must still be able to complete
+        # its restoration once the correct content profile is selected.
+        vm.state.flags.add("psf_profile_ger")
+        vm.run_effect("psf_finish_frontend")
+        self.assertNotIn("psf_frontend_preview_active", vm.state.flags)
+        self.assertEqual(vm.state.party_names["neutrality"]["name"], "psf_native_ger_base_neutrality")
+
     def test_governing_party_is_preferred_to_a_more_influential_court_or_army(self):
         profile = copy.deepcopy(self.profiles["jap"])
         alliance = next(a for a in profile["alliances"] if a["id"] == profile["government"]["alliance"])
@@ -99,7 +117,7 @@ class FrontendPoliticsTests(unittest.TestCase):
         self.assertEqual(late["ideology"], icons.closest_ideology(self.manifest, late["ruling_group"]))
         self.assertEqual(profile, original)
 
-    def test_text_payload_contains_real_group_regime_large_archetype_and_two_pies(self):
+    def test_text_payload_contains_both_large_identities_regime_and_two_pies(self):
         state = frontend.snapshot(self.manifest, self.profiles["ger"], None)
         image = {"sprite": "GFX_actual_snapshot"}
         for language in ("english", "simp_chinese"):
@@ -108,6 +126,7 @@ class FrontendPoliticsTests(unittest.TestCase):
             self.assertIn(icons.texticon(state["ruling_group"]), lines[0])
             self.assertIn(state["regime"]["name"][language][:5], lines[1])
             self.assertEqual(lines[3:5], ["", ""])
+            self.assertIn(icons.sprite(state["ruling_group"]).removeprefix("GFX_"), lines[5])
             self.assertIn(icons.sprite(state["ideology"], "ideology").removeprefix("GFX_"), lines[5])
             self.assertIn("£actual_snapshot£", lines[5])
             self.assertNotIn("PSF", "\n".join(lines))
@@ -115,9 +134,47 @@ class FrontendPoliticsTests(unittest.TestCase):
         custom = copy.deepcopy(state)
         custom["ideology"]["large_icon"] = "GFX_author_large_archetype"
         custom["ruling_group"]["small_icon"] = "GFX_author_small_party"
+        custom["ruling_group"]["large_icon"] = "GFX_author_large_party"
         text = frontend.panel_text(custom, image, "english")
         self.assertIn("£author_large_archetype£", text)
         self.assertIn("£author_small_party£", text)
+        self.assertIn("£author_large_party£", text)
+        self.assertEqual(text.count("§Y"), text.count("§!"))
+
+    def test_native_information_columns_fit_both_large_icons_without_covering_the_portrait(self):
+        from psf.ui import gui_nodes, patch_native
+        source = ROOT / "psf/assets/native_gui"
+        with tempfile.TemporaryDirectory() as folder:
+            patch_native(source, Path(folder), frontend_adapter=True)
+            text = (Path(folder) / "interface/frontendgamesetupview.gui").read_text()
+        nodes = gui_nodes(text)
+
+        def node(name, parent):
+            return next(item for item in nodes if item.name == name and parent in item.ancestry)
+
+        def coordinate(item, key, field):
+            child = next(child for child in item.children if child.kind.lower() == key)
+            return int(child.properties[field][2])
+
+        for parent in ("gamesetup_country_details", "gamesetup_interesting_countries_window"):
+            party = node("party", parent)
+            width = int(party.properties["maxwidth"][2])
+            self.assertGreaterEqual(width, 64 + 64 + 140 + 18)
+            self.assertEqual(node("party_label", parent).properties["text"][2].strip('"'), "RULING_PARTY")
+            native_icon = node("pol_faction_icon", parent)
+            self.assertEqual(native_icon.properties["hide"][2], "yes")
+        parent = "gamesetup_interesting_countries_window"
+        info = node("info", parent)
+        right = coordinate(info, "position", "x") + coordinate(info, "size", "width")
+        self.assertLessEqual(right, coordinate(node("minor_portrait_overlay", parent), "position", "x"))
+        self.assertLess(coordinate(node("minor_country_leader", parent), "position", "x"),
+                        coordinate(node("nation_title", parent), "position", "x"))
+        # The country title retains its original right edge; the historical
+        # description and native focus/spirit anchors remain untouched.
+        self.assertEqual(coordinate(node("nation_title", parent), "position", "x") +
+                         int(node("nation_title", parent).properties["maxwidth"][2]), 782)
+        self.assertEqual(coordinate(node("history", parent), "position", "x"), 810)
+        self.assertEqual(coordinate(node("spirit", parent), "position", "x"), 451)
 
     def test_extreme_names_cannot_grow_the_native_text_rows(self):
         for label in ("Very long organization " * 20, "政治团体名称" * 20, "A\nB\tC"):

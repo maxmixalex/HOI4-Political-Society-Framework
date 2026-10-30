@@ -10,12 +10,17 @@ native ideology names.
 
 Add an ordered `identities` list to a profile. A record contains `id` and
 bilingual `name`; optional `adjective` and `definite_name` default to the name.
-An optional `when` object accepts `regime`, `group`, `alliance` and `ideology`.
+An optional `when` object accepts `regime`, `group`, `leader`, `alliance` and `ideology`.
 All supplied conditions must match. The first matching record wins. A record
 without conditions is a default and must be last. A `group` condition means the
 single governing group; it does not mean any member of a coalition.
 Consequently a condition cannot specify both `group` and `alliance`; those
-government selections are mutually exclusive. If no conditional identity
+government selections are mutually exclusive. `leader` instead means the current
+leading governing organization, whether it governs alone or leads a coalition.
+It may be combined with `alliance` to select an appearance only when that party
+leads that particular agreement. It is checked against `psf_government_leader_group`
+and must name an organization in the same country profile. A caretaker matches
+no organization. If no conditional identity
 matches and there is no default, the current appearance is retained. Supply a
 final default or call `psf_release_identity` when a return to the base appearance
 is intended.
@@ -77,8 +82,11 @@ does not change country names or flags.
 
 HOI4 has one cosmetic-tag slot per country. This is shared with formable nations,
 occupation and puppet scripts. After PSF applies an identity, a subsequent
-non-PSF cosmetic tag suspends automatic updates rather than being overwritten
-at the next refresh. `psf_release_identity` also leaves an external tag intact.
+cosmetic tag differing from the country's recorded PSF identity suspends automatic
+updates rather than being overwritten at the next refresh. This also protects
+an external system that deliberately selects a different PSF-authored tag.
+`psf_release_identity` removes only the exact recorded identity's tag and leaves
+an external selection intact.
 Use `psf_resume_identity` when the integration explicitly returns ownership to
 PSF. An integration that changes appearance should ideally call
 `psf_suspend_identity` before applying its own cosmetic tag. Initial automatic

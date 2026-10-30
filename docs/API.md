@@ -45,7 +45,7 @@ Set an input immediately before the call; nested effects may reuse temporary nam
 
 Initialization is idempotent. It does not reapply starting scores to an existing save. Directly calling a specific `psf_init_<profile>` is available in the generated registry but should be reserved for deliberate integrations; it still refuses a country already initialized.
 
-Transactions do not provide rollback, nesting or security. Commit in the same branch. A change of government deliberately refreshes immediately because it changes ownership of derived governing state. Do not use an unfinished transaction to obtain stale permission checks.
+Transactions do not provide rollback, nesting or security. Commit in the same branch. A change of government deliberately refreshes immediately because it changes ownership of derived governing state. Organization government/ban triggers and the ban/deactivate effects read the current membership bits, including changes made earlier in the same transaction. Leaving a cabinet and then banning the former member works within one event; joining a cabinet immediately protects that member. Display aggregates still refresh at commit.
 
 ```text
 GER = {
@@ -298,9 +298,13 @@ Prefer mutation effects to direct writes. The following variables are intended f
 | `psf_a_<alliance>_electoral` | Independent eligibility as an electoral pact |
 | `psf_a_<alliance>_g_<group>` | Membership bit |
 | `psf_a_<alliance>_cohesion` | Current cohesion |
-| `psf_governing_alliance` | Numeric governing agreement ID |
+| `psf_governing_alliance` | Numeric governing agreement ID, or zero |
+| `psf_governing_group` | Numeric independently governing organization ID, or zero |
+| `psf_government_leader_group` | Representative governing party/organization ID; zero for a caretaker |
 | `psf_government_ideology` | Derived government prototype ID |
 | `psf_gov_<axis>` | Effective-influence-weighted government coordinate |
+| `psf_institution_<axis>` | Declared institution coordinate; zero if unspecified |
+| `psf_ui_institution_defined_<axis>` | Whether the institution actually declares that axis; use before displaying its coordinate |
 | `psf_regime` | Actual institutional regime ID |
 | `psf_alignment_gap` | Institutional mismatch 0…100 |
 | `psf_legitimacy` | Current legitimacy 0…100 |

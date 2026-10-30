@@ -62,7 +62,9 @@ D_k = \frac{\sum_d w_d |x_d-p_{k,d}|}{\sum_d w_d}.
 
 All groups and prototypes must provide every axis. Equal distances retain the earlier prototype in the manifest, giving deterministic tie-breaking. The selected prototype is a descriptive category and a native-engine compatibility mapping; it is not an exclusive party slot.
 
-A ruling coalition's coordinates are the effective-influence-weighted mean of its legal members. Unions, military institutions and associations can contribute when they are members of the political governing agreement. Their participation need not mean they provide cabinet ministers. A cabinet with no positive effective influence is treated as a caretaker rather than assigned a meaningful zero-coordinate ideology.
+A ruling coalition's coordinates are the effective-influence-weighted mean of its legal members. Unions, military institutions and associations can contribute when they are members of the political governing agreement. Their participation need not mean they provide cabinet ministers. A cabinet with no positive effective influence becomes a caretaker: its displayed membership count, support, satisfaction and leading organization are cleared. The organizations' underlying support remains intact.
+
+Each refresh also caches the institution's declared coordinates and both institution/government marker positions for the spectrum page. An institution may leave an axis unspecified; the corresponding `psf_ui_institution_defined_<axis>` flag is zero and its marker is hidden. A missing policy is therefore not presented as a centrist policy. These values refresh on a regime or government change without waiting for a daily tick.
 
 ## Activity state machine
 
@@ -109,7 +111,7 @@ Only legal groups marked `electoral: true` enter the ballot. Their support is no
 vote_i = 100\frac{support_i}{\sum_{j\in legal\ electoral}support_j}.
 \]
 
-Civil associations do not create additional votes. Electoral pacts sum the votes of their eligible members, counting each member once inside the pact. The largest party is recorded separately from the winning pact, so election reporting can explain why the largest individual party and the governing agreement differ. A winning party can govern directly without a generated alliance; a winning pact governs through its existing identity. Other alliances keep their activity and independent memberships.
+Civil associations do not create additional votes. Electoral pacts sum the votes of their eligible members, counting each member once inside the pact. The largest party is recorded separately from the winning pact, so election reporting can explain why the largest individual party and the governing agreement differ. Equal party totals and equal pact totals use the lowest stable numeric ID, making declaration reordering independent of the result. A pact retains precedence when its combined total exactly equals the strongest individual party. A winning party can govern directly without a generated alliance; a winning pact governs through its existing identity. Other alliances keep their activity and independent memberships.
 
 The default term is 48 monthly updates, configurable by `settings.term_months`. A profile can override it with `election_term_months` and seed `election_months_elapsed`; starting-bookmark overrides accept both fields. A country therefore need not start a fresh term on 1 January 1936. These are abstract monthly intervals, not a reconstruction of the exact historical election day. The example seeds major democratic profiles where dates are available and uses Spain's declared 36-month opening term. Authored election-related events are separate political-content choices, not an exact electoral-calendar simulator.
 
@@ -155,7 +157,7 @@ These are maintained as dynamic modifier values; a periodic update does not repe
 
 Dated events are delivered on the first eligible weekly pulse after their date. Initialization marks already-past scenario dates as consumed, avoiding a burst of 1936 events at the 1939 bookmark. Later-bookmark overrides only apply at initialization, not whenever an existing campaign reaches their date.
 
-Transactions group compatible mutations and recalculate once at commit. They are a refresh optimization, not rollback, nested transactions, database isolation or an authorization boundary. Operations such as forming a government require an immediate refresh; establish final status and membership before invoking them.
+Transactions group compatible mutations and recalculate once at commit. They are a refresh optimization, not rollback, nested transactions, database isolation or an authorization boundary. Operations such as forming a government require an immediate refresh. Government-membership predicates, bans and deactivation use current legal status and the selected government's actual membership rather than cached UI flags. This preserves sequential membership changes within an event while avoiding unnecessary complete chart recalculation for each change.
 
 ## Native ideology compatibility
 

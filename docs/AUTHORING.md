@@ -171,6 +171,14 @@ A regime defines actual institutions. Its `positions` may constrain only some ax
 
 Using that regime in a profile does not rewrite its organizations' positions. A monarchist party can govern a republic and accept the resulting legitimacy cost, change its own platform, or pursue institutional reform.
 
+In strict mode, a regime's optional `native_policy` overrides five diplomacy
+tension thresholds and three constitutional rules. Missing entries retain the
+electoral/non-electoral defaults; unknown fields and invalid values fail the
+build. Thresholds are fractions in 0–1 and rules are Booleans. See the complete
+[native policy contract and example](NATIVE_MECHANICS.md#actual-institutions-select-diplomacy-constraints).
+This keeps constitutional foreign-policy restrictions independent from the
+organization's ideology classification.
+
 ## Country profiles and fallback coverage
 
 A country profile declares `id`, `tag`, `regime`, `legitimacy`, `groups` and `alliances`. Optional `election_term_months` overrides the manifest-wide term, and `election_months_elapsed` seeds the current interval. The normal default is 48 months and zero elapsed months.

@@ -205,7 +205,7 @@ def validate(data: dict) -> None:
         for i, identity in enumerate(p.get("identities", [])):
             if {"group", "alliance"} <= identity.get("when", {}).keys():
                 errors.append(f"identity {identity['id']}: group and alliance government conditions are mutually exclusive")
-            for field, allowed in (("regime", regime_ids), ("ideology", ideology_ids), ("group", gids), ("alliance", aids)):
+            for field, allowed in (("regime", regime_ids), ("ideology", ideology_ids), ("group", gids), ("leader", gids), ("alliance", aids)):
                 value = identity.get("when", {}).get(field)
                 if value is not None and value not in allowed:
                     errors.append(f"identity {identity['id']}: unknown or cross-country {field}: {value}")

@@ -114,17 +114,18 @@ def _name(item: dict | None, language: str, short: bool = False) -> str:
 
 def panel_text(state: dict, image: dict, language: str) -> str:
     group = state["ruling_group"]
-    regime_label = "Regime" if language == "english" else "国体"
-    title = (icons.texticon(group) + " " if group else "") + _limit_label(_name(group, language, True))
-    regime = regime_label + ": " + _limit_label(_name(state["regime"], language), 20)
+    regime_label = "Regime" if language == "english" else "政体"
+    title = (icons.texticon(group) + " " if group else "") + "§Y" + _limit_label(_name(group, language, True)) + "§!"
+    regime = regime_label + ": §Y" + _limit_label(_name(state["regime"], language), 20) + "§!"
     heading = "Support / Influence" if language == "english" else "支持率 / 影响力"
     ideology = state["ideology"]
-    large = "£" + (icons.sprite(ideology, "ideology") if ideology else "GFX_ideology_unknown").removeprefix("GFX_") + "£"
+    large_party = "£" + (icons.sprite(group) if group else "GFX_ideology_unknown").removeprefix("GFX_") + "£"
+    large_ideology = "£" + (icons.sprite(ideology, "ideology") if ideology else "GFX_ideology_unknown").removeprefix("GFX_") + "£"
     pie = "£" + image["sprite"].removeprefix("GFX_") + "£"
     # The large images occupy their own reserved block below the three text
     # rows. The native party textbox sits inside a bounded political region;
     # no part of this payload is written to the historical description.
-    return "\n".join((title, regime, heading, "", "", large + " " + pie))
+    return "\n".join((title, regime, heading, "", "", large_party + " " + large_ideology + " " + pie))
 
 
 def _party_effects(profile: dict, day: str | None, preview: bool) -> list[Block]:
@@ -147,13 +148,15 @@ def runtime_effects(manifest: dict) -> list[Block]:
             incoming.append(conditional(limit, _party_effects(profile, day, True)))
             outgoing.append(conditional(limit, _party_effects(profile, day, False)))
         condition = ["has_country_flag = psf_profile_" + profile["id"]]
-        prepare.append(conditional(condition, incoming, kind="if" if index == 0 else "else_if"))
-        finish.append(conditional(condition, outgoing, kind="if" if index == 0 else "else_if"))
+        prepare.append(conditional(condition, incoming, "set_country_flag = psf_frontend_preview_active",
+                                   kind="if" if index == 0 else "else_if"))
+        finish.append(conditional(condition, outgoing, "clr_country_flag = psf_frontend_preview_active",
+                                  kind="if" if index == 0 else "else_if"))
     return [
         block("psf_prepare_frontend", conditional(["has_country_flag = psf_initialized"],
-              prepare, "set_country_flag = psf_frontend_preview_active")),
+              prepare)),
         block("psf_finish_frontend", conditional(["has_country_flag = psf_frontend_preview_active"],
-              finish, "clr_country_flag = psf_frontend_preview_active")),
+              finish)),
     ]
 
 
@@ -220,7 +223,7 @@ def patch_native(pick, hide, move, changes: list) -> None:
         prop(party, "maxHeight", "170")
         prop(party, "font", '"hoi_18mbs"')
         label = pick("party_label", parent)
-        prop(label, "text", '"GOVERNMENT"')
+        prop(label, "text", '"RULING_PARTY"')
         prop(label, "font", '"hoi_18mbs"')
         if parent == "gamesetup_country_details":
             move(panel, changes, 0, 0)
@@ -234,14 +237,21 @@ def patch_native(pick, hide, move, changes: list) -> None:
                 move(pick(name, parent), changes, 30, 230)
         else:
             move(panel, changes, 35, 477)
-            prop(panel, "size", "{ width = 245 height = 225 }")
+            prop(panel, "size", "{ width = 305 height = 225 }")
             move(pick("info_title", parent), changes, 10, 445)
             move(pick("leader_label", parent), changes, 0, 0)
             move(pick("leader", parent), changes, 0, 17)
-            prop(pick("leader", parent), "maxWidth", "245")
+            prop(pick("leader", parent), "maxWidth", "305")
             move(label, changes, 0, 35)
             move(party, changes, 0, 52)
-            prop(party, "maxWidth", "245")
+            prop(party, "maxWidth", "305")
+            # Two 64-pixel identities and the 140-pixel dual pie need their
+            # own width. Reclaim the unused gap before the native focus grid;
+            # never widen the text through the portrait or into the history.
+            move(pick("minor_country_leader", parent), changes, 349, 457)
+            move(pick("minor_portrait_overlay", parent), changes, 340, 446)
+            move(pick("nation_title", parent), changes, 477, 433)
+            prop(pick("nation_title", parent), "maxWidth", "305")
     history = pick("history", "gamesetup_interesting_countries_window")
     prop(history, "maxHeight", "160")
     prop(history, "multiline", "yes")

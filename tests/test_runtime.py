@@ -360,6 +360,33 @@ class GeneratedRuntimeTests(unittest.TestCase):
         self.assertEqual(vm.state.variables[alliance_var("fra_government", "g_" + gid)], 0)
         self.assertEqual(vm.state.variables[alliance_var("fra_popular_front", "g_" + gid)], 1)
 
+    def test_transaction_membership_changes_immediately_control_government_permissions(self):
+        for departure in ("leave", "clear"):
+            with self.subTest(departure=departure):
+                vm = self.vm()
+                gid = "eng_national_labour"
+                vm.run_effect("psf_begin_transaction")
+                vm.run_effect("psf_leave_eng_government_" + gid if departure == "leave" else "psf_clear_government")
+                self.assertFalse(vm.condition(vm.triggers[f"psf_{gid}_is_governing"]))
+                self.assertTrue(vm.condition(vm.triggers[f"psf_{gid}_can_be_banned"]))
+                vm.run_effect("psf_ban_" + gid if departure == "leave" else "psf_deactivate_" + gid)
+                self.assertIn("psf_batch_update", vm.state.flags)
+                vm.run_effect("psf_commit_transaction")
+                self.assertEqual(vm.state.variables[group_var(gid, "status")], 3 if departure == "leave" else 0)
+                self.assertEqual(vm.state.variables[group_var(gid, "governing")], 0)
+
+        vm = self.vm()
+        gid = "eng_labour"
+        vm.run_effect("psf_begin_transaction")
+        vm.run_effect("psf_join_eng_government_" + gid)
+        self.assertTrue(vm.condition(vm.triggers[f"psf_{gid}_is_governing"]))
+        self.assertFalse(vm.condition(vm.triggers[f"psf_{gid}_can_be_banned"]))
+        vm.run_effect("psf_ban_" + gid)
+        vm.run_effect("psf_deactivate_" + gid)
+        vm.run_effect("psf_commit_transaction")
+        self.assertEqual(vm.state.variables[group_var(gid, "status")], 1)
+        self.assertEqual(vm.state.variables[group_var(gid, "governing")], 1)
+
     def test_inactive_organizations_do_not_drift_until_activated(self):
         vm = self.vm("ger")
         gid = "ger_zentrum"
@@ -406,6 +433,43 @@ class GeneratedRuntimeTests(unittest.TestCase):
         vm.run_effect("psf_hold_election_eng")
         self.assertEqual(vm.state.variables["psf_election_count"], before)
 
+    def test_zero_power_caretaker_clears_former_cabinet_aggregates(self):
+        vm = self.vm()
+        self.assertGreater(vm.state.variables["psf_government_support"], 0)
+        for group in self.profile_map["eng"]["groups"]:
+            vm.state.variables[group_var(group["id"], "influence")] = 0
+        vm.run_effect("psf_refresh")
+        self.assertEqual(vm.state.variables["psf_caretaker"], 1)
+        for metric in ("support", "members", "satisfaction", "influence", "weight", "leader_group"):
+            self.assertEqual(vm.state.variables["psf_government_" + metric], 0, metric)
+        self.assertGreater(vm.state.variables["psf_total_party_support"], 0,
+                           "A caretaker must not erase the population's party preferences")
+
+    def test_spectrum_institution_and_government_positions_refresh_without_a_day(self):
+        from psf.script import emit
+        vm = self.vm()
+        altered = copy.deepcopy(self.manifest)
+        regime = altered["regimes"][0]
+        aid = altered["axes"][0]["id"]
+        regime["positions"] = {aid: -100}
+        refresh = entries(parse(emit([runtime.refresh_effect(altered, self.profile_map["eng"])])))[0]
+        vm.effects = {**self.effects, refresh.key: refresh.value}
+        vm.run_effect("psf_set_regime_" + regime["id"])
+        self.assertEqual(vm.state.variables["psf_institution_" + aid], -100)
+        self.assertEqual(vm.state.variables["psf_ui_institution_" + aid], 84)
+        self.assertEqual(vm.state.variables["psf_ui_institution_defined_" + aid], 1)
+        for axis in altered["axes"][1:]:
+            self.assertEqual(vm.state.variables["psf_ui_institution_defined_" + axis["id"]], 0)
+            self.assertEqual(vm.state.variables["psf_institution_" + axis["id"]], 0)
+            self.assertEqual(vm.state.variables["psf_ui_institution_" + axis["id"]], 184)
+        for axis in altered["axes"]:
+            self.assertAlmostEqual(vm.state.variables["psf_ui_government_" + axis["id"]],
+                                   vm.state.variables["psf_gov_" + axis["id"]] + 184)
+        vm.run_effect("psf_clear_government")
+        self.assertEqual(vm.state.variables["psf_caretaker"], 1)
+        for axis in altered["axes"]:
+            self.assertEqual(vm.state.variables["psf_ui_government_" + axis["id"]], 184)
+
     def test_ballots_exclude_banned_parties_and_nonparties(self):
         vm = self.vm("fra")
         vm.run_effect("psf_ban_fra_pcf")
@@ -433,6 +497,33 @@ class GeneratedRuntimeTests(unittest.TestCase):
         self.assertEqual(vm.state.variables[alliance_var(pact["id"], "electoral")], 1)
         self.assertEqual(vm.state.variables[group_var("fra_cgt", "governing")], 1)
         self.assertEqual(vm.state.variables[group_var("fra_cgt", "vote_share")], 0)
+
+    def test_tied_ballots_use_stable_ids_independently_of_declaration_order(self):
+        from psf.script import emit
+        original = self.profile_map["fra"]
+        candidates = sorted((g for g in original["groups"] if g["electoral"] and g["status"] == "legal"),
+                            key=lambda group: group["_index"])[:2]
+        for pact in (False, True):
+            for reverse in (False, True):
+                with self.subTest(pact=pact, reverse=reverse):
+                    profile = copy.deepcopy(original)
+                    if reverse:
+                        profile["groups"].reverse()
+                        profile["alliances"].reverse()
+                    vm = self.vm("fra")
+                    replacements = {n.key: n.value for n in entries(parse(emit(runtime.election_effect(self.manifest, profile))))}
+                    vm.effects = {**self.effects, **replacements}
+                    for group in original["groups"]:
+                        vm.state.variables[group_var(group["id"], "support")] = 50 if group in candidates else 0
+                    for alliance in original["alliances"]:
+                        vm.state.variables[alliance_var(alliance["id"], "electoral")] = int(pact)
+                        if pact:
+                            for group in original["groups"]:
+                                vm.state.variables[alliance_var(alliance["id"], "g_" + group["id"])] = int(group in candidates)
+                    vm.run_effect("psf_hold_election_fra")
+                    self.assertEqual(vm.state.variables["psf_winning_group"], candidates[0]["_index"])
+                    expected = min(a["_index"] for a in original["alliances"]) if pact else 0
+                    self.assertEqual(vm.state.variables["psf_winning_alliance"], expected)
 
     def test_regime_and_government_ideology_are_distinct_with_legitimacy_cost(self):
         aligned, divergent = self.vm("sov"), self.vm("sov")

@@ -10,6 +10,20 @@ from psf.compiler import compile_manifest
 from psf.model import load, profiles, stable_id
 
 REPO = Path(__file__).resolve().parents[1]
+MANDATE_SOURCES = {"independent_executive_mandate", "negotiated_governing_support", "caretaker_assurances"}
+
+
+class ContentInterpreter(Interpreter):
+    """Provide an explicit external game-rule value to the emitted scheduler."""
+    examples_enabled = True
+
+    def trigger(self, node):
+        if node.key == "has_game_rule":
+            request = mapping(node.value)
+            if request != {"rule": "psf_content_events", "option": "ENABLED"}:
+                raise AssertionError(f"Unexpected game-rule lookup: {request}")
+            return self.examples_enabled
+        return super().trigger(node)
 
 
 class CompiledContentTests(unittest.TestCase):
@@ -28,13 +42,14 @@ class CompiledContentTests(unittest.TestCase):
                       for event in entries(parse(event_source)) if event.key == "country_event"}
         on_actions = mapping(parse((cls.roots[1] / "common/on_actions/psf_on_actions.txt").read_text()))
         cls.daily = mapping(mapping(on_actions["on_actions"])["on_daily"])["effect"]
+        cls.weekly = mapping(mapping(on_actions["on_actions"])["on_weekly"])["effect"]
 
     @classmethod
     def tearDownClass(cls):
         cls.temporary.cleanup()
 
     def vm(self, profile: str) -> Interpreter:
-        vm = Interpreter(State(tag=self.profile_map[profile]["tag"]))
+        vm = ContentInterpreter(State(tag=self.profile_map[profile]["tag"]))
         vm.effects, vm.triggers = self.effects, self.triggers
         vm.run_effect("psf_init_" + profile)
         return vm
@@ -75,13 +90,16 @@ class CompiledContentTests(unittest.TestCase):
         self.assertTrue(any(d > 0 for d in durations))
 
     def late_vm(self, profile: str) -> Interpreter:
-        vm = Interpreter(State(tag=self.profile_map[profile]["tag"], date=(1939, 8, 14)))
+        vm = ContentInterpreter(State(tag=self.profile_map[profile]["tag"], date=(1939, 8, 14)))
         vm.effects, vm.triggers = self.effects, self.triggers
         vm.run_effect("psf_init_" + profile)
         return vm
 
     def coordination_scenarios(self):
         return [s for s in self.manifest["scenarios"] if s["id"].endswith("_coordination_settlement")]
+
+    def mandate_scenarios(self):
+        return [s for s in self.manifest["scenarios"] if s["id"].endswith("_government_mandate")]
 
     def execute_option(self, vm, scenario, choice):
         event = self.events["psf_content." + str(stable_id(scenario["id"]))]
@@ -149,6 +167,120 @@ class CompiledContentTests(unittest.TestCase):
         self.assertAlmostEqual(vm.state.variables[variable], min(100, initial + .015))
         self.assertEqual(vm.state.variables["psf_m_eng_tuc_production_council_active"], 0)
         self.assertEqual(vm.state.variables["psf_g_eng_tuc_modified_support"], vm.state.variables[variable])
+
+    def test_all_thirty_mandates_change_government_and_apply_nonstacking_sources(self):
+        scenarios = self.mandate_scenarios()
+        self.assertEqual({s["profile"] for s in scenarios}, {p["id"] for p in self.manifest["profiles"]})
+        self.assertEqual(sum(len(s["options"]) for s in scenarios), 30)
+        source_map = {m["id"]: m for m in self.manifest["modifiers"]}
+        for scenario in scenarios:
+            profile = self.profile_map[scenario["profile"]]
+            groups = {g["id"]: g for g in profile["groups"]}
+            pact = next(a for a in profile["alliances"] if a["id"] == profile["id"] + "_executive_agreement")
+            self.assertEqual(pact["members"], [])
+            self.assertNotEqual(pact["kind"], "government")
+            for index, option in enumerate(scenario["options"]):
+                with self.subTest(profile=profile["id"], option=option["id"]):
+                    vm = self.late_vm(profile["id"])
+                    original = {k: v for k, v in vm.state.variables.items()
+                                if k.startswith("psf_a_") and "_g_" in k and not k.startswith(f"psf_a_{pact['id']}_")}
+                    self.execute_option(vm, scenario, index)
+                    self.assertEqual({k: vm.state.variables[k] for k in original}, original)
+                    sources = [op for op in option["effects"] if op["op"] == "add_modifier"]
+                    for operation in sources:
+                        prefix = f"psf_m_{operation['group']}_{operation['modifier']}_"
+                        self.assertEqual(vm.state.variables[prefix + "active"], 1)
+                        self.assertEqual(vm.state.variables[prefix + "days"], source_map[operation["modifier"]]["duration_days"])
+                    if option["id"] == "independent":
+                        group = next(op["group"] for op in option["effects"] if op["op"] == "govern_group")
+                        self.assertEqual(vm.state.variables["psf_governing_group"], groups[group]["_index"])
+                        self.assertEqual(vm.state.variables["psf_governing_alliance"], 0)
+                        self.assertEqual(vm.state.variables["psf_caretaker"], 0)
+                    elif option["id"] == "agreement":
+                        self.assertEqual(vm.state.variables["psf_governing_alliance"], pact["_index"])
+                        self.assertEqual(vm.state.variables["psf_governing_group"], 0)
+                        self.assertEqual(vm.state.variables["psf_caretaker"], 0)
+                        for operation in (op for op in option["effects"] if op["op"] == "join"):
+                            self.assertEqual(vm.state.variables[f"psf_a_{pact['id']}_g_{operation['group']}"], 1)
+                            self.assertEqual(vm.state.variables[f"psf_g_{operation['group']}_governing"], 1)
+                    else:
+                        self.assertEqual(vm.state.variables["psf_governing_alliance"], 0)
+                        self.assertEqual(vm.state.variables["psf_governing_group"], 0)
+                        self.assertEqual(vm.state.variables["psf_caretaker"], 1)
+                        self.assertFalse(any(vm.state.variables[f"psf_g_{gid}_governing"] for gid in groups))
+                    # Re-execute the actual emitted option, not a Python
+                    # calculation of its expected bonus. Source replacement
+                    # and cabinet APIs must not accumulate repeated gains.
+                    keys = [f"psf_g_{op['group']}_{field}" for op in sources
+                            for field in ("influence", "satisfaction", "modified_influence", "modified_satisfaction")]
+                    once = {key: vm.state.variables[key] for key in keys}
+                    self.execute_option(vm, scenario, index)
+                    self.assertEqual({key: vm.state.variables[key] for key in keys}, once)
+                    self.assertNotIn("psf_batch_update", vm.state.flags)
+
+    def test_new_and_previous_alliances_survive_independent_and_caretaker_governments(self):
+        for scenario in self.mandate_scenarios():
+            with self.subTest(profile=scenario["profile"]):
+                vm = self.late_vm(scenario["profile"])
+                self.execute_option(vm, scenario, 1)
+                membership = {k: v for k, v in vm.state.variables.items() if k.startswith("psf_a_") and "_g_" in k}
+                active = {k: v for k, v in vm.state.variables.items() if k.startswith("psf_a_") and k.endswith("_active")}
+                self.assertGreaterEqual(sum(active.values()), 2)
+                for choice in (0, 2):
+                    self.execute_option(vm, scenario, choice)
+                    self.assertEqual({k: vm.state.variables[k] for k in membership}, membership)
+                    self.assertEqual({k: vm.state.variables[k] for k in active}, active)
+                active_sources = {mid for mid in MANDATE_SOURCES for g in self.profile_map[scenario["profile"]]["groups"]
+                                  if vm.state.variables.get(f"psf_m_{g['id']}_{mid}_active", 0)}
+                self.assertEqual(active_sources, {"caretaker_assurances"})
+
+    def test_mandates_reactivate_dormant_early_bookmark_participants_explicitly(self):
+        for profile, group, choice in (("spr", "spr_unification", 0), ("pol", "pol_ozon", 1)):
+            with self.subTest(profile=profile):
+                vm = self.vm(profile)
+                self.assertEqual(vm.state.variables[f"psf_g_{group}_status"], 0)
+                vm.state.date = (1939, 9, 2)
+                scenario = next(s for s in self.mandate_scenarios() if s["profile"] == profile)
+                self.execute_option(vm, scenario, choice)
+                self.assertEqual(vm.state.variables[f"psf_g_{group}_status"], 1)
+                self.assertEqual(vm.state.variables[f"psf_g_{group}_governing"], 1)
+                self.assertGreater(vm.state.variables[f"psf_g_{group}_effective_influence"], 0)
+
+    def test_late_bookmark_and_weekly_rule_preserve_and_dispatch_each_mandate_once(self):
+        for scenario in self.mandate_scenarios():
+            with self.subTest(profile=scenario["profile"]):
+                self.assertEqual(scenario["date"], "1939.9.1")
+                vm = self.late_vm(scenario["profile"])
+                marker = "psf_scenario_" + scenario["id"]
+                self.assertNotIn(marker, vm.state.flags)
+                for day, enabled in (((1939, 8, 14), True), ((1939, 9, 1), True), ((1939, 9, 2), False)):
+                    vm.state.date, vm.examples_enabled = day, enabled
+                    vm.executed = 0
+                    vm.execute(self.weekly)
+                    self.assertNotIn(marker, vm.state.flags)
+                    self.assertFalse(any(name == "country_event" for name, _ in vm.state.callbacks))
+                vm.examples_enabled = True
+                for _ in range(2):
+                    vm.executed = 0
+                    vm.execute(self.weekly)
+                self.assertIn(marker, vm.state.flags)
+                delivered = [mapping(body)["id"] for name, body in vm.state.callbacks if name == "country_event"]
+                self.assertEqual(delivered, ["psf_content." + str(stable_id(scenario["id"]))])
+
+    def test_expired_mandate_removes_bonus_without_dissolving_the_government(self):
+        scenario = next(s for s in self.mandate_scenarios() if s["profile"] == "eng")
+        vm = self.late_vm("eng")
+        self.execute_option(vm, scenario, 0)
+        group = "eng_conservative"
+        base = vm.state.variables[f"psf_g_{group}_influence"]
+        government = vm.state.variables["psf_governing_group"]
+        self.assertGreater(vm.state.variables[f"psf_g_{group}_modified_influence"], base)
+        vm.state.variables[f"psf_m_{group}_independent_executive_mandate_days"] = 1
+        vm.executed = 0
+        vm.execute(self.daily)
+        self.assertEqual(vm.state.variables[f"psf_m_{group}_independent_executive_mandate_active"], 0)
+        self.assertEqual(vm.state.variables[f"psf_g_{group}_modified_influence"], base)
+        self.assertEqual(vm.state.variables["psf_governing_group"], government)
 
 
 if __name__ == "__main__":

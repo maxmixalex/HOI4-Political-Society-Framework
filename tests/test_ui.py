@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+from itertools import combinations
 from pathlib import Path
 import re
 import shutil
@@ -323,8 +324,13 @@ class UIContractTests(unittest.TestCase):
             self.assertLessEqual(point(values)[0] + int(values.properties["maxwidth"][2]), point(status)[0])
             detail = next(n for n in nodes if n.name == f"psf_{mode}_detail_alpha")
             texts = [n for n in detail.children if n.kind == "instantTextboxType"]
-            for first, second in zip(texts, texts[1:]):
-                self.assertLessEqual(point(first)[1] + int(first.properties["maxheight"][2]), point(second)[1])
+            for first, second in combinations(texts, 2):
+                x1, y1 = point(first)
+                x2, y2 = point(second)
+                w1, h1 = (int(first.properties[k][2]) for k in ("maxwidth", "maxheight"))
+                w2, h2 = (int(second.properties[k][2]) for k in ("maxwidth", "maxheight"))
+                self.assertTrue(x1 + w1 <= x2 or x2 + w2 <= x1 or y1 + h1 <= y2 or y2 + h2 <= y1,
+                                f"{first.name} overlaps {second.name}")
             description = next(n for n in texts if n.name == "psf_detail_description_alpha")
             self.assertEqual(description.properties["scrollbartype"][2], '"standardtext_slider"')
 
@@ -356,7 +362,10 @@ class UIContractTests(unittest.TestCase):
         for mode, scope in (("political", "ROOT"), ("diplomatic", "THIS")):
             summary = nodes[f"psf_{mode}_summary"]
             binding = bindings[summary.name]
-            self.assertEqual(binding.properties["dirty"][2], f"{scope}.psf_ui_revision")
+            if mode == "political":
+                self.assertEqual(binding.properties["dirty"][2], f"{scope}.psf_ui_revision")
+            else:
+                self.assertNotIn("dirty", binding.properties)
             regime = next(n for n in summary.children if n.name == f"psf_{mode}_regime")
             key = regime.properties["text"][2].strip('"')
             self.assertEqual(strings[key], f"[{scope}.PSFUIRegime]")
@@ -472,6 +481,77 @@ class UIContractTests(unittest.TestCase):
         self.assertEqual(evaluate("PSFUIGovernmentPartyIcon"), "psf_ui_unknown_ideology_sprite")
         vm.state.variables["psf_caretaker"] = 1
         self.assertEqual(evaluate("PSFUIGovIdeologyIcon"), "psf_ui_unknown_ideology_sprite")
+
+    def test_foreign_country_switch_does_not_depend_on_distinct_revision_numbers(self):
+        from tools.ui.audit_layout import script_bindings
+        bindings = script_bindings(self.root)
+        # Two initialized countries commonly both have revision 1. A dirty
+        # value alone cannot distinguish them, and viewing must not mutate
+        # either foreign country just to force the UI to refresh.
+        for name, binding in bindings.items():
+            if name.startswith("psf_diplomatic_"):
+                self.assertNotIn("dirty", binding.properties, name)
+        self.assertIn("dirty", bindings["psf_political_summary"].properties)
+
+    def test_memberships_and_governing_role_remain_independent(self):
+        content = fixture()
+        content["profiles"][0]["alliances"].append({"id": "pact", "_index": 234,
+                                                   "members": ["alpha", "beta"]})
+        with tempfile.TemporaryDirectory() as folder:
+            generate_ui(content, Path(folder))
+            definitions = {mapping(node.value).get("name"): node for path in
+                           (Path(folder) / "common/scripted_localisation").glob("psf_ui*.txt")
+                           for node in entries(parse(path.read_text()))}
+            vm = Interpreter(State())
+            def evaluate(name):
+                for option in entries(definitions[name].value):
+                    if option.key == "text":
+                        fields = mapping(option.value)
+                        if "trigger" not in fields or vm.condition(fields["trigger"]):
+                            return fields["localization_key"]
+            self.assertEqual(evaluate("PSFUIAffiliations_alpha"), "psf_ui_none")
+            vm.state.variables.update(psf_g_alpha_status=1, psf_g_alpha_governing=1,
+                                      psf_a_cabinet_active=1, psf_a_cabinet_g_alpha=1,
+                                      psf_a_pact_active=1, psf_a_pact_g_alpha=1)
+            self.assertEqual(evaluate("PSFUIAffiliation_alpha_cabinet"), "psf_ui_affiliation_alpha_cabinet")
+            self.assertEqual(evaluate("PSFUIAffiliation_alpha_pact"), "psf_ui_affiliation_alpha_pact")
+            self.assertEqual(evaluate("PSFUIAffiliations_alpha"), "psf_ui_affiliations_alpha")
+            self.assertEqual(evaluate("PSFUIRole_alpha"), "psf_ui_government")
+            self.assertEqual(evaluate("PSFUIRowStatus_alpha"), "psf_ui_government")
+            vm.state.variables.update(psf_a_cabinet_active=0, psf_g_alpha_governing=0)
+            self.assertEqual(evaluate("PSFUIAffiliation_alpha_cabinet"), "psf_ui_empty")
+            self.assertEqual(evaluate("PSFUIAffiliation_alpha_pact"), "psf_ui_affiliation_alpha_pact")
+            self.assertEqual(evaluate("PSFUIRole_alpha"), "psf_ui_outside_government")
+            self.assertEqual(evaluate("PSFUIRowStatus_alpha"), "psf_ui_legal")
+            vm.state.variables["psf_a_pact_g_alpha"] = 0
+            self.assertEqual(evaluate("PSFUIAffiliations_alpha"), "psf_ui_none")
+
+    def test_spectrum_reference_lanes_read_current_country_and_hide_missing_values(self):
+        from tools.ui.audit_layout import point, script_bindings
+        bindings = script_bindings(self.root)
+        scripts = {entry.key: entry for root in entries(parse(self.script)) for entry in entries(root.value)}
+        vm = Interpreter(State())
+        for mode, scope in (("political", "ROOT"), ("diplomatic", "THIS")):
+            window = next(n for n in gui_nodes(self.gui) if n.name == f"psf_{mode}_spectrum_test")
+            properties = next(n for n in bindings[window.name].children if n.kind == "properties")
+            triggers = mapping(mapping(scripts[window.name + "_gui"].value)["triggers"])
+            values = []
+            for reference in ("institution", "government"):
+                name = f"psf_axis_reference_{reference}_economy"
+                marker = next(n for n in window.children if n.name == name)
+                prop = next(n for n in properties.children if n.kind == name)
+                self.assertEqual(prop.properties["x"][2], f"{scope}.psf_ui_{reference}_economy")
+                self.assertEqual(marker.kind, "iconType")
+                values.append(point(marker)[1])
+            first_group = next(n for n in window.children if n.name == "psf_axis_marker_alpha_economy")
+            self.assertGreaterEqual(values[1] - values[0], 18)
+            self.assertGreaterEqual(point(first_group)[1] - values[1], 18)
+            for defined in (0, 1):
+                for caretaker in (0, 1):
+                    vm.state.variables.update(psf_ui_institution_defined_economy=defined, psf_caretaker=caretaker)
+                    for suffix in ("", "_track", "_label", "_value"):
+                        self.assertEqual(vm.condition(triggers[f"psf_axis_reference_institution_economy{suffix}_visible"]), bool(defined))
+                        self.assertEqual(vm.condition(triggers[f"psf_axis_reference_government_economy{suffix}_visible"]), not caretaker)
 
 
 if __name__ == "__main__":

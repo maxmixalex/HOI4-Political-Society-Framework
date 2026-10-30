@@ -21,10 +21,10 @@ import tempfile
 
 try:
     from .engine_safety import MAX_SCRIPT_BYTES, inspect_build
-    from . import native_history
+    from . import native_history, native_politics
 except ImportError:  # Direct `python tools/ci/validate.py` invocation.
     from engine_safety import MAX_SCRIPT_BYTES, inspect_build
-    import native_history
+    import native_history, native_politics
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parent.parent
@@ -267,6 +267,7 @@ def self_test(binary: Path, output: Path) -> None:
                 if name == "declared_stock_texture":
                     summary[name]["gate_exit_code"] = 0
     summary.update(self_test_native_history(binary, output))
+    summary.update(self_test_native_politics(binary, output))
     (output / "selftest.json").write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
     print("CWTools positive and negative semantic controls passed.")
 
@@ -328,6 +329,52 @@ def self_test_native_history(binary: Path, output: Path) -> dict:
     return summary
 
 
+def self_test_native_politics(binary: Path, output: Path) -> dict:
+    """Unchanged original errors cannot hide a bad PSF political override."""
+    relative = native_politics.native_rules.PEACE
+    raw = (native_politics.native_rules.ASSETS / relative).read_bytes()
+    expected = native_politics.native_rules.neutralize(raw.decode("utf-8-sig"), relative)[0].encode("utf-8")
+    source = native_politics.reconstruct(relative, raw, expected)
+    summary = {}
+    with tempfile.TemporaryDirectory(prefix="psf-politics-control-") as temporary:
+        staged = Path(temporary)
+        path = staged / relative
+        path.parent.mkdir(parents=True)
+        path.write_bytes(expected)
+        baseline_result, baseline = native_history.run_baseline(
+            invoke, binary, staged, output / "selftest-native-politics-baseline.json", {relative: source})
+        result, diagnostics = invoke(binary, staged, output / "selftest-native-politics-generated.json")
+        checked, inherited = native_history.classify(diagnostics, baseline, staged, {relative: source})
+        if not inherited or any(d.get("severity", "").lower() in {"error", "warning"} for d in checked):
+            raise ValidationFailure("Exact generic politics output did not match its genuine original baseline")
+        summary["native_politics_exact_source"] = {"engine_exit_code": result,
+            "baseline_engine_exit_code": baseline_result, "gate_exit_code": 0,
+            "inherited_diagnostics": len(inherited), "passed": True}
+        for name, tampered in {
+            "native_politics_override_tamper": expected.replace(b"enable = { always = no }", b"enable = { always = yes }", 1),
+            "native_politics_original_tamper": expected.replace(b"cost_multiplier = 0.25", b"cost_multiplier = 0.26", 1),
+        }.items():
+            if tampered == expected:
+                raise ValidationFailure(f"Native-politics negative control did not change its target: {name}")
+            try:
+                native_politics.reconstruct(relative, raw, tampered)
+            except ValueError:
+                summary[name] = {"gate_exit_code": 2, "rejected_before_engine": True, "passed": True}
+            else:
+                raise ValidationFailure(f"Native politics reconstruction accepted {name}")
+        path.write_bytes(expected.replace(b"enable = { always = no }",
+                                         b"enable = { psf_ci_invalid_peace_trigger = yes }", 1))
+        result, diagnostics = invoke(binary, staged, output / "selftest-native-politics-new-trigger.json")
+        checked, _ = native_history.classify(diagnostics, baseline, staged, {relative: source})
+        errors = [d for d in checked if d.get("severity", "").lower() == "error"
+                  and "psf_ci_invalid_peace_trigger" in d.get("message", "")]
+        if result == 0 or not errors:
+            raise ValidationFailure("New PSF peace trigger escaped the original-source baseline")
+        summary["native_politics_new_trigger"] = {"engine_exit_code": result, "gate_exit_code": result,
+            "new_diagnostic_codes": sorted({d["code"] for d in errors}), "passed": True}
+    return summary
+
+
 def write_annotations(diagnostics: list[dict], staged: Path, root: Path) -> None:
     for diagnostic in diagnostics:
         severity = diagnostic.get("severity", "info").lower()
@@ -361,7 +408,8 @@ def main(argv: list[str] | None = None) -> int:
     # A failed rerun must not leave an older successful report beside it.
     if not args.self_test_only:
         for filename in ("summary.json", "cwtools.json", "stock-texture-dependencies.json", "engine-preflight.json",
-                         "native-history-baseline.json", "inherited-native-history-diagnostics.json"):
+                         "native-history-baseline.json", "inherited-native-history-diagnostics.json",
+                         "inherited-native-politics-diagnostics.json"):
             (args.reports / filename).unlink(missing_ok=True)
     try:
         preflight = None
@@ -388,24 +436,28 @@ def main(argv: list[str] | None = None) -> int:
             # inherited-diagnostic decision. A tampered insertion cannot earn
             # the source file's baseline merely by living in history/countries.
             verified_history = native_history.prepare(staged, args.root.resolve(), args.vanilla)
+            verified_politics = native_politics.prepare(staged, args.root.resolve(), args.vanilla)
             result, diagnostics = invoke(binary, staged, args.reports / "cwtools.json", args.vanilla)
             # Keep the engine's complete unmodified report, including CW113.
             (args.reports / "cwtools.json").write_text(json.dumps(diagnostics, indent=2) + "\n", encoding="utf-8")
             checked, dependencies = classify_stock_texture_dependencies(diagnostics, enabled=args.vanilla is None)
             (args.reports / "stock-texture-dependencies.json").write_text(json.dumps(dependencies, indent=2) + "\n", encoding="utf-8")
-            inherited, baseline_result, baseline_diagnostics = [], None, []
-            if verified_history:
+            inherited, inherited_politics, baseline_result, baseline_diagnostics = [], [], None, []
+            verified_sources = {**verified_history, **verified_politics}
+            if verified_sources:
                 baseline_result, baseline_diagnostics = native_history.run_baseline(
-                    invoke, binary, staged, args.reports / "native-history-baseline.json", verified_history, args.vanilla)
+                    invoke, binary, staged, args.reports / "native-history-baseline.json", verified_sources, args.vanilla)
                 checked, inherited = native_history.classify(checked, baseline_diagnostics, staged, verified_history)
+                checked, inherited_politics = native_history.classify(checked, baseline_diagnostics, staged, verified_politics)
             (args.reports / "inherited-native-history-diagnostics.json").write_text(json.dumps(inherited, indent=2) + "\n", encoding="utf-8")
+            (args.reports / "inherited-native-politics-diagnostics.json").write_text(json.dumps(inherited_politics, indent=2) + "\n", encoding="utf-8")
             write_annotations(checked, staged, args.root.resolve())
             errors = sum(d.get("severity", "").lower() == "error" for d in checked)
             warnings = sum(d.get("severity", "").lower() == "warning" for d in checked)
             raw_errors = sum(d.get("severity", "").lower() == "error" for d in diagnostics)
             # Exit 1 means ordinary diagnostics. Crashes/empty discovery/other
             # nonzero statuses cannot be recategorized as dependency-only.
-            dependency_only = result == 1 and bool(dependencies or inherited) and not errors and not warnings
+            dependency_only = result == 1 and bool(dependencies or inherited or inherited_politics) and not errors and not warnings
             gate_exit = 0 if dependency_only else result or int(bool(errors or warnings))
             summary = {
                 "engine": "cwtools 2.3.0", "generated_files": count,
@@ -423,6 +475,9 @@ def main(argv: list[str] | None = None) -> int:
                 "inherited_native_history_errors": sum(item["diagnostic"].get("severity", "").lower() == "error" for item in inherited),
                 "inherited_native_history_warnings": sum(item["diagnostic"].get("severity", "").lower() == "warning" for item in inherited),
                 "inherited_native_history_info": sum(item["diagnostic"].get("severity", "").lower() in {"info", "information"} for item in inherited),
+                "native_politics_verified_files": len(verified_politics),
+                "inherited_native_politics_errors": sum(item["diagnostic"].get("severity", "").lower() == "error" for item in inherited_politics),
+                "inherited_native_politics_warnings": sum(item["diagnostic"].get("severity", "").lower() == "warning" for item in inherited_politics),
                 "engine_preflight": {key: preflight[key] for key in ("checked_files", "native_gui_files", "errors")},
                 "runtime_launch_tested": False,
             }

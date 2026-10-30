@@ -66,7 +66,7 @@ def content_localization(manifest: dict) -> dict[str, dict[str, str]]:
                     label("psf_" + kind + "_" + item["id"] + "_" + suffix, item[field])
     pairs = {
         "psf_government_category": ("Political society: government", "政治社会：政府"),
-        "psf_government_category_desc": ("Institutions: [PSFUIRegime]\nGovernment: [PSFUIGovernment]\nLegitimacy: [?psf_legitimacy|1]/100\nMonthly change: [?psf_legitimacy_change|2]\nInstitutional mismatch: [?psf_alignment_gap|1]/100", "实际制度：[PSFUIRegime]\n执政联盟：[PSFUIGovernment]\n合法性：[?psf_legitimacy|1]/100\n每月变化：[?psf_legitimacy_change|2]\n制度偏离：[?psf_alignment_gap|1]/100"),
+        "psf_government_category_desc": ("Institutions: [PSFUIRegime]\nGovernment: [PSFUIGovernment]\nLegitimacy: [?psf_legitimacy|1]/100\nMonthly change: [?psf_legitimacy_change|2]\nInstitutional mismatch: [?psf_alignment_gap|1]/100", "实际制度：[PSFUIRegime]\n政府：[PSFUIGovernment]\n合法性：[?psf_legitimacy|1]/100\n每月变化：[?psf_legitimacy_change|2]\n制度偏离：[?psf_alignment_gap|1]/100"),
         "psf_groups_category": ("Political society: organizations", "政治社会：政治团体"),
         "psf_groups_category_desc": ("Select an organization in the politics sidebar to see its policy actions here. Support, institutional influence and satisfaction are independent values. Banning suppresses influence; it does not erase supporters.", "在政治界面侧栏选择一个团体，即可在这里处理该团体的政治事务。支持率、制度影响力和满意度分别记录。查禁压低影响力，不会凭空消除其支持者。"),
         "psf_alliances_category": ("Political society: alliances", "政治社会：政治联盟"),
@@ -83,7 +83,7 @@ def content_localization(manifest: dict) -> dict[str, dict[str, str]]:
         "psf_effect_clear_government": ("The government becomes a caretaker administration; existing political alliances remain active.", "政府进入看守状态；现有政治联盟继续存在。"),
         "psf_open_society_view_desc": ("Enable the organization sidebar. Open the country's politics tab to view it.", "开启团体侧栏；打开本国政治面板即可查看。"),
         "psf_event_1_title": ("The ballot has been counted", "选举结果揭晓"),
-        "psf_event_1_desc": ("The largest individual electoral party is [PSFRuntimeGetWinner]. The government is [PSFUIGovernment].\n\nVotes were normalized among legal electoral organizations. An electoral alliance may form the government even when a different party holds the largest individual vote.\n\nThe country's institutions remain [PSFUIRegime].", "单个政党中得票最多的是[PSFRuntimeGetWinner]。现执政联盟为[PSFUIGovernment]。\n\n选票在合法参选组织之间归一分配。选举联盟可能凭合计票数组阁，而不是由单党得票第一者组阁。\n\n国家实际制度仍为[PSFUIRegime]。"),
+        "psf_event_1_desc": ("The largest individual electoral party is [PSFRuntimeGetWinner]. The government is [PSFUIGovernment].\n\nVotes were normalized among legal electoral organizations. An electoral alliance may form the government even when a different party holds the largest individual vote.\n\nThe country's institutions remain [PSFUIRegime].", "单个政党中得票最多的是[PSFRuntimeGetWinner]。现政府为[PSFUIGovernment]。\n\n选票在合法参选组织之间归一分配。选举联盟可能凭合计票数组阁，而不是由单党得票第一者组阁。\n\n国家实际制度仍为[PSFUIRegime]。"),
         "psf_event_2_title": ("An alliance changes course", "政治联盟出现变动"),
         "psf_event_2_desc": ("An alliance has lost members or dissolved after prolonged internal disagreements.\n\nThe society sidebar shows the surviving memberships and the government's current support. A caretaker government can be replaced through a new cabinet agreement.", "长期内部矛盾导致某个政治联盟出现成员退出或解散。\n\n政治社会侧栏可以查看当前成员关系以及政府支持情况。如进入看守状态，可以重新达成执政协定。"),
         "psf_acknowledge": ("Continue", "继续"),

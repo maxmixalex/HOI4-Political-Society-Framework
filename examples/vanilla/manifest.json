@@ -594,7 +594,17 @@
         "authority": 40,
         "liberties": -30
       },
-      "elections": true
+      "elections": true,
+      "native_policy": {
+        "generate_wargoal_tension": 0.75,
+        "join_faction_tension": 0.6,
+        "lend_lease_tension": 0.25,
+        "send_volunteers_tension": 0.25,
+        "guarantee_tension": 0.25,
+        "can_only_justify_war_on_threat_country": true,
+        "can_lower_tension": true,
+        "can_create_collaboration_government": false
+      }
     }
   ],
   "profiles": [
@@ -964,6 +974,20 @@
             "ger_officers"
           ],
           "cohesion": 72
+        },
+        {
+          "id": "ger_executive_agreement",
+          "name": {
+            "english": "Industrial and Military Administrative Compact",
+            "simp_chinese": "工商与军方行政协定"
+          },
+          "description": {
+            "english": "A proposed governing agreement whose organizations retain their separate identities. It has no members until an agreement is explicitly concluded.",
+            "simp_chinese": "各组织保留独立身份的拟议执政协议。在明确达成协议前没有任何成员。"
+          },
+          "kind": "opposition",
+          "members": [],
+          "cohesion": 70
         }
       ],
       "start_overrides": [
@@ -1372,6 +1396,20 @@
             "eng_tuc"
           ],
           "cohesion": 81
+        },
+        {
+          "id": "eng_executive_agreement",
+          "name": {
+            "english": "Cross-party Ministry Agreement",
+            "simp_chinese": "跨党派内阁协议"
+          },
+          "description": {
+            "english": "A proposed governing agreement whose organizations retain their separate identities. It has no members until an agreement is explicitly concluded.",
+            "simp_chinese": "各组织保留独立身份的拟议执政协议。在明确达成协议前没有任何成员。"
+          },
+          "kind": "opposition",
+          "members": [],
+          "cohesion": 70
         }
       ],
       "start_overrides": [
@@ -1817,6 +1855,20 @@
             "fra_cgt"
           ],
           "cohesion": 73
+        },
+        {
+          "id": "fra_executive_agreement",
+          "name": {
+            "english": "Republican Ministry Support Agreement",
+            "simp_chinese": "共和内阁支持协议"
+          },
+          "description": {
+            "english": "A proposed governing agreement whose organizations retain their separate identities. It has no members until an agreement is explicitly concluded.",
+            "simp_chinese": "各组织保留独立身份的拟议执政协议。在明确达成协议前没有任何成员。"
+          },
+          "kind": "opposition",
+          "members": [],
+          "cohesion": 70
         }
       ],
       "start_overrides": [
@@ -2284,6 +2336,20 @@
             "usa_cio"
           ],
           "cohesion": 71
+        },
+        {
+          "id": "usa_executive_agreement",
+          "name": {
+            "english": "Executive and Congressional Support Agreement",
+            "simp_chinese": "行政与国会支持协议"
+          },
+          "description": {
+            "english": "A proposed governing agreement whose organizations retain their separate identities. It has no members until an agreement is explicitly concluded.",
+            "simp_chinese": "各组织保留独立身份的拟议执政协议。在明确达成协议前没有任何成员。"
+          },
+          "kind": "opposition",
+          "members": [],
+          "cohesion": 70
         }
       ],
       "start_overrides": [
@@ -2649,6 +2715,20 @@
             "sov_unions"
           ],
           "cohesion": 78
+        },
+        {
+          "id": "sov_executive_agreement",
+          "name": {
+            "english": "Party, Enterprise and Union Administrative Compact",
+            "simp_chinese": "党、企业与工会行政协定"
+          },
+          "description": {
+            "english": "A proposed governing agreement whose organizations retain their separate identities. It has no members until an agreement is explicitly concluded.",
+            "simp_chinese": "各组织保留独立身份的拟议执政协议。在明确达成协议前没有任何成员。"
+          },
+          "kind": "opposition",
+          "members": [],
+          "cohesion": 70
         }
       ],
       "start_overrides": [
@@ -3044,6 +3124,20 @@
             "ita_syndicates"
           ],
           "cohesion": 69
+        },
+        {
+          "id": "ita_executive_agreement",
+          "name": {
+            "english": "Crown, Party and Industry Executive Agreement",
+            "simp_chinese": "王室、执政党与工商界行政协议"
+          },
+          "description": {
+            "english": "A proposed governing agreement whose organizations retain their separate identities. It has no members until an agreement is explicitly concluded.",
+            "simp_chinese": "各组织保留独立身份的拟议执政协议。在明确达成协议前没有任何成员。"
+          },
+          "kind": "opposition",
+          "members": [],
+          "cohesion": 70
         }
       ],
       "start_overrides": [
@@ -3451,6 +3545,20 @@
             "jap_kodoha"
           ],
           "cohesion": 38
+        },
+        {
+          "id": "jap_executive_agreement",
+          "name": {
+            "english": "Civilian Cabinet Support Agreement",
+            "simp_chinese": "文官内阁支持协议"
+          },
+          "description": {
+            "english": "A proposed governing agreement whose organizations retain their separate identities. It has no members until an agreement is explicitly concluded.",
+            "simp_chinese": "各组织保留独立身份的拟议执政协议。在明确达成协议前没有任何成员。"
+          },
+          "kind": "opposition",
+          "members": [],
+          "cohesion": 70
         }
       ],
       "start_overrides": [
@@ -3897,6 +4005,20 @@
             "chi_business"
           ],
           "cohesion": 65
+        },
+        {
+          "id": "chi_executive_agreement",
+          "name": {
+            "english": "Central and Regional Administrative Agreement",
+            "simp_chinese": "中央与地方行政协议"
+          },
+          "description": {
+            "english": "A proposed governing agreement whose organizations retain their separate identities. It has no members until an agreement is explicitly concluded.",
+            "simp_chinese": "各组织保留独立身份的拟议执政协议。在明确达成协议前没有任何成员。"
+          },
+          "kind": "opposition",
+          "members": [],
+          "cohesion": 70
         }
       ],
       "start_overrides": [
@@ -4424,6 +4546,20 @@
             "spr_carlists"
           ],
           "cohesion": 57
+        },
+        {
+          "id": "spr_executive_agreement",
+          "name": {
+            "english": "Party, Officer and Traditionalist Governing Compact",
+            "simp_chinese": "政党、军官与传统派执政协定"
+          },
+          "description": {
+            "english": "A proposed governing agreement whose organizations retain their separate identities. It has no members until an agreement is explicitly concluded.",
+            "simp_chinese": "各组织保留独立身份的拟议执政协议。在明确达成协议前没有任何成员。"
+          },
+          "kind": "opposition",
+          "members": [],
+          "cohesion": 70
         }
       ],
       "start_overrides": [
@@ -4938,6 +5074,20 @@
             "pol_unions"
           ],
           "cohesion": 63
+        },
+        {
+          "id": "pol_executive_agreement",
+          "name": {
+            "english": "Presidential, Military and Unity Camp Agreement",
+            "simp_chinese": "总统派、军方与民族团结营协议"
+          },
+          "description": {
+            "english": "A proposed governing agreement whose organizations retain their separate identities. It has no members until an agreement is explicitly concluded.",
+            "simp_chinese": "各组织保留独立身份的拟议执政协议。在明确达成协议前没有任何成员。"
+          },
+          "kind": "opposition",
+          "members": [],
+          "cohesion": 70
         }
       ],
       "start_overrides": [
@@ -9700,6 +9850,2436 @@
           ]
         }
       ]
+    },
+    {
+      "id": "ger_government_mandate",
+      "profile": "ger",
+      "date": "1939.9.1",
+      "title": {
+        "english": "Party command or an administrative compact?",
+        "simp_chinese": "党内指挥还是行政协议？"
+      },
+      "description": {
+        "english": "A proposed reallocation of executive responsibility has exposed differences between the ruling party, industrial employers and the officer corps. Party officials demand an exclusive mandate; industrial and military representatives seek a binding agreement of their own. An interim administration is also being discussed while the dispute remains unsettled.",
+        "simp_chinese": "一项重新分配行政职责的提案暴露了执政党、工业界与军官团之间的分歧。党内官员要求取得单独授权，工商与军方代表则希望通过新的共同协议约束行政权。各方也在讨论先由看守行政当局维持日常事务。"
+      },
+      "options": [
+        {
+          "id": "independent",
+          "label": {
+            "english": "Give the ruling party sole executive responsibility",
+            "simp_chinese": "由执政党单独承担行政责任"
+          },
+          "ai_chance": 45,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "ger_nsdap",
+              "modifier": "independent_executive_mandate"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ger_nsdap",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ger_industry",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ger_officers",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ger_nsdap",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ger_industry",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ger_officers",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "activate",
+              "group": "ger_nsdap"
+            },
+            {
+              "op": "legalize",
+              "group": "ger_nsdap"
+            },
+            {
+              "op": "add_modifier",
+              "group": "ger_nsdap",
+              "modifier": "independent_executive_mandate"
+            },
+            {
+              "op": "govern_group",
+              "group": "ger_nsdap"
+            }
+          ]
+        },
+        {
+          "id": "agreement",
+          "label": {
+            "english": "Conclude a party, industry and officer compact",
+            "simp_chinese": "签订党、工商界与军官团的共同协定"
+          },
+          "ai_chance": 45,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "ger_nsdap",
+              "modifier": "independent_executive_mandate"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ger_nsdap",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ger_industry",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ger_officers",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ger_nsdap",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ger_industry",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ger_officers",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "activate",
+              "group": "ger_nsdap"
+            },
+            {
+              "op": "legalize",
+              "group": "ger_nsdap"
+            },
+            {
+              "op": "join",
+              "group": "ger_nsdap",
+              "alliance": "ger_executive_agreement"
+            },
+            {
+              "op": "add_modifier",
+              "group": "ger_nsdap",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "activate",
+              "group": "ger_industry"
+            },
+            {
+              "op": "legalize",
+              "group": "ger_industry"
+            },
+            {
+              "op": "join",
+              "group": "ger_industry",
+              "alliance": "ger_executive_agreement"
+            },
+            {
+              "op": "add_modifier",
+              "group": "ger_industry",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "activate",
+              "group": "ger_officers"
+            },
+            {
+              "op": "legalize",
+              "group": "ger_officers"
+            },
+            {
+              "op": "join",
+              "group": "ger_officers",
+              "alliance": "ger_executive_agreement"
+            },
+            {
+              "op": "add_modifier",
+              "group": "ger_officers",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "govern",
+              "alliance": "ger_executive_agreement"
+            }
+          ]
+        },
+        {
+          "id": "caretaker",
+          "label": {
+            "english": "Place daily administration under a caretaker",
+            "simp_chinese": "交由看守行政当局维持日常事务"
+          },
+          "ai_chance": 10,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "ger_nsdap",
+              "modifier": "independent_executive_mandate"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ger_nsdap",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ger_industry",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ger_officers",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ger_nsdap",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ger_industry",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ger_officers",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "clear_government"
+            },
+            {
+              "op": "add_modifier",
+              "group": "ger_nsdap",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "add_modifier",
+              "group": "ger_industry",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "add_modifier",
+              "group": "ger_officers",
+              "modifier": "caretaker_assurances"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "eng_government_mandate",
+      "profile": "eng",
+      "date": "1939.9.1",
+      "title": {
+        "english": "The basis of the next ministry",
+        "simp_chinese": "下一届内阁的政治基础"
+      },
+      "description": {
+        "english": "Conservative leaders are reviewing the authority of the ministry. One proposal leaves executive responsibility with their own party; another invites Labour and the Liberals to negotiate a broader governing agreement. The Crown could instead appoint a caretaker while the parties continue their discussions.",
+        "simp_chinese": "保守党领袖正在重新审视内阁的授权。一项提案由本党单独承担执政责任，另一项则邀请工党与自由党谈判更广泛的执政协议。王室也可先任命看守内阁，等待党派协商取得结果。"
+      },
+      "options": [
+        {
+          "id": "independent",
+          "label": {
+            "english": "Authorize a Conservative ministry",
+            "simp_chinese": "授权保守党单独组阁"
+          },
+          "ai_chance": 45,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "eng_conservative",
+              "modifier": "independent_executive_mandate"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "eng_conservative",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "eng_labour",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "eng_liberal",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "eng_conservative",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "eng_labour",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "eng_liberal",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "activate",
+              "group": "eng_conservative"
+            },
+            {
+              "op": "legalize",
+              "group": "eng_conservative"
+            },
+            {
+              "op": "add_modifier",
+              "group": "eng_conservative",
+              "modifier": "independent_executive_mandate"
+            },
+            {
+              "op": "govern_group",
+              "group": "eng_conservative"
+            }
+          ]
+        },
+        {
+          "id": "agreement",
+          "label": {
+            "english": "Invite Labour and the Liberals into a new agreement",
+            "simp_chinese": "与工党、自由党达成新的执政协议"
+          },
+          "ai_chance": 45,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "eng_conservative",
+              "modifier": "independent_executive_mandate"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "eng_conservative",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "eng_labour",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "eng_liberal",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "eng_conservative",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "eng_labour",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "eng_liberal",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "activate",
+              "group": "eng_conservative"
+            },
+            {
+              "op": "legalize",
+              "group": "eng_conservative"
+            },
+            {
+              "op": "join",
+              "group": "eng_conservative",
+              "alliance": "eng_executive_agreement"
+            },
+            {
+              "op": "add_modifier",
+              "group": "eng_conservative",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "activate",
+              "group": "eng_labour"
+            },
+            {
+              "op": "legalize",
+              "group": "eng_labour"
+            },
+            {
+              "op": "join",
+              "group": "eng_labour",
+              "alliance": "eng_executive_agreement"
+            },
+            {
+              "op": "add_modifier",
+              "group": "eng_labour",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "activate",
+              "group": "eng_liberal"
+            },
+            {
+              "op": "legalize",
+              "group": "eng_liberal"
+            },
+            {
+              "op": "join",
+              "group": "eng_liberal",
+              "alliance": "eng_executive_agreement"
+            },
+            {
+              "op": "add_modifier",
+              "group": "eng_liberal",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "govern",
+              "alliance": "eng_executive_agreement"
+            }
+          ]
+        },
+        {
+          "id": "caretaker",
+          "label": {
+            "english": "Appoint a caretaker pending agreement",
+            "simp_chinese": "协商期间任命看守内阁"
+          },
+          "ai_chance": 10,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "eng_conservative",
+              "modifier": "independent_executive_mandate"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "eng_conservative",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "eng_labour",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "eng_liberal",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "eng_conservative",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "eng_labour",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "eng_liberal",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "clear_government"
+            },
+            {
+              "op": "add_modifier",
+              "group": "eng_conservative",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "add_modifier",
+              "group": "eng_labour",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "add_modifier",
+              "group": "eng_liberal",
+              "modifier": "caretaker_assurances"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fra_government_mandate",
+      "profile": "fra",
+      "date": "1939.9.1",
+      "title": {
+        "english": "A mandate for the Council of Ministers",
+        "simp_chinese": "部长会议的授权"
+      },
+      "description": {
+        "english": "The Radicals are considering whether to accept responsibility alone or negotiate a new support agreement with the Socialists and the Democratic Alliance. The proposal concerns political backing for the ministry rather than a fixed allocation of ministerial portfolios. A caretaker ministry could maintain administration while negotiations continue.",
+        "simp_chinese": "激进党正在考虑单独承担执政责任，或与工人国际法国支部、民主联盟谈判新的支持协议。这份提案确定的是内阁的政治基础，并不预先分配部长席位。各方也可暂由看守内阁维持行政运转，继续协商。"
+      },
+      "options": [
+        {
+          "id": "independent",
+          "label": {
+            "english": "Entrust the ministry to the Radicals",
+            "simp_chinese": "授权激进党单独承担执政责任"
+          },
+          "ai_chance": 45,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "fra_radical",
+              "modifier": "independent_executive_mandate"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "fra_radical",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "fra_sfio",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "fra_ad",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "fra_radical",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "fra_sfio",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "fra_ad",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "activate",
+              "group": "fra_radical"
+            },
+            {
+              "op": "legalize",
+              "group": "fra_radical"
+            },
+            {
+              "op": "add_modifier",
+              "group": "fra_radical",
+              "modifier": "independent_executive_mandate"
+            },
+            {
+              "op": "govern_group",
+              "group": "fra_radical"
+            }
+          ]
+        },
+        {
+          "id": "agreement",
+          "label": {
+            "english": "Negotiate a Radical, Socialist and Alliance agreement",
+            "simp_chinese": "达成激进党、社会党与民主联盟的协议"
+          },
+          "ai_chance": 45,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "fra_radical",
+              "modifier": "independent_executive_mandate"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "fra_radical",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "fra_sfio",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "fra_ad",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "fra_radical",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "fra_sfio",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "fra_ad",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "activate",
+              "group": "fra_radical"
+            },
+            {
+              "op": "legalize",
+              "group": "fra_radical"
+            },
+            {
+              "op": "join",
+              "group": "fra_radical",
+              "alliance": "fra_executive_agreement"
+            },
+            {
+              "op": "add_modifier",
+              "group": "fra_radical",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "activate",
+              "group": "fra_sfio"
+            },
+            {
+              "op": "legalize",
+              "group": "fra_sfio"
+            },
+            {
+              "op": "join",
+              "group": "fra_sfio",
+              "alliance": "fra_executive_agreement"
+            },
+            {
+              "op": "add_modifier",
+              "group": "fra_sfio",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "activate",
+              "group": "fra_ad"
+            },
+            {
+              "op": "legalize",
+              "group": "fra_ad"
+            },
+            {
+              "op": "join",
+              "group": "fra_ad",
+              "alliance": "fra_executive_agreement"
+            },
+            {
+              "op": "add_modifier",
+              "group": "fra_ad",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "govern",
+              "alliance": "fra_executive_agreement"
+            }
+          ]
+        },
+        {
+          "id": "caretaker",
+          "label": {
+            "english": "Retain a caretaker while talks continue",
+            "simp_chinese": "继续协商，由看守内阁维持行政"
+          },
+          "ai_chance": 10,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "fra_radical",
+              "modifier": "independent_executive_mandate"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "fra_radical",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "fra_sfio",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "fra_ad",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "fra_radical",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "fra_sfio",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "fra_ad",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "clear_government"
+            },
+            {
+              "op": "add_modifier",
+              "group": "fra_radical",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "add_modifier",
+              "group": "fra_sfio",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "add_modifier",
+              "group": "fra_ad",
+              "modifier": "caretaker_assurances"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "usa_government_mandate",
+      "profile": "usa",
+      "date": "1939.9.1",
+      "title": {
+        "english": "Executive responsibility and congressional support",
+        "simp_chinese": "行政责任与国会支持"
+      },
+      "description": {
+        "english": "Democratic leaders face a proposal to distinguish executive responsibility from their agreements in Congress. They may retain a Democratic mandate or negotiate explicit cooperation with progressive and Republican legislators. A temporary caretaker arrangement has also been proposed pending a broader political settlement; none of these proposals dissolves existing labor or electoral associations.",
+        "simp_chinese": "民主党领袖面临一项重新界定行政责任与国会支持关系的提案。他们可以维持民主党的单独授权，也可与进步派及共和党议员商定明确的合作安排。另有人提议先设立过渡性的看守行政安排，等待政治协商完成。既有劳工与选举合作继续存在。"
+      },
+      "options": [
+        {
+          "id": "independent",
+          "label": {
+            "english": "Keep executive responsibility with the Democrats",
+            "simp_chinese": "由民主党单独承担行政责任"
+          },
+          "ai_chance": 45,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "usa_democratic",
+              "modifier": "independent_executive_mandate"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "usa_democratic",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "usa_progressives",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "usa_republican",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "usa_democratic",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "usa_progressives",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "usa_republican",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "activate",
+              "group": "usa_democratic"
+            },
+            {
+              "op": "legalize",
+              "group": "usa_democratic"
+            },
+            {
+              "op": "add_modifier",
+              "group": "usa_democratic",
+              "modifier": "independent_executive_mandate"
+            },
+            {
+              "op": "govern_group",
+              "group": "usa_democratic"
+            }
+          ]
+        },
+        {
+          "id": "agreement",
+          "label": {
+            "english": "Agree cooperation with progressive and Republican legislators",
+            "simp_chinese": "与进步派及共和党议员达成合作"
+          },
+          "ai_chance": 45,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "usa_democratic",
+              "modifier": "independent_executive_mandate"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "usa_democratic",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "usa_progressives",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "usa_republican",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "usa_democratic",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "usa_progressives",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "usa_republican",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "activate",
+              "group": "usa_democratic"
+            },
+            {
+              "op": "legalize",
+              "group": "usa_democratic"
+            },
+            {
+              "op": "join",
+              "group": "usa_democratic",
+              "alliance": "usa_executive_agreement"
+            },
+            {
+              "op": "add_modifier",
+              "group": "usa_democratic",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "activate",
+              "group": "usa_progressives"
+            },
+            {
+              "op": "legalize",
+              "group": "usa_progressives"
+            },
+            {
+              "op": "join",
+              "group": "usa_progressives",
+              "alliance": "usa_executive_agreement"
+            },
+            {
+              "op": "add_modifier",
+              "group": "usa_progressives",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "activate",
+              "group": "usa_republican"
+            },
+            {
+              "op": "legalize",
+              "group": "usa_republican"
+            },
+            {
+              "op": "join",
+              "group": "usa_republican",
+              "alliance": "usa_executive_agreement"
+            },
+            {
+              "op": "add_modifier",
+              "group": "usa_republican",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "govern",
+              "alliance": "usa_executive_agreement"
+            }
+          ]
+        },
+        {
+          "id": "caretaker",
+          "label": {
+            "english": "Adopt an interim caretaker arrangement",
+            "simp_chinese": "采取临时看守行政安排"
+          },
+          "ai_chance": 10,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "usa_democratic",
+              "modifier": "independent_executive_mandate"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "usa_democratic",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "usa_progressives",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "usa_republican",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "usa_democratic",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "usa_progressives",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "usa_republican",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "clear_government"
+            },
+            {
+              "op": "add_modifier",
+              "group": "usa_democratic",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "add_modifier",
+              "group": "usa_progressives",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "add_modifier",
+              "group": "usa_republican",
+              "modifier": "caretaker_assurances"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sov_government_mandate",
+      "profile": "sov",
+      "date": "1939.9.1",
+      "title": {
+        "english": "Responsibility within the party-state",
+        "simp_chinese": "党国体制内的行政责任"
+      },
+      "description": {
+        "english": "Party officials, enterprise directors and union representatives are debating a proposed division of administrative responsibility. The party leadership could retain a sole mandate, or the three institutions could establish a joint administrative compact. A caretaker executive has also been suggested while the leadership settles the terms; this is an institutional dispute within the party-state.",
+        "simp_chinese": "党内官员、企业管理者与工会代表正在讨论一项行政职责分配提案。党的领导机构可以保留单独授权，也可与另外两类机构建立共同的行政协定。部分代表主张先由看守行政当局维持事务，等待领导层确定安排。这是一场党国体制内部的机构协商。"
+      },
+      "options": [
+        {
+          "id": "independent",
+          "label": {
+            "english": "Retain the party leadership’s sole mandate",
+            "simp_chinese": "由党的领导机构保留单独授权"
+          },
+          "ai_chance": 45,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "sov_party",
+              "modifier": "independent_executive_mandate"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "sov_party",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "sov_managers",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "sov_unions",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "sov_party",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "sov_managers",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "sov_unions",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "activate",
+              "group": "sov_party"
+            },
+            {
+              "op": "legalize",
+              "group": "sov_party"
+            },
+            {
+              "op": "add_modifier",
+              "group": "sov_party",
+              "modifier": "independent_executive_mandate"
+            },
+            {
+              "op": "govern_group",
+              "group": "sov_party"
+            }
+          ]
+        },
+        {
+          "id": "agreement",
+          "label": {
+            "english": "Adopt a joint administrative compact",
+            "simp_chinese": "建立党、企业与工会的共同行政协定"
+          },
+          "ai_chance": 45,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "sov_party",
+              "modifier": "independent_executive_mandate"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "sov_party",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "sov_managers",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "sov_unions",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "sov_party",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "sov_managers",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "sov_unions",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "activate",
+              "group": "sov_party"
+            },
+            {
+              "op": "legalize",
+              "group": "sov_party"
+            },
+            {
+              "op": "join",
+              "group": "sov_party",
+              "alliance": "sov_executive_agreement"
+            },
+            {
+              "op": "add_modifier",
+              "group": "sov_party",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "activate",
+              "group": "sov_managers"
+            },
+            {
+              "op": "legalize",
+              "group": "sov_managers"
+            },
+            {
+              "op": "join",
+              "group": "sov_managers",
+              "alliance": "sov_executive_agreement"
+            },
+            {
+              "op": "add_modifier",
+              "group": "sov_managers",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "activate",
+              "group": "sov_unions"
+            },
+            {
+              "op": "legalize",
+              "group": "sov_unions"
+            },
+            {
+              "op": "join",
+              "group": "sov_unions",
+              "alliance": "sov_executive_agreement"
+            },
+            {
+              "op": "add_modifier",
+              "group": "sov_unions",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "govern",
+              "alliance": "sov_executive_agreement"
+            }
+          ]
+        },
+        {
+          "id": "caretaker",
+          "label": {
+            "english": "Assign routine administration to a caretaker executive",
+            "simp_chinese": "由看守行政当局处理日常事务"
+          },
+          "ai_chance": 10,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "sov_party",
+              "modifier": "independent_executive_mandate"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "sov_party",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "sov_managers",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "sov_unions",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "sov_party",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "sov_managers",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "sov_unions",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "clear_government"
+            },
+            {
+              "op": "add_modifier",
+              "group": "sov_party",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "add_modifier",
+              "group": "sov_managers",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "add_modifier",
+              "group": "sov_unions",
+              "modifier": "caretaker_assurances"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ita_government_mandate",
+      "profile": "ita",
+      "date": "1939.9.1",
+      "title": {
+        "english": "The party, the Crown and executive authority",
+        "simp_chinese": "党、王室与行政授权"
+      },
+      "description": {
+        "english": "A proposed executive settlement has reopened negotiations between the ruling party, the royal court and industrial employers. Party representatives seek a mandate of their own, while the court and employers want their commitments written into a joint agreement. A royal caretaker administration could suspend the dispute over governing responsibility while negotiations continue.",
+        "simp_chinese": "一项新的行政安排提案，使执政党、王室与工业界重新展开协商。党代表要求取得单独授权，宫廷与工商代表则希望把各方承诺写入共同协议。王室也可先任命看守行政当局，暂缓执政责任之争。"
+      },
+      "options": [
+        {
+          "id": "independent",
+          "label": {
+            "english": "Grant the party a sole executive mandate",
+            "simp_chinese": "给予执政党单独的行政授权"
+          },
+          "ai_chance": 45,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "ita_pnf",
+              "modifier": "independent_executive_mandate"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ita_pnf",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ita_crown",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ita_industry",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ita_pnf",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ita_crown",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ita_industry",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "activate",
+              "group": "ita_pnf"
+            },
+            {
+              "op": "legalize",
+              "group": "ita_pnf"
+            },
+            {
+              "op": "add_modifier",
+              "group": "ita_pnf",
+              "modifier": "independent_executive_mandate"
+            },
+            {
+              "op": "govern_group",
+              "group": "ita_pnf"
+            }
+          ]
+        },
+        {
+          "id": "agreement",
+          "label": {
+            "english": "Conclude a Crown, party and industry agreement",
+            "simp_chinese": "签订王室、执政党与工商界的共同协议"
+          },
+          "ai_chance": 45,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "ita_pnf",
+              "modifier": "independent_executive_mandate"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ita_pnf",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ita_crown",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ita_industry",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ita_pnf",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ita_crown",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ita_industry",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "activate",
+              "group": "ita_pnf"
+            },
+            {
+              "op": "legalize",
+              "group": "ita_pnf"
+            },
+            {
+              "op": "join",
+              "group": "ita_pnf",
+              "alliance": "ita_executive_agreement"
+            },
+            {
+              "op": "add_modifier",
+              "group": "ita_pnf",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "activate",
+              "group": "ita_crown"
+            },
+            {
+              "op": "legalize",
+              "group": "ita_crown"
+            },
+            {
+              "op": "join",
+              "group": "ita_crown",
+              "alliance": "ita_executive_agreement"
+            },
+            {
+              "op": "add_modifier",
+              "group": "ita_crown",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "activate",
+              "group": "ita_industry"
+            },
+            {
+              "op": "legalize",
+              "group": "ita_industry"
+            },
+            {
+              "op": "join",
+              "group": "ita_industry",
+              "alliance": "ita_executive_agreement"
+            },
+            {
+              "op": "add_modifier",
+              "group": "ita_industry",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "govern",
+              "alliance": "ita_executive_agreement"
+            }
+          ]
+        },
+        {
+          "id": "caretaker",
+          "label": {
+            "english": "Request a royal caretaker administration",
+            "simp_chinese": "请王室任命看守行政当局"
+          },
+          "ai_chance": 10,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "ita_pnf",
+              "modifier": "independent_executive_mandate"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ita_pnf",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ita_crown",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ita_industry",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ita_pnf",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ita_crown",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ita_industry",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "clear_government"
+            },
+            {
+              "op": "add_modifier",
+              "group": "ita_pnf",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "add_modifier",
+              "group": "ita_crown",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "add_modifier",
+              "group": "ita_industry",
+              "modifier": "caretaker_assurances"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "jap_government_mandate",
+      "profile": "jap",
+      "date": "1939.9.1",
+      "title": {
+        "english": "Political backing for a new cabinet",
+        "simp_chinese": "新内阁的政治支持"
+      },
+      "description": {
+        "english": "Senior statesmen are considering an alternative cabinet mandate. Minseito could accept responsibility alone, or negotiate political support with Seiyukai and the court. If no durable terms can be agreed, a caretaker cabinet could preserve ordinary administration while the separate parties and institutions continue their talks.",
+        "simp_chinese": "重臣正在讨论一种替代性的内阁授权。民政党可以单独承担责任，也可与政友会及宫廷谈判新的政治支持安排。若各方无法确定持久的条件，看守内阁可先维持行政，党派与机构继续分别参与协商。"
+      },
+      "options": [
+        {
+          "id": "independent",
+          "label": {
+            "english": "Authorize a Minseito cabinet",
+            "simp_chinese": "授权民政党单独组阁"
+          },
+          "ai_chance": 45,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "jap_minseito",
+              "modifier": "independent_executive_mandate"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "jap_minseito",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "jap_seiyukai",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "jap_court",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "jap_minseito",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "jap_seiyukai",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "jap_court",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "activate",
+              "group": "jap_minseito"
+            },
+            {
+              "op": "legalize",
+              "group": "jap_minseito"
+            },
+            {
+              "op": "add_modifier",
+              "group": "jap_minseito",
+              "modifier": "independent_executive_mandate"
+            },
+            {
+              "op": "govern_group",
+              "group": "jap_minseito"
+            }
+          ]
+        },
+        {
+          "id": "agreement",
+          "label": {
+            "english": "Agree support between both parties and the court",
+            "simp_chinese": "达成两党与宫廷的内阁支持协议"
+          },
+          "ai_chance": 45,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "jap_minseito",
+              "modifier": "independent_executive_mandate"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "jap_minseito",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "jap_seiyukai",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "jap_court",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "jap_minseito",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "jap_seiyukai",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "jap_court",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "activate",
+              "group": "jap_minseito"
+            },
+            {
+              "op": "legalize",
+              "group": "jap_minseito"
+            },
+            {
+              "op": "join",
+              "group": "jap_minseito",
+              "alliance": "jap_executive_agreement"
+            },
+            {
+              "op": "add_modifier",
+              "group": "jap_minseito",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "activate",
+              "group": "jap_seiyukai"
+            },
+            {
+              "op": "legalize",
+              "group": "jap_seiyukai"
+            },
+            {
+              "op": "join",
+              "group": "jap_seiyukai",
+              "alliance": "jap_executive_agreement"
+            },
+            {
+              "op": "add_modifier",
+              "group": "jap_seiyukai",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "activate",
+              "group": "jap_court"
+            },
+            {
+              "op": "legalize",
+              "group": "jap_court"
+            },
+            {
+              "op": "join",
+              "group": "jap_court",
+              "alliance": "jap_executive_agreement"
+            },
+            {
+              "op": "add_modifier",
+              "group": "jap_court",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "govern",
+              "alliance": "jap_executive_agreement"
+            }
+          ]
+        },
+        {
+          "id": "caretaker",
+          "label": {
+            "english": "Appoint a caretaker cabinet for the negotiations",
+            "simp_chinese": "协商期间任命看守内阁"
+          },
+          "ai_chance": 10,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "jap_minseito",
+              "modifier": "independent_executive_mandate"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "jap_minseito",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "jap_seiyukai",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "jap_court",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "jap_minseito",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "jap_seiyukai",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "jap_court",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "clear_government"
+            },
+            {
+              "op": "add_modifier",
+              "group": "jap_minseito",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "add_modifier",
+              "group": "jap_seiyukai",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "add_modifier",
+              "group": "jap_court",
+              "modifier": "caretaker_assurances"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chi_government_mandate",
+      "profile": "chi",
+      "date": "1939.9.1",
+      "title": {
+        "english": "Central authority and regional commitments",
+        "simp_chinese": "中央授权与地方承诺"
+      },
+      "description": {
+        "english": "The Nationalist leadership is reviewing a proposal for executive responsibility. It may retain a sole party mandate or conclude a new agreement with regional military brokers and chambers of commerce. A caretaker administration is a third proposal, allowing routine government to continue while the terms of political support remain unsettled.",
+        "simp_chinese": "国民党领导层正在审议行政责任安排。中央可以维持党的单独授权，也可与地方军事网络及商会订立新的共同协议。另一项提案是暂设看守行政当局，在政治支持条件尚未确定时维持日常行政。"
+      },
+      "options": [
+        {
+          "id": "independent",
+          "label": {
+            "english": "Retain the Nationalist Party’s sole mandate",
+            "simp_chinese": "由国民党维持单独执政授权"
+          },
+          "ai_chance": 45,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "chi_kmt",
+              "modifier": "independent_executive_mandate"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "chi_kmt",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "chi_regional",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "chi_business",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "chi_kmt",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "chi_regional",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "chi_business",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "activate",
+              "group": "chi_kmt"
+            },
+            {
+              "op": "legalize",
+              "group": "chi_kmt"
+            },
+            {
+              "op": "add_modifier",
+              "group": "chi_kmt",
+              "modifier": "independent_executive_mandate"
+            },
+            {
+              "op": "govern_group",
+              "group": "chi_kmt"
+            }
+          ]
+        },
+        {
+          "id": "agreement",
+          "label": {
+            "english": "Conclude an agreement with regional and commercial representatives",
+            "simp_chinese": "与地方军事代表及商会达成协议"
+          },
+          "ai_chance": 45,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "chi_kmt",
+              "modifier": "independent_executive_mandate"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "chi_kmt",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "chi_regional",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "chi_business",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "chi_kmt",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "chi_regional",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "chi_business",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "activate",
+              "group": "chi_kmt"
+            },
+            {
+              "op": "legalize",
+              "group": "chi_kmt"
+            },
+            {
+              "op": "join",
+              "group": "chi_kmt",
+              "alliance": "chi_executive_agreement"
+            },
+            {
+              "op": "add_modifier",
+              "group": "chi_kmt",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "activate",
+              "group": "chi_regional"
+            },
+            {
+              "op": "legalize",
+              "group": "chi_regional"
+            },
+            {
+              "op": "join",
+              "group": "chi_regional",
+              "alliance": "chi_executive_agreement"
+            },
+            {
+              "op": "add_modifier",
+              "group": "chi_regional",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "activate",
+              "group": "chi_business"
+            },
+            {
+              "op": "legalize",
+              "group": "chi_business"
+            },
+            {
+              "op": "join",
+              "group": "chi_business",
+              "alliance": "chi_executive_agreement"
+            },
+            {
+              "op": "add_modifier",
+              "group": "chi_business",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "govern",
+              "alliance": "chi_executive_agreement"
+            }
+          ]
+        },
+        {
+          "id": "caretaker",
+          "label": {
+            "english": "Place routine administration under a caretaker",
+            "simp_chinese": "由看守行政当局维持日常事务"
+          },
+          "ai_chance": 10,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "chi_kmt",
+              "modifier": "independent_executive_mandate"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "chi_kmt",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "chi_regional",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "chi_business",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "chi_kmt",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "chi_regional",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "chi_business",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "clear_government"
+            },
+            {
+              "op": "add_modifier",
+              "group": "chi_kmt",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "add_modifier",
+              "group": "chi_regional",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "add_modifier",
+              "group": "chi_business",
+              "modifier": "caretaker_assurances"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "spr_government_mandate",
+      "profile": "spr",
+      "date": "1939.9.1",
+      "title": {
+        "english": "Party authority and traditionalist guarantees",
+        "simp_chinese": "政党授权与传统派保障"
+      },
+      "description": {
+        "english": "An alternative executive proposal brings the unified party organization, army officers and Traditionalist representatives to the same table. The party could receive a sole mandate, or the three groups could accept a new governing compact. A caretaker administration would defer the allocation of political responsibility while preserving the separate organizations.",
+        "simp_chinese": "一项替代性的行政提案，把统一政党组织、军官集团与传统派代表带到同一张谈判桌前。政党可以取得单独授权，三个集团也可签订新的共同执政协议。看守行政安排则会暂缓政治责任的分配，保留各组织的独立身份。"
+      },
+      "options": [
+        {
+          "id": "independent",
+          "label": {
+            "english": "Authorize the unified party organization alone",
+            "simp_chinese": "授权统一政党组织单独执政"
+          },
+          "ai_chance": 45,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "spr_unification",
+              "modifier": "independent_executive_mandate"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "spr_unification",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "spr_army",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "spr_carlists",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "spr_unification",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "spr_army",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "spr_carlists",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "activate",
+              "group": "spr_unification"
+            },
+            {
+              "op": "legalize",
+              "group": "spr_unification"
+            },
+            {
+              "op": "add_modifier",
+              "group": "spr_unification",
+              "modifier": "independent_executive_mandate"
+            },
+            {
+              "op": "govern_group",
+              "group": "spr_unification"
+            }
+          ]
+        },
+        {
+          "id": "agreement",
+          "label": {
+            "english": "Conclude a party, officer and Traditionalist compact",
+            "simp_chinese": "签订政党、军官与传统派执政协定"
+          },
+          "ai_chance": 45,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "spr_unification",
+              "modifier": "independent_executive_mandate"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "spr_unification",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "spr_army",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "spr_carlists",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "spr_unification",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "spr_army",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "spr_carlists",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "activate",
+              "group": "spr_unification"
+            },
+            {
+              "op": "legalize",
+              "group": "spr_unification"
+            },
+            {
+              "op": "join",
+              "group": "spr_unification",
+              "alliance": "spr_executive_agreement"
+            },
+            {
+              "op": "add_modifier",
+              "group": "spr_unification",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "activate",
+              "group": "spr_army"
+            },
+            {
+              "op": "legalize",
+              "group": "spr_army"
+            },
+            {
+              "op": "join",
+              "group": "spr_army",
+              "alliance": "spr_executive_agreement"
+            },
+            {
+              "op": "add_modifier",
+              "group": "spr_army",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "activate",
+              "group": "spr_carlists"
+            },
+            {
+              "op": "legalize",
+              "group": "spr_carlists"
+            },
+            {
+              "op": "join",
+              "group": "spr_carlists",
+              "alliance": "spr_executive_agreement"
+            },
+            {
+              "op": "add_modifier",
+              "group": "spr_carlists",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "govern",
+              "alliance": "spr_executive_agreement"
+            }
+          ]
+        },
+        {
+          "id": "caretaker",
+          "label": {
+            "english": "Appoint a caretaker until the terms are settled",
+            "simp_chinese": "待条件确定前任命看守行政当局"
+          },
+          "ai_chance": 10,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "spr_unification",
+              "modifier": "independent_executive_mandate"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "spr_unification",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "spr_army",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "spr_carlists",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "spr_unification",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "spr_army",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "spr_carlists",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "clear_government"
+            },
+            {
+              "op": "add_modifier",
+              "group": "spr_unification",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "add_modifier",
+              "group": "spr_army",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "add_modifier",
+              "group": "spr_carlists",
+              "modifier": "caretaker_assurances"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pol_government_mandate",
+      "profile": "pol",
+      "date": "1939.9.1",
+      "title": {
+        "english": "The presidency and the governing circles",
+        "simp_chinese": "总统与执政集团"
+      },
+      "description": {
+        "english": "The presidential circle is reviewing its relationship with the military circle and the Camp of National Unity. An alternative mandate could place responsibility with the presidential circle alone or bind the three organizations through a new agreement. A caretaker cabinet remains a possible interim arrangement while those commitments are negotiated.",
+        "simp_chinese": "总统派正在重新审视与军方集团及民族团结营的关系。一种替代性授权可以由总统派单独承担责任，也可让三个组织通过新的协议约定各自承诺。谈判期间，各方仍可选择由看守内阁暂时处理行政。"
+      },
+      "options": [
+        {
+          "id": "independent",
+          "label": {
+            "english": "Entrust executive responsibility to the presidential circle",
+            "simp_chinese": "由总统派单独承担行政责任"
+          },
+          "ai_chance": 45,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "pol_castle",
+              "modifier": "independent_executive_mandate"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "pol_castle",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "pol_military",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "pol_ozon",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "pol_castle",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "pol_military",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "pol_ozon",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "activate",
+              "group": "pol_castle"
+            },
+            {
+              "op": "legalize",
+              "group": "pol_castle"
+            },
+            {
+              "op": "add_modifier",
+              "group": "pol_castle",
+              "modifier": "independent_executive_mandate"
+            },
+            {
+              "op": "govern_group",
+              "group": "pol_castle"
+            }
+          ]
+        },
+        {
+          "id": "agreement",
+          "label": {
+            "english": "Agree a presidential, military and Unity Camp compact",
+            "simp_chinese": "达成总统派、军方与民族团结营协定"
+          },
+          "ai_chance": 45,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "pol_castle",
+              "modifier": "independent_executive_mandate"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "pol_castle",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "pol_military",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "pol_ozon",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "pol_castle",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "pol_military",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "pol_ozon",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "activate",
+              "group": "pol_castle"
+            },
+            {
+              "op": "legalize",
+              "group": "pol_castle"
+            },
+            {
+              "op": "join",
+              "group": "pol_castle",
+              "alliance": "pol_executive_agreement"
+            },
+            {
+              "op": "add_modifier",
+              "group": "pol_castle",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "activate",
+              "group": "pol_military"
+            },
+            {
+              "op": "legalize",
+              "group": "pol_military"
+            },
+            {
+              "op": "join",
+              "group": "pol_military",
+              "alliance": "pol_executive_agreement"
+            },
+            {
+              "op": "add_modifier",
+              "group": "pol_military",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "activate",
+              "group": "pol_ozon"
+            },
+            {
+              "op": "legalize",
+              "group": "pol_ozon"
+            },
+            {
+              "op": "join",
+              "group": "pol_ozon",
+              "alliance": "pol_executive_agreement"
+            },
+            {
+              "op": "add_modifier",
+              "group": "pol_ozon",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "govern",
+              "alliance": "pol_executive_agreement"
+            }
+          ]
+        },
+        {
+          "id": "caretaker",
+          "label": {
+            "english": "Appoint a caretaker during the negotiations",
+            "simp_chinese": "谈判期间任命看守内阁"
+          },
+          "ai_chance": 10,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "pol_castle",
+              "modifier": "independent_executive_mandate"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "pol_castle",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "pol_military",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "pol_ozon",
+              "modifier": "negotiated_governing_support"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "pol_castle",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "pol_military",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "pol_ozon",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "clear_government"
+            },
+            {
+              "op": "add_modifier",
+              "group": "pol_castle",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "add_modifier",
+              "group": "pol_military",
+              "modifier": "caretaker_assurances"
+            },
+            {
+              "op": "add_modifier",
+              "group": "pol_ozon",
+              "modifier": "caretaker_assurances"
+            }
+          ]
+        }
+      ]
     }
   ],
   "modifiers": [
@@ -10348,6 +12928,158 @@
         "satisfaction": {
           "add": -8,
           "daily": -0.02
+        }
+      }
+    },
+    {
+      "id": "independent_executive_mandate",
+      "name": {
+        "english": "Independent executive mandate",
+        "simp_chinese": "单独行政授权"
+      },
+      "description": {
+        "english": "A ninety-day mandate strengthens one organization’s executive influence without requiring an alliance.",
+        "simp_chinese": "为期90天的单独授权提高该组织的行政影响力，不要求成立执政联盟。"
+      },
+      "duration_days": 90,
+      "groups": [
+        "ger_nsdap",
+        "eng_conservative",
+        "fra_radical",
+        "usa_democratic",
+        "sov_party",
+        "ita_pnf",
+        "jap_minseito",
+        "chi_kmt",
+        "spr_unification",
+        "pol_castle"
+      ],
+      "attributes": {
+        "influence": {
+          "add": 8,
+          "factor": 0.05
+        },
+        "satisfaction": {
+          "add": 6
+        }
+      },
+      "positions": {
+        "authority": {
+          "add": 8
+        }
+      }
+    },
+    {
+      "id": "negotiated_governing_support",
+      "name": {
+        "english": "Negotiated governing support",
+        "simp_chinese": "协商执政支持"
+      },
+      "description": {
+        "english": "A 120-day agreement grants its signatories additional influence and confidence while distributing authority.",
+        "simp_chinese": "为期120天的协议提高签署组织的影响力与满意度，使其当前权力主张偏向共同承担责任。"
+      },
+      "duration_days": 120,
+      "groups": [
+        "chi_business",
+        "chi_kmt",
+        "chi_regional",
+        "eng_conservative",
+        "eng_labour",
+        "eng_liberal",
+        "fra_ad",
+        "fra_radical",
+        "fra_sfio",
+        "ger_industry",
+        "ger_nsdap",
+        "ger_officers",
+        "ita_crown",
+        "ita_industry",
+        "ita_pnf",
+        "jap_court",
+        "jap_minseito",
+        "jap_seiyukai",
+        "pol_castle",
+        "pol_military",
+        "pol_ozon",
+        "sov_managers",
+        "sov_party",
+        "sov_unions",
+        "spr_army",
+        "spr_carlists",
+        "spr_unification",
+        "usa_democratic",
+        "usa_progressives",
+        "usa_republican"
+      ],
+      "attributes": {
+        "influence": {
+          "add": 5
+        },
+        "satisfaction": {
+          "add": 10
+        }
+      },
+      "positions": {
+        "authority": {
+          "add": -6
+        }
+      }
+    },
+    {
+      "id": "caretaker_assurances",
+      "name": {
+        "english": "Caretaker assurances",
+        "simp_chinese": "过渡行政保障"
+      },
+      "description": {
+        "english": "Sixty days of transitional assurances improve confidence and limit discretionary authority without granting a governing mandate.",
+        "simp_chinese": "为期60天的过渡保障提高满意度并限制自由裁量权，但不授予任何组织执政资格。"
+      },
+      "duration_days": 60,
+      "groups": [
+        "chi_business",
+        "chi_kmt",
+        "chi_regional",
+        "eng_conservative",
+        "eng_labour",
+        "eng_liberal",
+        "fra_ad",
+        "fra_radical",
+        "fra_sfio",
+        "ger_industry",
+        "ger_nsdap",
+        "ger_officers",
+        "ita_crown",
+        "ita_industry",
+        "ita_pnf",
+        "jap_court",
+        "jap_minseito",
+        "jap_seiyukai",
+        "pol_castle",
+        "pol_military",
+        "pol_ozon",
+        "sov_managers",
+        "sov_party",
+        "sov_unions",
+        "spr_army",
+        "spr_carlists",
+        "spr_unification",
+        "usa_democratic",
+        "usa_progressives",
+        "usa_republican"
+      ],
+      "attributes": {
+        "influence": {
+          "add": -3
+        },
+        "satisfaction": {
+          "add": 8
+        }
+      },
+      "positions": {
+        "liberties": {
+          "add": -6
         }
       }
     }

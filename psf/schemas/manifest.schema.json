@@ -243,6 +243,9 @@
         },
         "elections": {
           "type": "boolean"
+        },
+        "native_policy": {
+          "$ref": "#/$defs/native_policy"
         }
       },
       "required": [
@@ -964,6 +967,9 @@
             },
             "ideology": {
               "$ref": "#/$defs/id"
+            },
+            "leader": {
+              "$ref": "#/$defs/id"
             }
           },
           "additionalProperties": false
@@ -1004,6 +1010,46 @@
         "name"
       ],
       "additionalProperties": false
+    },
+    "native_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "generate_wargoal_tension": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "join_faction_tension": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "lend_lease_tension": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "send_volunteers_tension": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "guarantee_tension": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "can_only_justify_war_on_threat_country": {
+          "type": "boolean"
+        },
+        "can_lower_tension": {
+          "type": "boolean"
+        },
+        "can_create_collaboration_government": {
+          "type": "boolean"
+        }
+      }
     }
   }
 }

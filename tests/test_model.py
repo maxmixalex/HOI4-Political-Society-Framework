@@ -158,6 +158,16 @@ class ManifestTests(unittest.TestCase):
         with self.assertRaisesRegex(ManifestError, "government group must be legal"):
             validate(self.data)
 
+    def test_identity_leader_condition_rejects_foreign_organizations(self):
+        profile = next(p for p in self.data["profiles"] if p.get("identities"))
+        identity = profile["identities"][0]
+        identity["when"] = {"leader": profile["groups"][0]["id"]}
+        validate(self.data)
+        foreign = next(p for p in self.data["profiles"] if p["id"] != profile["id"])
+        identity["when"]["leader"] = foreign["groups"][0]["id"]
+        with self.assertRaisesRegex(ManifestError, "unknown or cross-country leader"):
+            validate(self.data)
+
     def test_scenario_numeric_collisions_rejected(self):
         original = stable_id
         scenario_ids = {s["id"] for s in self.data["scenarios"]}

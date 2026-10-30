@@ -1,5 +1,50 @@
 # Release notes
 
+## 0.4.1 — immediate foreign refresh, government transitions and deeper native isolation
+
+Foreign summaries no longer use a data-only dirty value: switching between two
+countries with equal revisions must refresh their pictures, labels and chart
+frames immediately. Both country-selection routes now include independent large
+party and ideology icons, with a wider important-country political column and
+native portrait/title positions adjusted to fit. Historical text stays separate.
+Party and regime labels retain the native presentation, with colored values.
+
+The sidebar adds colored governing roles and every current alliance membership.
+Spectrum pages compare organizations with actual institutions and the governing
+program; undefined constitutional axes and caretaker programs do not display
+invented midpoint positions. Existing native title/frame/scrollbar artwork and
+the inset 63-pixel pie overlay are retained, with explicit gutter and geometry
+checks. Closing uses the native close-button sound.
+
+Transaction permissions now read current government membership. Leaving office
+then banning/deactivating an organization works within one event; a member that
+just joined the government is immediately protected. A zero-influence caretaker
+government clears stale support/member summaries. Equal election results use
+stable numeric IDs rather than declaration order.
+
+Strict mode now neutralizes 61 original political defines, all three generic
+party-opinion differences and thirteen generic ideological peace-price entries.
+Regimes can override five diplomatic tension thresholds and three constitutional
+rules through `native_policy`, with full reset when institutions change.
+Original story conditions, country-specific peace logic and unexposed engine
+branches still read the compatibility projection; complete eradication is not
+claimed. New exact-source reconstruction and real positive/negative controls
+keep inherited original-source diagnostics separate from PSF defects.
+
+Country identities can follow the leading party inside an alliance through
+`when.leader`. External cosmetic selections are protected even when they select
+another PSF-authored tag; releasing ownership only removes the recorded tag.
+
+Ten additional fictional political settlements offer thirty executable choices:
+independent government, an explicitly negotiated multi-organization agreement,
+or a caretaker. Ten optional agreements and three timed modifier sources bring
+the example to 27 alliances, 50 scenarios, 120 choices and 23 named sources.
+The existing 125 organization baselines and initial governments are preserved.
+
+The release is validated by generated-script execution, native layout checks,
+the pinned Rust CWTools and deterministic packaging. No HOI4 engine launch is
+claimed; current evidence and source-diagnostic accounting are in VALIDATION.md.
+
 ## 0.4.0 — immediate country data, native presentation and independent government
 
 Repairs the second set of in-game screenshots: domestic localized values and

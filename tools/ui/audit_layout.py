@@ -110,6 +110,16 @@ def audit(mod: Path) -> dict:
             checks[name + "_explicit_parent"] = binding.properties.get("parent_scripted_gui", (0, 0, ""))[2] == f"psf_{mode}_society_side_gui"
             checks[name + "_own_visibility"] = any(n.kind == "visible" for n in binding.children)
             checks[name + "_reacts_to_ui_state"] = "dirty" not in binding.properties
+            content_width = w - int(margin.get("right", "0"))
+            for child in node.children:
+                if child.kind.lower() == "instanttextboxtype":
+                    child_width = int(child.properties["maxwidth"][2])
+                elif child.name and any(n.kind.lower() == "size" for n in child.children):
+                    child_width = size(child)[0]
+                else:
+                    continue
+                checks[f"{name}/{child.name}_leaves_scrollbar_gutter"] = (
+                    point(child)[0] >= 0 and point(child)[0] + child_width <= content_width)
         if mode == "diplomatic":
             party_window = windows["psf_diplomatic_government_party"]
             native_icon = named(diplomacy, "ideology_icon", "country_info")
@@ -123,6 +133,8 @@ def audit(mod: Path) -> dict:
         for name, binding in bindings.items():
             if not name.startswith(f"psf_{mode}_"):
                 continue
+            if mode == "diplomatic":
+                checks[name + "_refreshes_on_equal_revision_country_switch"] = "dirty" not in binding.properties
             window = windows[name]
             direct_names = {n.name for n in window.children if n.name}
             for section in binding.children:

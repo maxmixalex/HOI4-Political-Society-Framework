@@ -1,194 +1,147 @@
-# PSF 0.4.0 validation
+# PSF 0.4.1 validation
 
-Validated on 2026-10-30 with the pinned Rust CWTools 2.3.0, the supplied HOI4
-rules, native script snapshots and vanilla symbol cache. User-provided game
-screenshots and logs informed the repairs. The supplied vanilla, Kaiserreich,
-The New Order and Pax Britannica scripts provided the native widget, scope,
-asset and initialization references.
+The release was checked against the user-supplied original-game, Kaiserreich,
+The New Order and Pax Britannica scripts and the pinned Rust CWTools 2.3.0.
+Original user screenshots informed the overlap and attachment repairs. Current
+geometry was rendered for internal inspection; it is not an HOI4 screenshot.
 
-**The final static gate reports zero new errors and zero new warnings.** The
-unmodified CWTools report still contains **366 errors and 117 warnings**, with
-engine exit code 1. Those raw diagnostics are retained and accounted for below;
-this release does not claim that the binary itself returned a clean report.
-There was no available HOI4 process, so no new engine launch or successful game
-render is claimed.
+**The final gate has zero new errors and zero new warnings.** Raw CWTools still
+exits 1 with **367 errors and 117 warnings**. Exact original-source comparisons
+and declared original-texture dependencies account for these diagnostics below.
+The raw reports and severity levels have not been changed to claim a clean run.
 
-## Final release gates
+**HOI4 itself was not available for a launch or rendering test.** Actual native
+attachment origins, DDS pixels, font/texticon baselines, first-frame ordering and
+scrollbar mouse input remain outside these checks.
 
-| Gate | Result |
+## Completed release gates
+
+| Gate | Observed result |
 | --- | --- |
-| Full Python regression suite | 213 tests passed in 218.806 seconds; exit 0 |
-| Raw Rust CWTools result | 366 errors, 117 warnings; engine exit 1 |
-| Declared external stock textures | 272 missing-texture occurrences across 14 exact paths |
-| Matched original country-history diagnostics | 94 errors, 117 warnings, 83 informational diagnostics |
-| New diagnostics after the verified classifications | 0 errors, 0 warnings; wrapper exit 0 |
-| Exact country-history reconstruction | All 364 generated native histories verified |
-| Engine-loader preflight | 449 text files, including 3 native GUI files; 0 errors |
-| Generated script discovery | 446 staged files; 252 declared stock-localisation imports |
-| Positive and negative validation controls | All 16 passed against the real binary and reconstruction gate |
-| Emitted GUI geometry and binding audit | 19,729 checks; 339 independently owned windows; 0 failures |
-| Installer integrity | Archive CRC check passed |
-| Independent rebuild | Isolated installed-wheel build matched all 788 output files: 0 missing, 0 extra, 0 changed |
-| Independent installer reproducibility | Isolated-wheel packing produced a byte-identical ZIP: 3,173,703 bytes and the same SHA-256 |
-| Actual HOI4 rendering and startup | Not performed in this environment |
+| Complete Python suite | 244 tests passed, 150.087 seconds, exit 0 |
+| Real CWTools positive and negative controls | 20 passed |
+| Generated-script validation | 0 new errors, 0 new warnings, gate exit 0 |
+| Raw CWTools result | 367 errors, 117 warnings, engine exit 1 |
+| Loader preflight | 456 text files, 3 native GUI roots, 0 errors |
+| Generated script discovery | 453 staged files, 252 stock-localisation imports |
+| History reconstruction | All 364 country histories matched their source transform |
+| Generic political reconstruction | Both originals matched; 3 opinion and 13 peace definitions changed |
+| GUI geometry and bindings | 32,461 checks, 339 windows, 0 failures |
+| Installer CRC | All 795 entries passed |
+| Isolated installed-wheel rebuild | 795 files matched; 0 missing, extra or changed |
+| Isolated installer reproduction | Byte-identical to the distributed installer |
+| HOI4 launch and in-game interaction | Not performed |
 
-The final validation reports are in `build/validation-0.4.0/`. The layout audit
-is `build/layout-0.4.0.json`. Reports preserve the distinction between the
-binary's raw exit and the wrapper's result after explicit dependency and
-original-source matching.
+The suite includes all thirty new choices, each also repeated to check source
+idempotence. An independent review verified all 61 define names and namespaces
+against the supplied `00_defines.lua` and exercised repeated policy transitions.
 
-The independently installed wheel is 673,474 bytes and includes all 364 native
-country histories, the native ideology source, three GUI sources and two
-bookmark sources. Its actual vanilla and identity-example compilations ran
-under Python `-I`; the imported `psf.*` modules came from the isolated
-installation. This checks packaged resources and import provenance as well as
-the byte-for-byte output comparison against the release build. Packing the
-independently generated vanilla output through that isolated installation also
-reproduced the official installer byte for byte.
+Reports are in `build/validation-0.4.1/`, `build/validation-041-controls/`,
+`build/layout-0.4.1.json` and `build/wheel-verification-0.4.1.json`.
+The previous release has a separate [0.4.0 record](history/VALIDATION_0.4.0.md).
 
-## How the raw CWTools diagnostics are accounted for
+## Raw diagnostic accounting
 
-### 272 occurrences are declared original-game texture dependencies
+### Original texture payloads: 272 errors
 
-The supplied script archive includes native GFX declarations but omits the DDS
-payloads. The current default icon aliases refer to 14 distinct paths already
-declared in those original files. Their 272 CW113 occurrences are recorded in
-`stock-texture-dependencies.json`, with exact source paths and declaration
-provenance. The dependency manifest also declares the native unknown and
-anarchism fallback paths; those are not additional used-path occurrences in
-this build.
+The script archive declares original sprites but omits their DDS payloads.
+These CW113 occurrences reference 14 exact original texture paths. Only an
+exact declared missing-texture message/path from a GFX declaration qualifies;
+unknown paths and spelling mistakes fail. Declaration provenance is retained
+in `stock-texture-dependencies.json`. No placeholder DDS or forged cache is used.
+A full `--vanilla` run does not apply this script-only dependency classification.
+This does not prove rendering in an arbitrary installation.
 
-This classification accepts only the exact declared missing-file message,
-path and GFX source. A typo or a new missing PSF texture remains an error. No
-placeholder DDS, forged binary cache, relaxed filepath rule or changed severity
-is used. `stock_texture_payloads_bundled` is false. The record establishes a
-dependency on the installed game; it does not establish that the texture exists
-or renders correctly in a particular user's installation.
+### Original country history: 94 errors and 117 warnings
 
-### 294 diagnostics are reproduced on original country histories
+The same complete staged environment runs once with emitted histories and once
+with independently verified originals. File inventory, pinned source hashes,
+complete output reconstruction, source-line mapping, diagnostic identity and
+surrounding original text must match. Each baseline occurrence can justify only
+one inherited diagnostic. The originals contribute **94 errors, 117 warnings
+and 83 informational diagnostics**. Missing references and rule/snapshot
+differences are not collectively described as harmless or false positives.
 
-Strict mode preserves 364 complete native country-history files and adds PSF
-initialization calls. Validating those files exposes diagnostics already
-present in the supplied original scripts and validation environment. Their
-matched totals are **94 errors + 117 warnings + 83 informational diagnostics**.
-Some concern missing original-game references in the available archive/cache;
-others concern the validator's interpretation of original script. They must
-not collectively be called false positives or dismissed as harmless.
+`cwtools.json`, `native-history-baseline.json` and
+`inherited-native-history-diagnostics.json` retain the raw results and proof.
+New bootstrap statements and changed original statements cannot inherit an
+error merely by occurring in the same file. The explicit Norway source repair
+remains separately recorded and tested.
 
-Before comparing diagnostics, the gate verifies the complete filename
-inventory, pinned original hashes, combined source hash and exact generated
-bytes against `bootstrap.patch_history(original)`. It also accounts explicitly
-for BOM normalization and the exact-hash Norway repairs: a missing final brace
-and preservation of an empty pre-MtG branch as comments. An additional change
-to an original statement or a bootstrap call fails reconstruction.
+### Original generic peace source: one error
 
-The same real CWTools binary then runs twice in the same complete staged PSF
-environment. The baseline run substitutes the verified originals without PSF
-bootstrap insertions; all other effects, variables, GUI, localisation, rules
-and lookup data stay the same. A diagnostic is inherited only if its relative
-filename, code, severity, complete message, mapped source line and original
-surrounding-line hash match one for one. Insertion lines have no source mapping.
-Repeated messages elsewhere do not qualify merely because they look similar.
+The supplied `defensive_war_take_state` definition contains
+`peace_action_type = take_state`; the pinned rules diagnose this original enum.
+The adapter leaves the original statement intact. Both new political snapshots
+are independently pinned, and their complete generated transformations and
+changed-definition inventories are verified before a baseline is permitted.
 
-`cwtools.json` retains the full generated-file report;
-`native-history-baseline.json` retains the full baseline report;
-`inherited-native-history-diagnostics.json` records each matched diagnostic and
-its source proof. Generated histories are restored after the baseline run.
-The baseline itself also exits 1; its errors have not been relabeled as a clean
-engine run.
+The original source reproduces the same error in the same staged environment.
+Matching includes original line, surrounding text, code, severity, full message
+and multiplicity. Every line inside a PSF-rewritten definition is excluded,
+even if its text happens to be unchanged or repeated elsewhere.
+`inherited-native-politics-diagnostics.json` records this separate proof.
+The diagnostic is not called harmless, a validator false positive, or a clean
+engine result. A new invalid PSF peace trigger fails the real negative control.
 
-After these two documented classifications, this build has **0 new errors and
-0 new warnings**. New unresolved PSF diagnostics still fail the gate, including
-new warnings. See [the CI documentation](../tools/ci/README.md) for the exact
-classification contract and the complete-installation validation path.
+## Behavior and layout coverage
 
-## What the regression and control suites exercise
+The strict interpreter executes emitted Clausewitz effects and rejects commands
+outside its supported subset. It does not emulate the whole engine or renderer.
 
-The generated-script interpreter executes emitted Clausewitz effects. It is a
-strict test harness for the supported subset, not an emulator for HOI4's
-renderer or complete engine.
+- Government checks cover independent organizations, concurrent alliances,
+  caretakers, live membership within transactions, zero-influence cleanup,
+  stable election ties, legitimacy and immediate derived-value refresh.
+- Initialization covers original histories, 1939 overrides, fallback countries
+  and idempotent bootstrap without advancing modifier timers.
+- Policy checks execute partial overrides and repeated institution transitions,
+  including resetting old thresholds and Boolean rules.
+- Identity checks cover coalition leaders, manual/resume/release APIs, exact
+  cosmetic-slot ownership, all native-name variants and three authored flag sizes.
+- UI checks cover domestic/foreign scopes, equal-revision country switching,
+  exclusive pages, all current alliance memberships, institution/program markers,
+  scroll bounds, direct callbacks, independent icons and bilingual localization.
+- Content checks execute all new choices, early activation where needed,
+  membership preservation, nonstacking sources, expiry, late-bookmark retention
+  and the actual weekly scheduling hook.
+- Source controls reject changed pins, forged metadata, modified PSF overrides,
+  unrelated original edits and new errors in rewritten definitions.
 
-- Runtime coverage includes immediate history/bootstrap initialization,
-  elections, transactions, source expiry, modifiers, native-mechanic
-  cancellation, direct organization governments, alliances and caretakers.
-- Identity coverage includes actual cosmetic-tag effects, regime selection,
-  three flag sizes and all native ideology variants, external-tag ownership,
-  missing assets and deterministic output.
-- UI coverage executes visibility through navigation, closing, selection and
-  country changes; checks direct callback ownership; enforces domestic `ROOT`
-  versus foreign `THIS` data scope; and prevents foreign political mutations.
-- Color and image coverage inspects exact generated TGA pixels, all pie sectors
-  and frames, the four-pixel inset, independent RGB keys and native icon aliases.
-  Hex and RGB-array colors produce the same artwork.
-- Frontend coverage executes temporary party-name preparation and restoration
-  for both name forms, multiple countries and 1936/1939. It checks direct and
-  alliance government data, large ideology and small party artwork, independent
-  dual pies and completely unchanged history descriptions. Compat mode retains
-  the complete native frontend when no history binding is installed.
-- Content and localisation coverage checks scenario choices, dates, modifier
-  settlement/expiry and starting-bookmark overrides; static aliases resolve at
-  compile time while live country expressions remain live.
+Domestic summary bottom is Y=382, before the original management area at Y=383.
+Foreign summary bottom is native-window Y=246, before the focus area at Y=248.
+Pie fill remains inset within the 63-pixel overlay. The important-country
+political column is 305 pixels wide; original portrait/title positions make
+room while history anchors remain. These are coordinate/script facts, not
+measured game pixels.
 
-The 16 validation controls cover four script/value/syntax cases; six
-sprite/localisation/trigger/equipment cases; two stock-texture cases; and four
-native-history baseline/tamper cases. They include a real original PRC history
-with exact PSF insertions, a new unknown effect on an insertion line, a changed
-bootstrap value, and a changed original state assignment. The latter changes
-must not disappear into the inherited-diagnostic classification. The valid
-texture control retains its raw missing-file error as a declared dependency;
-the misspelled texture control remains a failing unresolved error.
-
-Separate engine-loader checks reject BOM-contaminated GUI/GFX roots, unsupported
-launcher version syntax, absent native windows and incorrectly named generated
-GFX roots. These checks exist because the script validator is more tolerant
-than the engine loader in some of these cases.
-
-## Package
+## Distributed artifact and independent rebuild
 
 | Field | Value |
 | --- | --- |
-| File | `distributions/psf-0.4.0.zip` |
-| Compressed size | 3,173,703 bytes |
-| Archive entries | 788 |
-| Uncompressed size | 60,258,671 bytes |
-| SHA-256 | `3ca5180dc2aebda4a943f1d6a5b92a9929e2340817dfd05ccfa9542c9b32a8ae` |
+| Installer | `distributions/psf-0.4.1.zip` |
+| Archive size | 3,405,066 bytes |
+| Entries | 795 |
+| Uncompressed size | 64,873,707 bytes |
+| SHA-256 | `f36806a02a8bb0af7e047cbb2265d805de36e82e96def5a7c1f16512961d6523` |
+| Compiler wheel | `hoi4_psf-0.4.1-py3-none-any.whl`, 684,006 bytes |
 
-The installer contains the framework and vanilla-example mod folders, two
-launcher descriptors, bilingual installation instructions, notices, generated
-scripts/assets and the author API registry. The build contains **125 groups,
-17 declared alliances, 40 scenarios, 20 named modifier sources and 20 country
-identities**. It generates **4,500 organization modifier keys, 9,009 scripted
-effects and 2,943 scripted triggers**. There are no compiler-invented transition
-cabinets.
+The wheel was installed into an isolated target. Compilation ran under Python
+`-I` outside the repository, with assertions that loaded PSF modules came from
+that installation. This exercises packaged GUI, history, ideology and generic
+political snapshots. All 795 file hashes matched the repository build; packing
+the isolated output produced the same archive bytes and SHA-256.
 
-## Reproduction and in-game boundary
+To reproduce the source gates:
 
 ```sh
-python -m unittest discover -s tests -q
+python -m unittest discover -s tests -v
 python -m psf compile examples/vanilla/manifest.json --output dist
-python tools/ci/validate.py --root dist --self-test
-python tools/ui/audit_layout.py dist/psf_vanilla_example
-python -m psf pack --root dist --output distributions/psf-0.4.0.zip
+python tools/ci/validate.py --root dist --reports build/validation-0.4.1 --self-test
+python tools/ui/audit_layout.py dist/psf_vanilla_example --report build/layout-0.4.1.json
+python -m psf pack --root dist --output build/psf-0.4.1.zip
+cmp distributions/psf-0.4.1.zip build/psf-0.4.1.zip
 ```
 
-With a complete licensed game installation, pass `--vanilla` to the validator
-as described in the CI documentation. That replaces the script-only lookup
-cache and disables missing-stock-texture classification; a missing DDS in that
-installation is a normal unresolved error. Original-history matching still
-requires independently supplied originals with the compilation hashes.
-
-`docs/assets/ui-layout.svg` projects emitted GUI coordinates; it is not a game
-screenshot. The final audit places the domestic summary's lower edge at y=382,
-before the preserved native row at y=383, and the diplomatic summary's lower
-edge at y=246, before the native focus area at y=248. The native panel and
-sidebar require at least 966×668 logical pixels; GUI scaling affects the area
-available. Static geometry cannot establish font baselines, texture rendering,
-mouse scrolling, animation behavior or the engine's first-frame startup order.
-Those remain part of the in-game smoke test, including the frontend's temporary
-party-name restoration and the exact installed game snapshot.
-
-For upgrades, move both previous PSF mod directories aside before copying the
-current directories and descriptors. Do not overlay a new build onto stale
-generated GUI chunks. Enable both mods in the same playset and start a new
-campaign; this package does not claim a tested migration of older content
-registries or saves.
+Remaining original story conditions, country-specific peace logic and hardcoded
+branches are documented in [NATIVE_MECHANICS.md](NATIVE_MECHANICS.md).
+No percentage of complete game replacement or successful game launch is inferred.

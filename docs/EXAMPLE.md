@@ -6,24 +6,24 @@ The vanilla example is a complete declarative content pack for PSF. Its source i
 
 ## Content coverage
 
-| Profile | Organizations | Initial alliances | Institutional regime | Main demonstration |
+| Profile | Organizations | Declared alliances | Institutional regime | Main demonstration |
 | --- | ---: | ---: | --- | --- |
-| Germany / 德国 | 10 | 1 | One-party republic / 一党共和国 | Prohibited and underground opposition; dissolved parties can resume activity; industry and officers have influence beyond public support |
-| Britain / 英国 | 9 | 2 | Constitutional monarchy / 君主立宪制 | Three-party governing agreement; Labour and Liberals coexist; unions retain a separate organization |
-| France / 法国 | 10 | 2 | Parliamentary republic / 议会共和国 | An electoral alliance and a government are distinct; one party can join both; a movement can create a successor party |
-| United States / 美国 | 10 | 2 | Presidential republic / 总统共和国 | Democrats and Republicans are separate parties within overlapping ideology space; progressive caucus, unions and manufacturers bargain independently |
-| Soviet Union / 苏联 | 8 | 1 | Soviet party-state / 苏维埃党国体制 | Non-electoral factions, security institutions, military leadership, managers and unions have distinct interests |
-| Italy / 意大利 | 9 | 1 | Corporatist monarchy / 法团君主制 | A ruling party coexists with crown, officers, employers and official syndicates; institutional preference differs from the actual constitution |
-| Japan / 日本 | 9 | 2 | Imperial constitutional order / 帝国宪制 | Two parliamentary parties coexist with court, navy and rival army factions |
-| China / 中国 | 10 | 1 | Authoritarian republic / 威权共和国 | A state party, internal factions, regional military networks and civic organizations remain separate actors |
-| Spain / 西班牙 | 12 | 3 | Parliamentary republic / 议会共和国 | Electoral cooperation, worker organizations outside party politics, monarchists and a distinct 1939 starting arrangement |
-| Poland / 波兰 | 10 | 2 | Authoritarian republic / 威权共和国 | Civilian and military governing circles; democratic opposition; an initially inactive organization begins activity |
-| Generic democratic | 7 | 1 | Parliamentary republic | Abstract governing and opposition parties, organized labor, business, military and an inactive civic association |
-| Generic fascist | 7 | 1 | One-party republic | The same organizational model with different initial legal access and governing preferences |
-| Generic communist | 7 | 1 | Soviet party-state | Overlapping public support and party-state institutions |
-| Generic non-aligned | 7 | 1 | Authoritarian republic | Institutional bargaining outside competitive party government |
+| Germany / 德国 | 10 | 2 | One-party republic / 一党共和国 | Prohibited and underground opposition; dissolved parties can resume activity; industry and officers have influence beyond public support |
+| Britain / 英国 | 9 | 3 | Constitutional monarchy / 君主立宪制 | Three-party governing agreement; Labour and Liberals coexist; unions retain a separate organization |
+| France / 法国 | 10 | 3 | Parliamentary republic / 议会共和国 | An electoral alliance and a government are distinct; one party can join both; a movement can create a successor party |
+| United States / 美国 | 10 | 3 | Presidential republic / 总统共和国 | Democrats and Republicans are separate parties within overlapping ideology space; progressive caucus, unions and manufacturers bargain independently |
+| Soviet Union / 苏联 | 8 | 2 | Soviet party-state / 苏维埃党国体制 | Non-electoral factions, security institutions, military leadership, managers and unions have distinct interests |
+| Italy / 意大利 | 9 | 2 | Corporatist monarchy / 法团君主制 | A ruling party coexists with crown, officers, employers and official syndicates; institutional preference differs from the actual constitution |
+| Japan / 日本 | 9 | 3 | Imperial constitutional order / 帝国宪制 | Two parliamentary parties coexist with court, navy and rival army factions |
+| China / 中国 | 10 | 2 | Authoritarian republic / 威权共和国 | A state party, internal factions, regional military networks and civic organizations remain separate actors |
+| Spain / 西班牙 | 12 | 4 | Parliamentary republic / 议会共和国 | Electoral cooperation, worker organizations outside party politics, monarchists and a distinct 1939 starting arrangement |
+| Poland / 波兰 | 10 | 3 | Authoritarian republic / 威权共和国 | Civilian and military governing circles; democratic opposition; an initially inactive organization begins activity |
+| Generic democratic | 7 | 0 | Parliamentary republic | A single governing organization, distinct opposition parties, organized labor, business, military and an inactive civic association |
+| Generic fascist | 7 | 0 | One-party republic | A single governing organization with different initial legal access and governing preferences |
+| Generic communist | 7 | 0 | Soviet party-state | A single governing organization; overlapping public support and party-state institutions |
+| Generic non-aligned | 7 | 0 | Authoritarian republic | A single governing organization; institutional bargaining outside competitive party government |
 
-There are **125 declared organizations, 21 declared alliances, nine axes, 11 ideology prototypes, nine regime definitions, and 40 dated scenarios with 90 choices**. The pack also declares **20 named modifier sources** and generates **4,500 native group/attribute modifier keys**. Compiler-generated working cabinets and framework actions are additional to these content counts.
+There are **125 declared organizations, 27 declared alliances, nine axes, 11 ideology prototypes, nine regime definitions, and 50 dated scenarios with 120 choices**. The pack also declares **23 named modifier sources** and generates **4,500 native group/attribute modifier keys**. Seventeen existing alliances retain their original membership and ten proposed agreements start empty. The compiler creates no additional working-cabinet alliances; the four generic profiles govern through a single organization and require no alliance.
 
 Every country outside the ten authored profiles receives an abstract fallback selected from its initial native ideological compatibility state. The four generic profiles are reusable templates, not four extra countries. They provide playable political organizations for minor countries, releasable nations and new countries initialized by the framework. They do not claim to identify every minor country's historical parties or exact constitutional structure.
 
@@ -61,6 +61,20 @@ The `workers_monarchy` regime is explicitly fictional. It is supplied as a usabl
 
 `workers_monarchy` 是明确标注的架空制度，用于展示世袭元首与劳动者政治代表制度可以同时存在，不是任何国家的真实 1936 年初始国体。
 
+This fictional regime also demonstrates an explicit `native_policy` rather
+than inheriting diplomatic permissions from an ideology slot. Its authored
+tension thresholds are 75% for war justification, 60% for joining a faction,
+and 25% for lend-lease, volunteers and guarantees. War justification is limited
+to countries that generated tension; lowering tension is permitted;
+collaboration governments are disabled. These are chosen game rules, not
+historical or constitutional findings about any real monarchy. Other regimes
+continue to use their existing policy defaults.
+
+该架空制度还展示了独立的 `native_policy`：制造战争借口、加入阵营、租借法案、
+志愿军与独立保障的紧张度门槛分别为 75%、60%、25%、25%、25%；战争借口仅针对
+制造紧张度的国家，允许降低紧张度，禁止建立合作政府。这些都是作者指定的玩法规则，
+不从“君主制”名称推导现实政治结论，也不修改其他政体的默认规则。
+
 ## Parties, factions and associations
 
 Seven organization kinds appear in the example:
@@ -89,7 +103,7 @@ The initial January snapshots are compact political models, rather than a day-by
 
 ## Dated scenarios and alternatives
 
-Each authored profile contains four one-time scenarios, including a new post-bookmark negotiation in October 1939. Their dates provide the earliest eligibility for a 1936 campaign; delivery occurs on the first weekly framework pulse after that date. Some coincide with a historical electoral or organizational milestone; others are explicitly authored opportunities for bargaining. Their choices are not scripts claiming that every offered action historically occurred.
+Each authored profile contains five one-time scenarios, including government-mandate negotiations in September 1939 and coordination settlements in October 1939. Their dates provide the earliest eligibility for a 1936 campaign; delivery occurs on the first weekly framework pulse after that date. Some coincide with a historical electoral or organizational milestone; others are explicitly authored opportunities for bargaining. Their choices are not scripts claiming that every offered action historically occurred.
 
 | Country | Date | Scenario | Mechanics exercised |
 | --- | --- | --- | --- |
@@ -154,6 +168,58 @@ Historical examples can be disabled through the framework's example-events game 
 各国参与者使用已有的稳定团体 ID：德国的工商组织、军官团与独立工会；英国的工商联合会、保守党与 TUC；法国的工商联合会、民主联盟与 CGT；美国的制造商协会、民主党与 CIO；苏联的工业管理者、安全机构与合作社；意大利的工商组织、军队与天主教社团；日本的工商界、统制派与社会大众党；中国的工商网络、中央军官与乡村社团；西班牙的卡洛斯派、军队与 UGT；波兰的工商组织、军方集团与工会。
 
 These ten fictional negotiations extend play beyond the later opening bookmark. Their three choices implement shared consultation, concentrated authority, or independent representation through real timed/permanent sources, daily changes, legality changes and legitimacy trade-offs. They preserve organization identities and coalition memberships. Political participation does not imply cabinet membership.
+
+## 政府授权：独立执政、政治协议与看守政府（0.4.1）
+
+新增的十场政府授权情景统一以 **1939-09-01** 为日期门槛，由之后的首个每周更新派发。
+1939-08-14 开局不会将它们标记为已经发生。每场均提供三种实际改变政治状态的选择：
+授权一个现有组织独立执政、明确邀请三个现有组织达成新协议并执政，或清空政治授权、
+进入看守状态。组织并不需要先加入联盟才能单独取得执政权。
+
+这十场情景、十项拟议协议与所有授权结果均为**架空玩法**，不是对 1939 年真实事件的
+复述，也不假定特定战争、领土变化或宪法程序已经发生。总统制国家使用行政与国会
+支持的叙事，党国体制使用机构职责分配，君主制国家使用宫廷与内阁授权；没有把每个
+国家都套入议会组阁模板。政治支持协议仍不等于部长名单。
+
+| 国家 | 单独授权的组织 | 新协议的另两方 |
+| --- | --- | --- |
+| 德国 | 纳粹党 | 工业集团、军官团 |
+| 英国 | 保守党 | 工党、自由党 |
+| 法国 | 激进党 | 工人国际法国支部、民主联盟 |
+| 美国 | 民主党 | 国会进步派、共和党 |
+| 苏联 | 联共（布） | 国有企业管理者、工会中央理事会 |
+| 意大利 | 国家法西斯党 | 王室、工业联合会 |
+| 日本 | 民政党 | 政友会、宫廷与重臣 |
+| 中国 | 国民党 | 地方军事网络、商会 |
+| 西班牙 | 统一传统主义长枪党组织 | 军官集团、传统主义共融 |
+| 波兰 | 总统派 | 军方集团、民族团结营 |
+
+每项新协议初始没有成员，也不执政；只有玩家明确选择协商方案才会填入成员并赋予
+执政身份。原有联盟不会被删除，原联盟与新协议可以同时存在。同样，从协议执政改成
+独立组织执政或看守状态，只改变执政身份，不清除任何既存联盟的成员。
+从 1936 年开始的游戏若尚未激活西班牙统一组织或波兰民族团结营，相应选择会明确
+执行激活与合法化，并通过该方案的实际影响力来源保证新参与者具备有效政治权重。
+它不会在日历走到 1939 年时强行覆盖初始数据。
+
+| 具名来源 | 期限 | 实际效果 |
+| --- | --- | --- |
+| `independent_executive_mandate` / 单独行政授权 | 90 天 | 授权组织影响力 +8、影响力系数 +5%、满意度 +6、权力立场 +8 |
+| `negotiated_governing_support` / 协商执政支持 | 120 天 | 三个签署组织各获得影响力 +5、满意度 +10、权力立场 −6 |
+| `caretaker_assurances` / 过渡行政保障 | 60 天 | 三个参与组织各获得影响力 −3、满意度 +8、自由度立场 −6；不授予执政权 |
+
+三个方案仅撤销本条授权链中互相冲突的来源，保留其他事件和作者添加的修正。重复
+执行不会叠加同名加成。来源到期撤销临时数值，不自动解散政治协议或撤销独立组织的
+执政身份；政府更替仍由政治操作决定。
+
+The ten fictional mandate scenarios add thirty fully executable choices.
+Every new agreement starts dormant, and no initial organization score, legal
+status, government, existing alliance or 1939 override was changed. Tests
+execute every emitted choice, repeat it to detect stacked gains, switch from
+agreement to independent and caretaker government while preserving all
+memberships, exercise initially inactive participants, and run the actual
+weekly scheduler with the example-events rule enabled and disabled. A separate
+expiry check verifies that a temporary mandate bonus expires without removing
+the independent government.
 
 ## 1939 starting overrides
 

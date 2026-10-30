@@ -1,7 +1,7 @@
 # Country-selection politics
 
 Country selection displays the selected country's governing organization,
-regime, ideology artwork, and separate support and influence pies in its native
+regime, both party and ideology artwork, and separate support and influence pies in its native
 political information area. This works through the existing `party` binding in
 both the interesting-country panel and the map-selection details panel. The
 original history description contains no political statistics, generated
@@ -34,8 +34,10 @@ that existing connection:
    profile/date presentation, so the display does not depend on which native
    ideology slot currently projects the government.
 3. The native `party` textbox displays the governing organization's small icon
-   and name, the actual regime, and a separate artwork row containing the PSF
-   ideology's large icon and a 140×63 support/influence image.
+   and name, the actual regime, and a separate artwork row containing the
+   party's large icon, the PSF ideology's large icon and a 140×63
+   support/influence image. Party and regime values use native yellow
+   emphasis; labels remain ordinary text.
 4. `psf_finish_frontend` restores ordinary short and long party names. Campaign
    startup and `psf_bootstrap`, including opening the campaign political
    interface, call this idempotent restoration.
@@ -44,7 +46,10 @@ Presentation names are temporary selection state. Ordinary party names use
 actual electoral organizations matching each engine ideology projection. An
 empty projection has a neutral “No electoral organization” name; it does not
 create an organization, cabinet, or alliance. The original engine-owned leader
-name and portrait remain bound to the selected country.
+name and portrait remain bound to the selected country. Preparation only marks
+a preview active after matching and writing a known profile. Restoration only
+clears that marker after a known profile has supplied normal names; temporarily
+missing content cannot silently discard the pending restoration.
 
 The game's exact startup rendering order still needs a live engine check.
 `on_startup` may occur after the first paused frame; the GUI bootstrap also
@@ -57,18 +62,23 @@ claim that every engine window has already rendered those effects.
 `psf/frontend.py::patch_native` preserves all native widget names and ancestry.
 It hides the old four-slot ideology icon, wheel and redundant ideology,
 government and election text fields. The `party_label` uses the native
-`GOVERNMENT` localisation, with the native leader fields retained. No visible
+`RULING_PARTY` localisation, with the native leader fields retained. No visible
 “PSF” banner or implementation explanation replaces the country's politics.
 
-The interesting-country political region is 245×225 pixels at `(35,477)`;
-its 245×170 party field starts at `(0,52)`. The neighboring native portrait
-continues to start at x=289. The map-selection information region remains
+The interesting-country political region is 305×225 pixels at `(35,477)`;
+its 305×170 party field starts at `(0,52)`. The neighboring native portrait and
+its frame move right by 60 pixels to x=349 and x=340. The country title starts
+at x=477 with a 305-pixel width, retaining its original right edge. The native
+focus and spirit anchors, historical description and country-selection
+controls keep their original positions. The map-selection information region remains
 inside the native 492×301 panel: its party field is 350×170 at `(110,34)`,
 with the leader row below and the native spirit grid at y=230. Explicit
 clipping contains the presentation within these political regions. Text rows
 use a native 18-point font and compact labels; the artwork row has its own
-reserved space below them. The large archetype icon and dual pies fit the
-left-column width without widening into the portrait.
+reserved space below them. Two author-supplied 64-pixel identity sprites and
+the dual pies have 37 pixels of combined spacing budget in the narrower
+305-pixel column. Original default-artwork dimensions remain an external game
+asset dependency; they are not inferred from an absent DDS payload.
 
 This is distinct from the earlier history-inline implementation. PSF no longer
 writes `common/bookmarks/*.txt`, creates replacement history keys, or appends
@@ -105,8 +115,8 @@ archetype to the government's influence-weighted positions.
 
 All groups and archetypes have separate native-artwork large and small sprites,
 with independent authored overrides. The frontend consumes the government's
-party small sprite and ideology large sprite; campaign politics and diplomacy
-also use both large identities. Default artwork represents broad political
+party small sprite and both party and ideology large sprites; campaign politics
+and diplomacy also use both large identities. Default artwork represents broad political
 families or organization types, not a claim to reproduce every historical
 party emblem. See [AUTHORING.md](AUTHORING.md#custom-icons) for custom sprites.
 

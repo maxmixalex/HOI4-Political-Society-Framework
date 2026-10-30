@@ -1,74 +1,60 @@
-# Installable builds
+# Installable build
 
-[`psf-0.4.0.zip`](psf-0.4.0.zip) contains the reusable PSF framework, the vanilla
-political-society example, both launcher descriptors, bilingual installation
-instructions, licenses and the generated API registry. Unpack it into the HOI4
-user-data `mod` directory as described by `INSTALL.md` inside the archive, and
-enable both mods in the same playset. Move the two previous PSF folders aside
-first: overlaying files can leave obsolete generated GUI chunks loaded. The
-installation folder names have not changed. Start a new campaign.
+[`psf-0.4.1.zip`](psf-0.4.1.zip) contains the reusable framework, vanilla political
+societies, both launcher descriptors, bilingual installation instructions,
+licenses and the generated API registry. Unpack into the HOI4 user-data `mod`
+directory and enable both mods in one playset. Move the previous `psf/` and
+`psf_vanilla_example/` folders aside before copying the new folders; overlaying
+files can leave obsolete GUI chunks loaded. Start a new campaign.
 
-## What changed in 0.4.0
+## 0.4.1 changes
 
-This release corrects domestic data scope, diplomacy attachment and pie bounds;
-uses native interface artwork and scrolling sidebars; and supplies actual
-large and small party/ideology icons with independent custom overrides. Exact
-authored RGB colors remain consistent across support, influence and color keys.
+- Immediate foreign-country refresh even when revision numbers match.
+- Independent large party and ideology images in both country-selection routes,
+  with historical descriptions kept separate.
+- Colored government roles, all current alliance memberships, and institution
+  versus government reference rows in the scrollable sidebar.
+- Live government membership in transactions, cleared caretaker summaries and
+  stable election tie-breaking.
+- Strict neutralization of 61 political defines, three generic party-opinion
+  differences and thirteen generic ideological peace-price rules.
+- Per-regime diplomacy policy and coalition-leader identity conditions.
+- Ten fictional negotiations, thirty choices, ten optional agreements and three
+  timed sources, preserving all existing organization baselines and governments.
 
-The strict vanilla adapter initializes politics in country history, removes the
-principal native ideology/popularity mechanics, and makes PSF institutions
-control the replacement policy. Governments can be individual organizations or
-authored alliances. Country identities support conditional names and three
-sizes of custom flags. The bundled name identities inherit installed-game flags
-unless the author supplies flag artwork.
+The example now has 125 organizations, 27 declared alliances, 50 scenarios,
+120 choices and 23 named sources. Native story conditions and some hardcoded
+mechanics still inspect the compatibility projection. Authored identity flags
+are independent of native ideology; without artwork, installed-game flags remain.
 
-Both selection routes receive separate political information through the
-native selected-country binding. Historical descriptions are unchanged, and no
-framework explanation replaces the country's information. Compat mode preserves
-the original frontend when no history preparation hook is installed. The
-previous BOM/loader repair is retained.
-
-## Release artifact
+## Artifact and verification
 
 | Field | Value |
 | --- | --- |
-| Version | 0.4.0 |
-| Size | 3,173,703 bytes |
-| Entries | 788 |
-| Uncompressed size | 60,258,671 bytes |
-| SHA-256 | `3ca5180dc2aebda4a943f1d6a5b92a9929e2340817dfd05ccfa9542c9b32a8ae` |
+| Version | 0.4.1 |
+| Size | 3,405,066 bytes |
+| Entries | 795 |
+| Uncompressed size | 64,873,707 bytes |
+| SHA-256 | `f36806a02a8bb0af7e047cbb2265d805de36e82e96def5a7c1f16512961d6523` |
 
-The archive CRC check, **213 Python regressions**, all **16 validation
-controls** and **19,729 geometry/binding checks** passed. An independently
-installed-wheel build matched all 788 generated files, and packing that output
-reproduced the installer byte for byte. The final static gate has **0 new errors and
-0 new warnings**. Raw CWTools output remains **366 errors and 117 warnings**:
-272 occurrences concern 14 declared original-game texture dependencies; the
-original-history comparison matches another 94 errors, 117 warnings and 83
-informational diagnostics. All 364 generated native histories are verified
-against their exact reconstruction. Missing native references are not
-collectively dismissed as false positives. See [validation](../docs/VALIDATION.md)
-for the complete accounting, regression/control results and reproducibility
-record.
+All **244 tests**, **20 real validation controls** and **32,461 geometry/binding
+checks** passed. The installed-wheel build matched all 795 files and reproduced
+the installer byte for byte. CRC checks passed.
 
-Build and validate the installer from source with:
+The final gate has **0 new errors and 0 new warnings**. Raw CWTools still reports
+**367 errors and 117 warnings**: 272 declared stock-texture dependencies,
+94 errors and 117 warnings matched on original histories, plus one error on
+unchanged original generic peace code. See [VALIDATION.md](../docs/VALIDATION.md)
+for exact source proof and limits. No HOI4 launch or game rendering was available.
 
 ```sh
 python -m psf compile examples/vanilla/manifest.json --output dist
 python tools/ci/validate.py --root dist --self-test
-python -m psf pack --root dist --output distributions/psf-0.4.0.zip
+python -m psf pack --root dist --output build/psf-0.4.1.zip
+cmp distributions/psf-0.4.1.zip build/psf-0.4.1.zip
 ```
 
-The workflow also builds release artifacts from validated commits. Static
-validation is separate from an actual HOI4 launch, which was not available in
-this environment. The package does not claim verified rendering, first-frame
-initialization order or compatibility with every installed game snapshot.
-
-安装包包含框架、原版示例、两个启动器描述文件及双语安装说明。升级时先移走旧的
-`psf/`、`psf_vanilla_example/`，再复制新目录与两个 `.mod`；在同一游玩集中同时启用
-两个模组，并开始新战役。0.4.0 修复国内数据作用域、外交双饼与侧栏布局，提供原版
-大小图标、独立组织政府、历史阶段初始化和国名／国旗接口；选国政治信息已从历史
-简介中移出。兼容模式没有前端绑定时保留完整原版布局。
-
-本轮静态门禁没有新增错误或警告，但保留并公开原始 CWTools 诊断及其来源分类。
-未进行实际 HOI4 引擎加载或渲染验收；原版脚本缺失引用也没有被一概称为误报。
+安装包包含框架、原版示例、两个启动器描述文件和双语说明。升级时先移走旧的
+`psf/`、`psf_vanilla_example/`，复制新目录及 `.mod`，启用两个模组并新开战役。
+已完成代码、脚本执行、原生布局结构与安装包校验；没有将它们等同于实机运行。
+原始诊断与残余原版机制均已明确记录。

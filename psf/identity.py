@@ -26,9 +26,11 @@ def all_identities(manifest: dict) -> list[dict]:
 def _conditions(manifest: dict, profile: dict, identity: dict) -> list[str]:
     index = {kind: {item["id"]: item["_index"] for item in items} for kind, items in
              (("regime", manifest["regimes"]), ("ideology", manifest["ideologies"]),
-              ("group", profile["groups"]), ("alliance", profile["alliances"]))}
+              ("group", profile["groups"]), ("leader", profile["groups"]),
+              ("alliance", profile["alliances"]))}
     variable = {"regime": "psf_regime", "ideology": "psf_government_ideology",
-                "group": "psf_governing_group", "alliance": "psf_governing_alliance"}
+                "group": "psf_governing_group", "leader": "psf_government_leader_group",
+                "alliance": "psf_governing_alliance"}
     return [check(variable[kind], index[kind][identifier])
             for kind, identifier in identity.get("when", {}).items()]
 
@@ -44,7 +46,13 @@ def definitions(manifest: dict) -> list[Block]:
     """Emit actual effects, including public manual/suspend/resume APIs."""
     result: list[Block] = []
     dispatch: list[Block] = []
-    owned = ["has_cosmetic_tag = " + item["cosmetic_tag"] for item in all_identities(manifest)]
+    identities_by_id = all_identities(manifest)
+    # Ownership means this country's recorded identity still owns its slot.
+    # Another system may legitimately select even a PSF-authored tag; treating
+    # every PSF tag as ours would silently overwrite that external selection.
+    owned = [block("AND", check("psf_identity", item["_index"]),
+                   "has_cosmetic_tag = " + item["cosmetic_tag"])
+             for item in identities_by_id]
     for profile in profiles(manifest):
         identities = profile.get("identities", [])
         if not identities:

@@ -38,6 +38,20 @@ def legal(group: dict) -> str:
     return check(gv(group["id"], "status"), 1)
 
 
+def governing_member(profile: dict, group: dict) -> Block:
+    """Read current membership, including changes inside an open transaction.
+
+    The derived ``governing`` flag is a UI cache. Using it as a permission
+    predicate would reject leaving a cabinet and banning that organization in
+    the same event, or permit banning a member that just joined the cabinet.
+    """
+    membership = [check("psf_governing_group", group["_index"])]
+    membership += [block("AND", check("psf_governing_alliance", alliance["_index"]),
+                         check(av(alliance["id"], "g_" + group["id"]), 1))
+                   for alliance in profile["alliances"]]
+    return block("AND", legal(group), block("OR", membership))
+
+
 def government_selection(profile: dict) -> dict | None:
     """Explicit government takes precedence; omitted fields keep legacy data."""
     if "government" in profile:
@@ -130,7 +144,9 @@ def refresh_effect(manifest: dict, p: dict) -> Block:
         setv("psf_government_leader_group", 0), setv("psf_government_leader_weight", -1, True),
     ]
     for axis in axes:
-        out.append(setv("psf_gov_" + axis["id"], 0))
+        aid = axis["id"]
+        out += [setv("psf_gov_" + aid, 0), setv("psf_institution_" + aid, 0),
+                setv("psf_ui_institution_defined_" + aid, 0)]
     for alliance in p["alliances"]:
         out += [setv(av(alliance["id"], "active"), 0),
                 conditional([block("OR", [check(av(alliance["id"], "g_" + group["id"]), 1) for group in p["groups"]])],
@@ -165,6 +181,7 @@ def refresh_effect(manifest: dict, p: dict) -> Block:
                            divv("psf_government_satisfaction", "psf_government_weight")))
     # Zero-power legal cabinets remain a caretaker: their coordinates are undefined.
     out.append(conditional([check("psf_government_weight", 0)], setv("psf_caretaker", 1), setv("psf_governing_alliance", 0), setv("psf_governing_group", 0),
+                           setv("psf_government_members", 0), setv("psf_government_support", 0), setv("psf_government_satisfaction", 0),
                            [setv(gv(g['id'], 'governing'), 0) for g in p['groups']]))
     # The displayed governing organization prioritizes a governing party over
     # the army, palace or another institutional member of a coalition. This is
@@ -183,9 +200,17 @@ def refresh_effect(manifest: dict, p: dict) -> Block:
     out += [setv("psf_alignment_gap", 0), setv("psf_elections_enabled", 0)]
     for regime in manifest["regimes"]:
         pairs = [("psf_gov_" + axis["id"], regime["positions"][axis["id"]], axis["weight"]) for axis in axes if axis["id"] in regime["positions"]]
+        institution = [value for aid, coordinate in regime["positions"].items()
+                       for value in (setv("psf_institution_" + aid, coordinate),
+                                     setv("psf_ui_institution_defined_" + aid, 1))]
         out.append(conditional([check("psf_regime", regime["_index"])],
                                distance("psf_distance", pairs, 0.5), setv("psf_alignment_gap", "psf_distance"),
-                               setv("psf_elections_enabled", int(regime.get("elections", False)))))
+                               setv("psf_elections_enabled", int(regime.get("elections", False))), institution))
+    for axis in axes:
+        aid = axis["id"]
+        for identity, source in (("institution", "psf_institution_"), ("government", "psf_gov_")):
+            position = "psf_ui_" + identity + "_" + aid
+            out += [setv(position, source + aid), clamp(position, -100, 100), addv(position, 184)]
     out.append(conditional([check("psf_caretaker", 1)], setv("psf_alignment_gap", 100), setv("psf_government_ideology", 0)))
     for alliance in p["alliances"]:
         aid = alliance["id"]
@@ -243,10 +268,10 @@ def group_effects(manifest: dict, p: dict, g: dict) -> list[Block]:
     changes = {
         "activate": ([check(state, 0)], [setv(state, 1), setv(gv(gid, "prohibited"), 0)]),
         "legalize": ([check(state, 1, "greater_than")], [setv(state, 1), setv(gv(gid, "prohibited"), 0), addv(gv(gid, "satisfaction"), 8)]),
-        "ban": ([check(state, 0, "greater_than"), check(state, 3, "less_than"), check(gv(gid, "governing"), 0)],
+        "ban": ([check(state, 0, "greater_than"), check(state, 3, "less_than"), block("NOT", governing_member(p, g))],
                 [setv(state, 3), setv(gv(gid, "prohibited"), 1), subv(gv(gid, "satisfaction"), 15), subv("psf_legitimacy", 3)]),
         "underground": ([block("OR", check(state, 1), check(state, 3))], [setv(state, 2)]),
-        "deactivate": ([active(g), check(gv(gid, "governing"), 0)], [setv(state, 0)]),
+        "deactivate": ([active(g), block("NOT", governing_member(p, g))], [setv(state, 0)]),
     }
     for name, (requirements, body) in changes.items():
         if name in ("ban", "deactivate", "underground"):
@@ -392,7 +417,7 @@ def election_effect(manifest: dict, p: dict) -> list[Block]:
         if g["electoral"]:
             body.append(conditional([legal(g)], addv("psf_ballot_total", ev(g["id"], "support"), True)))
     count_votes: list[Block | str] = []
-    for g in p["groups"]:
+    for g in sorted(p["groups"], key=lambda group: group["_index"]):
         if not g["electoral"]:
             continue
         count_votes.append(conditional([legal(g)],
@@ -402,7 +427,7 @@ def election_effect(manifest: dict, p: dict) -> list[Block]:
     count_votes += [setv("psf_winning_alliance", 0), setv("psf_winning_score", -1, True)]
     # Electoral pacts compete as combined ballots; overlapping pacts do not
     # double count inside a pact, and a winning party is counted once per pact.
-    for a in p["alliances"]:
+    for a in sorted(p["alliances"], key=lambda alliance: alliance["_index"]):
         pact: list[Block | str] = [setv("psf_pact_votes", 0, True)]
         for g in p["groups"]:
             if g["electoral"]:
@@ -641,8 +666,8 @@ def triggers(manifest: dict) -> str:
             for status, value in STATUS.items():
                 out.append(block(f"psf_{gid}_is_{status}", flag(p), check(gv(gid, "prohibited"), 1) if status == "banned" else check(gv(gid, "status"), value)))
             out.append(block(f"psf_{gid}_is_suppressed", flag(p), check(gv(gid, "status"), 3)))
-            out.append(block(f"psf_{gid}_is_governing", flag(p), check(gv(gid, "governing"), 1)))
-            out.append(block(f"psf_{gid}_can_be_banned", flag(p), active(g), check(gv(gid, "status"), 3, "less_than"), check(gv(gid, "governing"), 0)))
+            out.append(block(f"psf_{gid}_is_governing", flag(p), governing_member(p, g).children))
+            out.append(block(f"psf_{gid}_can_be_banned", flag(p), active(g), check(gv(gid, "status"), 3, "less_than"), block("NOT", governing_member(p, g))))
             for metric in ("support", "influence", "satisfaction"):
                 out.append(block(f"psf_{gid}_{metric}_at_least", flag(p), check(ev(gid, metric), "psf_threshold", "greater_than_or_equals")))
         for a in p["alliances"]:

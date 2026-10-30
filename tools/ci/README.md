@@ -237,6 +237,34 @@ in `build/validation/selftest*.json`.
 
 ## Limits
 
+### Original generic political source diagnostics
+
+Strict mode also preserves complete original generic opinion and peace-cost
+files while changing three party-opinion definitions and thirteen ideological
+peace-cost definitions. `native_politics.py` pins both original files
+independently, verifies the full generated transform and changed-definition
+inventory, and uses the same staged CWTools environment for a source baseline.
+External originals require the exact installation supplied at compilation.
+
+Only matching diagnostics on untouched original definitions can be inherited.
+Every line within a rewritten definition is excluded even if its text happens
+to be unchanged or repeated elsewhere. A mismatch in file, line, diagnostic
+code, severity, full message, source context or occurrence count remains new.
+`inherited-native-politics-diagnostics.json` records the separate evidence.
+
+The supplied generic peace file already contains `peace_action_type = take_state`
+in `defensive_war_take_state`; the pinned rules diagnose that original value.
+The raw diagnostic and engine exit remain visible. It is not described as
+harmless or suppressed by loosening an enum, and the original gameplay statement
+is not rewritten to get a clean report. New PSF errors and warnings still fail.
+
+Four additional real controls check exact original reproduction, rejected
+PSF-override tampering, rejected unrelated-source tampering, and an inserted
+invalid peace trigger. Together with the existing sixteen controls, `--self-test`
+runs twenty positive and negative gates.
+
+### Engine boundary
+
 CWTools checks script syntax, CWT semantics, available identifiers,
 localisation references and the supplied GUI rules. It does not run HOI4 or
 render a GUI, prove save compatibility, simulate an election, or guarantee that
