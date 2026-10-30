@@ -11,6 +11,8 @@ from pathlib import Path
 
 from jsonschema import Draft202012Validator
 
+from .palette import color
+
 ENGINE_IDEOLOGIES = ("democratic", "fascism", "communism", "neutrality")
 STATUS = {"inactive": 0, "legal": 1, "underground": 2, "banned": 3}
 ROLES = {"government": 1, "opposition": 2, "electoral": 3}
@@ -296,5 +298,9 @@ def normalize(data: dict) -> dict:
                 raise ManifestError(f"Alliance numeric id collision including generated cabinets: {alliance_indices[index]} and {alliance['id']}; give the authored alliance a different numeric_id")
             alliance_indices[index] = alliance["id"]
     for p in profiles(data):
+        # Canonical RGB keeps JSON/TOML/YAML and equivalent hex spellings
+        # byte-identical throughout all generated UI and bookmark artwork.
+        for organization in p["groups"]:
+            organization["color"] = list(color(organization))
         p["start_overrides"] = sorted(p.get("start_overrides", []), key=lambda v: date_tuple(v["date"]))
     return data

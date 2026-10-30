@@ -314,6 +314,9 @@
         },
         "notes": {
           "$ref": "#/$defs/loc"
+        },
+        "color": {
+          "$ref": "#/$defs/organization_color"
         }
       },
       "required": [
@@ -850,6 +853,25 @@
         }
       ],
       "additionalProperties": false
+    },
+    "organization_color": {
+      "description": "Identity color used by support/influence charts, bookmark snapshots and generated badges. Omit to preserve the stable ID-based default.",
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 255
+          },
+          "minItems": 3,
+          "maxItems": 3
+        }
+      ]
     }
   }
 }

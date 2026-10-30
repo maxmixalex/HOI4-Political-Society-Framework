@@ -32,6 +32,14 @@ window. A comment or nested window with the same name cannot satisfy that
 check. Descriptor `supported_version` patterns must include all three parts,
 such as `1.17.*`; `1.*` is rejected.
 
+Generated `psf_*.gfx` sprite files must begin with the exact `spriteTypes` root,
+after comments and whitespace. The CWT sprite index deliberately accepts any
+root to import vanilla sprites from `bitmapfonts`, so this generator-specific
+check catches misspellings and a BOM before the root even after a leading
+comment. It does not reject legitimate alternative roots in third-party GFX
+files. The supplied log's `psf_society.gfx` failure is checked independently of
+the GUI-window failure that follows it.
+
 This is a separate check because a tolerant parser is not the game loader.
 The supplied `error(9).log` reports five BOM-prefixed `guiTypes`/`spriteTypes`
 tokens and then `Undefined GUI_TYPE: frontendgamesetupview`, explicitly

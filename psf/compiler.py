@@ -102,6 +102,7 @@ def compile_manifest(manifest_path: str | Path, output: str | Path, *, vanilla: 
 - macOS 通常为 `~/Documents/Paradox Interactive/Hearts of Iron IV/mod`。
 
 在启动器的同一游玩集中同时启用 **{FRAMEWORK_NAME}** 和 **{manifest['name']['english']}**。本版本请开始新战役。
+从旧版升级时，先移走旧的 `psf/` 与 `{manifest['id']}/` 两个目录，再复制本包；不要只把新文件覆盖到旧目录上，否则旧的 GUI 分块可能继续被游戏加载。保留其他模组目录。
 打开本国政治面板或其他国家的外交面板，即可查看国家总览、政治团体、政治光谱与联盟。选中本国团体后，决议面板提供对应政治行动。
 
 此包按提供的原版界面脚本构建。会同时替换政治、外交或选国界面文件的其他模组需要合并适配。原版脚本快照没有提供可核实的游戏版本号；默认省略可选的 `supported_version`，作者可在编译时显式指定本机目标版本。
@@ -110,6 +111,7 @@ def compile_manifest(manifest_path: str | Path, output: str | Path, *, vanilla: 
 ## Installation
 
 Copy both mod folders and both `.mod` launcher files to your HOI4 user-data `mod` directory. Enable the framework and the dependent content pack together and start a new campaign.
+When upgrading, move the old `psf/` and `{manifest['id']}/` folders aside before copying the new folders. Overlaying files can leave obsolete GUI chunks loaded alongside this version; leave unrelated mods in place.
 Open politics or diplomacy to inspect societies. Select a domestic organization for its actions in the decisions panel.
 The native interface overrides need compatibility work with other UI overhauls. Static/script checks do not replace an in-game launch test.
 
@@ -139,7 +141,7 @@ Source and authoring documentation: https://github.com/maxmixalex/HOI4-Political
         registry = {
             "schema_version": "1.0", "compiler_version": __version__, "content_id": manifest["id"],
             "axes": [a["id"] for a in manifest["axes"]],
-            "groups": {g["id"]: {"numeric_id": g["_index"], "profile": p["id"], "kind": g["kind"],
+            "groups": {g["id"]: {"numeric_id": g["_index"], "profile": p["id"], "kind": g["kind"], "color": g["color"],
                                   "variables": {field: runtime.gv(g["id"], field) for field in ("support", "influence", "effective_influence", "satisfaction", "status", "prohibited", "ideology", "governing", "vote_share")}}
                        for p in profiles(manifest) for g in p["groups"]},
             "alliances": {a["id"]: {"numeric_id": a["_index"], "profile": p["id"]} for p in profiles(manifest) for a in p["alliances"]},

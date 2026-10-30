@@ -82,6 +82,20 @@ guiTypes = { containerWindowType = { name = "different"
         path = self.write("interface/psf.gui", b'# guiTypes = {}\nwrongTypes = {}')
         self.assertIn("PSF_GUI_ROOT", self.codes(path))
 
+    def test_generated_sprite_root_is_checked_before_cwt_wildcard_indexing(self):
+        path = self.write("interface/psf_society.gfx", b'# spriteTypes = {}\nwrongTypes = {}')
+        self.assertIn("PSF_GFX_ROOT", self.codes(path))
+        # A BOM after a comment is not at byte zero; it still contaminates the
+        # engine root token, like the actual error(9).log startup failure.
+        path.write_bytes(b"# Generated sprites\n" + UTF8_BOM + b"spriteTypes = {}")
+        self.assertIn("PSF_GFX_ROOT", self.codes(path))
+        path.write_bytes(b"# Generated sprites\n\nspriteTypes = {}")
+        self.assertEqual(file_findings(path), [])
+        # Vanilla also places sprites inside bitmapfonts. The PSF generator's
+        # root contract must not become an invented third-party GFX rule.
+        external = self.write("interface/core.gfx", b"bitmapfonts = {}")
+        self.assertEqual(file_findings(external), [])
+
     def test_launcher_version_warning_cannot_recur(self):
         path = self.write("psf.mod", b'supported_version="1.*"\n')
         self.assertIn("PSF_SUPPORTED_VERSION", self.codes(path))

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from collections import Counter
+import hashlib
 from pathlib import Path
 import random
 import struct
@@ -100,6 +101,83 @@ class ChartRuntimeTests(unittest.TestCase):
             self.assertEqual(struct.unpack_from("<HH", second.read_bytes(), 12), (140, 63))
             self.assertEqual(len(second.read_bytes()), 18 + 140 * 63 * 4)
             self.assertEqual(profile["groups"][0]["support"], 80)
+
+    def test_custom_colors_are_exact_in_every_runtime_frame_and_legend_swatch(self):
+        groups = [{"id": "alpha", "color": "#01aBff"},
+                  {"id": "beta", "color": [255, 0, 17], "small_icon": "GFX_custom_badge"}]
+        expected = [(74, 79, 73), (1, 171, 255), (255, 0, 17)]
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            sprites = charts.artwork(root, groups)
+            for index, (_, _, width, height) in enumerate(charts.geometry()):
+                data = (root / f"gfx/interface/psf/pie/sector_{index:03}.tga").read_bytes()
+                atlas_width = width * len(expected)
+                self.assertEqual(struct.unpack_from("<HH", data, 12), (atlas_width, height))
+                for frame, (r, g, b) in enumerate(expected):
+                    opaque = []
+                    for y in range(height):
+                        for x in range(width):
+                            offset = 18 + (y * atlas_width + frame * width + x) * 4
+                            pixel = data[offset:offset + 4]
+                            if pixel[3]:
+                                opaque.append(pixel)
+                    self.assertTrue(opaque)
+                    self.assertEqual(set(opaque), {bytes((b, g, r, 255))})
+            for group, (r, g, b) in zip(groups, expected[1:]):
+                data = (root / f"gfx/interface/psf/colors/{group['id']}.tga").read_bytes()
+                self.assertEqual(struct.unpack_from("<HH", data, 12), (8, 8))
+                self.assertEqual(data[18:], bytes((b, g, r, 255)) * 64)
+                self.assertTrue(any(f'"GFX_psf_color_{group["id"]}"' in sprite for sprite in sprites))
+
+    def test_custom_colors_match_both_bookmark_pies_at_both_start_dates(self):
+        profile = {"id": "colors", "groups": [
+            {"id": "alpha", "color": "#F10040", "support": 75, "influence": 20},
+            {"id": "beta", "color": [0, 25, 240], "support": 25, "influence": 80}],
+            "start_overrides": [{"date": "1939.1.1", "groups": [
+                {"id": "alpha", "support": 20}, {"id": "beta", "support": 80}]}]}
+        manifest = {"profiles": [profile]}
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for day in ("1936.1.1", "1939.8.14"):
+                picture = charts.bookmark_artwork(manifest, profile, day, root)
+                data = (root / picture["texture"]).read_bytes()
+                width, height = struct.unpack_from("<HH", data, 12)
+                for left in (0, charts.SIZE + 14):
+                    colors = set()
+                    for y in range(height):
+                        for x in range(left, left + charts.SIZE):
+                            offset = 18 + (y * width + x) * 4
+                            b, g, r, a = data[offset:offset + 4]
+                            if a:
+                                colors.add((r, g, b))
+                    self.assertEqual(colors, {(241, 0, 64), (0, 25, 240)})
+
+    def test_legacy_identity_colors_stay_stable_and_do_not_depend_on_registry_order(self):
+        for identifier in ("ger_spd", "eng_labour", "fallback_democratic_opposition"):
+            expected = tuple(86 + byte % 140 for byte in hashlib.sha256(identifier.encode()).digest()[:3])
+            self.assertEqual(charts.color(identifier), expected)
+            self.assertEqual(charts.color({"id": identifier}), expected)
+        self.assertEqual(charts.color({"id": "alpha", "color": "#FF0011"}),
+                         charts.color({"id": "other_country_alpha", "color": [255, 0, 17]}))
+
+    def test_equivalent_color_spellings_produce_identical_artwork(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            charts.artwork(root / "hex", [{"id": "alpha", "color": "#01abFF"}])
+            charts.artwork(root / "rgb", [{"id": "alpha", "color": [1, 171, 255]}])
+            for first in sorted((root / "hex").rglob("*.tga")):
+                self.assertEqual(first.read_bytes(), (root / "rgb" / first.relative_to(root / "hex")).read_bytes())
+
+    def test_generated_identity_badges_use_the_same_color_as_chart_frames(self):
+        from psf.ui import _artwork
+
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            _artwork(root, [{"id": "alpha", "color": "#01ABFF", "icon": "party"}])
+            for size, suffix in ((24, "small"), (64, "large")):
+                data = (root / f"gfx/interface/psf/alpha_{suffix}.tga").read_bytes()
+                offset = 18 + (size // 2 * size + size // 2) * 4
+                self.assertEqual(data[offset:offset + 4], bytes((255, 171, 1, 255)))
 
 
 if __name__ == "__main__":

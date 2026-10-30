@@ -7,12 +7,12 @@ exactly one sector; rotating a thin antialiased wedge would leave visible seams.
 """
 from __future__ import annotations
 
-import hashlib
 import copy
 import math
 from pathlib import Path
 import struct
 
+from .palette import color
 from .script import Block, addv, block, check, clamp, conditional, divv, mulv, setv
 
 SECTORS = 180
@@ -22,11 +22,6 @@ SIZE = 63
 def groups(manifest: dict) -> list[dict]:
     return [g for p in manifest.get("profiles", []) + manifest.get("fallback_profiles", [])
             for g in p.get("groups", [])]
-
-
-def color(group_id: str) -> tuple[int, int, int]:
-    digest = hashlib.sha256(group_id.encode()).digest()
-    return tuple(86 + byte % 140 for byte in digest[:3])
 
 
 def sector_pixels() -> list[list[tuple[int, int]]]:
@@ -51,7 +46,7 @@ def geometry() -> list[tuple[int, int, int, int]]:
 
 def artwork(output: Path, organizations: list[dict]) -> list[str]:
     """Write cropped sector strips; frame 1 is the zero-total neutral color."""
-    colors = [(74, 79, 73)] + [color(g["id"]) for g in organizations]
+    colors = [(74, 79, 73)] + [color(g) for g in organizations]
     sprites = []
     for index, (pixels, (left, top, width, height)) in enumerate(zip(sector_pixels(), geometry())):
         atlas_width = width * len(colors)
@@ -71,15 +66,21 @@ def artwork(output: Path, organizations: list[dict]) -> list[str]:
         path.write_bytes(header + atlas)
         sprites.append(f'spriteType = {{ name = "GFX_psf_pie_sector_{index:03}" '
                        f'texturefile = "{relative}" noOfFrames = {len(colors)} }}')
+    # Always emit a separate identity key, including when the author supplies
+    # custom icons whose artwork does not contain the organization's color.
+    for organization, rgb in zip(organizations, colors[1:]):
+        relative = f"gfx/interface/psf/colors/{organization['id']}.tga"
+        path = output / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        header = struct.pack("<BBBHHBHHHHBB", 0, 0, 2, 0, 0, 0, 0, 0, 8, 8, 32, 0x28)
+        path.write_bytes(header + bytes((rgb[2], rgb[1], rgb[0], 255)) * 64)
+        sprites.append(f'spriteType = {{ name = "GFX_psf_color_{organization["id"]}" '
+                       f'texturefile = "{relative}" noOfFrames = 1 }}')
     return sprites
 
 
-def bookmark_artwork(manifest: dict, profile: dict, date: str, output: Path) -> dict:
-    """Build a true country/bookmark snapshot for native history text icons.
-
-    This deliberately uses compiled starting data rather than uninitialized
-    runtime variables or an undocumented frontend scripted-GUI context.
-    """
+def bookmark_values(manifest: dict, profile: dict, date: str) -> dict:
+    """Resolve a bookmark once for both compact native text and optional artwork."""
     organizations = copy.deepcopy(profile["groups"])
     by_id = {g["id"]: g for g in organizations}
     start = tuple(map(int, date.split(".")))
@@ -90,8 +91,7 @@ def bookmark_artwork(manifest: dict, profile: dict, date: str, output: Path) -> 
                     if field in item:
                         by_id[item["id"]][field] = item[field]
     settings = manifest.get("settings", {})
-    totals = {}
-    colors = []
+    shares, totals, weights = {}, {}, {}
     for metric in ("support", "influence"):
         values = []
         for g in organizations:
@@ -108,15 +108,32 @@ def bookmark_artwork(manifest: dict, profile: dict, date: str, output: Path) -> 
         # Built-in sum(float) changed in Python 3.12. Keep report hashes and
         # snapshot boundaries identical on every supported Python version.
         total = math.fsum(values)
-        totals[metric] = {g["id"]: value * 100 / total if total else 0
+        totals[metric] = total
+        weights[metric] = values
+        shares[metric] = {g["id"]: value * 100 / total if total else 0
                           for g, value in zip(organizations, values)}
+    return {"organizations": organizations, "weights": weights, "totals": totals, **shares}
+
+
+def bookmark_artwork(manifest: dict, profile: dict, date: str, output: Path) -> dict:
+    """Build an optional dual-pie snapshot, never embed it in a native text row.
+
+    The native history field does not reserve 63 pixels for an inline icon.
+    Front-end previews use ``bookmark_values`` and font-sized identity keys;
+    this complete image remains available for appropriately sized GUI widgets
+    or offline previews.
+    """
+    snapshot = bookmark_values(manifest, profile, date)
+    colors = []
+    for metric in ("support", "influence"):
+        total = snapshot["totals"][metric]
         segments = [(74, 79, 73)] * SECTORS
         cumulative, begin = 0.0, 0
         if total:
-            for g, value in zip(organizations, values):
+            for g, value in zip(snapshot["organizations"], snapshot["weights"][metric]):
                 cumulative += value
                 end = min(SECTORS, int(cumulative * SECTORS / total + .5))
-                segments[begin:end] = [color(g["id"])] * (end - begin)
+                segments[begin:end] = [color(g)] * (end - begin)
                 begin = end
         colors.append(segments)
     width = SIZE * 2 + 14
@@ -135,7 +152,8 @@ def bookmark_artwork(manifest: dict, profile: dict, date: str, output: Path) -> 
     header = struct.pack("<BBBHHBHHHHBB", 0, 0, 2, 0, 0, 0, 0, 0, width, SIZE, 32, 0x28)
     target.write_bytes(header + image)
     return {"sprite": "GFX_" + stem, "texture": relative,
-            "width": width, "height": SIZE, **totals}
+            "width": width, "height": SIZE,
+            "support": snapshot["support"], "influence": snapshot["influence"]}
 
 
 def refresh_effect(manifest: dict, profile: dict) -> Block:

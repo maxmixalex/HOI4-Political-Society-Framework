@@ -1,5 +1,16 @@
 # Release notes
 
+## 0.3.1 — native UI placement, organization colors and later campaigns
+
+- Bind political and diplomatic summaries and sidebars to native window tokens; use the diplomacy-specific token confirmed in the supplied KR/PB scripts so the panel does not leak into intelligence views.
+- Split pages and organization details into independently visible scripted GUI windows. Keep bound buttons, chart slices and spectrum markers directly under their owning windows rather than relying on deep child visibility or property lookups.
+- Correct dynamic localization wrappers and expand static UI text references at build time. Separate list columns, detail metrics and scrollable descriptions; keep charts on opaque, correctly sized backgrounds.
+- Replace oversized inline bookmark charts with font-height color legends and both support/influence values. Retain native chart containers in politics and diplomacy.
+- Accept per-organization `color` as `#RRGGBB` or RGB bytes, normalize it in the model and registry, and use it for both pies, default emblems, independent swatches and bookmark previews. All 125 example organizations now declare colors; old manifests retain their deterministic fallback.
+- Refresh legitimacy's GUI dirty value and native dynamic modifier immediately. Elections called inside a transaction now read the updated support and institutional rules. Spectrum markers use clamped effective positions, including source expiry.
+- Add ten fictional post-bookmark negotiations with thirty choices and four real named sources. The example now has forty scenarios, ninety choices and twenty named sources while retaining 4,500 native organization modifier keys.
+- Extend regression coverage to the actual reported window bindings, exclusive pages, localization references, emitted image pixels, 1939 choices and modifier expiry. Static checks and CWTools remain distinct from a game-engine rendering test.
+
 ## 0.2.0 — loader repair and organization modifiers
 
 ### Startup repair

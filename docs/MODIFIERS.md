@@ -45,6 +45,8 @@ GER = {
 
 多个修改可以放进 `psf_begin_transaction = yes` / `psf_commit_transaction = yes`，最后集中重算并同步。`begin` 在进入批次之前导入原版变化；`commit` 刷新并导出。批次作为单层配对使用。临时参数应在相邻的调用前赋值，避免复用别的 effect 留下的临时数值。
 
+若在批次中调用 `psf_hold_election = yes`，选举入口会先重算，再读取当前制度是否允许选举及各党的有效支持率。此前同一批次的属性、命名来源或制度变更会参与本次投票；选举本身不会替调用者结束批次，后续仍须调用 `psf_commit_transaction = yes`。
+
 框架没有发明 `psf_add_group_support = { GROUP = ... AMOUNT = ... }` 一类参数语法。所附原版脚本和规则使用 `scripted_effect = yes`；需要声明式单行调用时可使用下面的命名修正来源。
 
 ## 2. 直接写进国家精神、人物特质或动态修正
@@ -100,6 +102,8 @@ psf_export_popularity = yes
 导出入口也会先处理尚未确认的原版差值，避免直接导出覆盖它们。显式把导入放在更换来源之前，还能保证这份原版变化按变更前的组织分类与倍率分配。`psf_import_popularity` 导入成功后立即记录原版快照，因此连续调用、再调用其他 API 或随后导出都不会重复累计同一份变化；在批次内显式导入也会保留批次状态。`bridge_mode = export` 不导入原版变化，`none` 不作原版投影。
 
 原生 dynamic modifier 的变量更新周期由 HOI4 决定。改变其输入变量后，需要立即刷新原生 modifier 时，应按游戏支持的 `force_update_dynamic_modifier` 用法刷新来源，再调用 PSF 的重算。PSF 自己的 `psf_refresh` 不替代引擎的动态修正刷新。
+
+PSF 自有的合法性修正由框架负责同步：`psf_add_legitimacy` 会即时通知界面更新；稳定度或政治点数修正值变化时，框架调用 `force_update_dynamic_modifier = yes`，不必等待下一次每日结算。数值没有变化的重复刷新不会再次强制刷新国家内所有动态修正。这一处理只管理合法性输入的变化，内容作者仍应按上面的顺序刷新自行维护的动态来源。
 
 ## 3. 声明命名修正来源
 

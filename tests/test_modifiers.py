@@ -163,11 +163,30 @@ class OrganizationModifierTests(unittest.TestCase):
         before = self.base(vm, "position_economy")
         vm.run_effect("psf_add_eng_labour_modifier_policy_discussion")
         self.assertEqual(self.effective(vm, "position_economy"), max(-100, before - 30))
+        self.assertEqual(vm.state.variables[modifiers.gv("eng_labour", "ui_position_economy")],
+                         184 + self.effective(vm, "position_economy"))
         vm.run_effect("psf_daily_modifiers")
         vm.run_effect("psf_daily_modifiers")
         self.assertFalse(self.active(vm, "policy_discussion"))
         self.assertEqual(self.base(vm, "position_economy"), max(-100, before - 6))
         self.assertEqual(self.effective(vm, "position_economy"), self.base(vm, "position_economy"))
+        self.assertEqual(vm.state.variables[modifiers.gv("eng_labour", "ui_position_economy")],
+                         184 + self.base(vm, "position_economy"))
+
+    def test_spectrum_coordinates_follow_modified_values_and_stay_on_track(self):
+        vm = self.vm()
+        marker = modifiers.gv("eng_labour", "ui_position_economy")
+        for value, expected in ((-100, 84), (0, 184), (100, 284)):
+            with self.subTest(position=value):
+                vm.run_effect("psf_set_eng_labour_position_economy", {"psf_position": value})
+                self.assertEqual(vm.state.variables[marker], expected)
+        vm.state.modifier_values["psf_eng_labour_position_economy_add"] = -300
+        vm.run_effect("psf_refresh")
+        self.assertEqual(vm.state.variables[marker], 84)
+        self.assertEqual(self.base(vm, "position_economy"), 100)
+        vm.state.modifier_values["psf_eng_labour_position_economy_add"] = 300
+        vm.run_effect("psf_refresh")
+        self.assertEqual(vm.state.variables[marker], 284)
 
     def test_suppression_applies_after_modified_influence_once(self):
         vm = self.vm()

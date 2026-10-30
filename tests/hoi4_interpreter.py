@@ -135,7 +135,7 @@ class State:
 
 class Interpreter:
     RECORDED_CALLBACKS = {
-        "add_dynamic_modifier", "remove_dynamic_modifier", "country_event", "news_event",
+        "add_dynamic_modifier", "remove_dynamic_modifier", "force_update_dynamic_modifier", "country_event", "news_event",
         "custom_effect_tooltip", "log", "set_country_leader_ideology", "set_party_name",
         "set_country_name", "set_cosmetic_tag", "remove_ideas", "add_ideas", "set_rule",
         "set_oob", "set_capital", "set_country_leader_name", "set_country_leader_portrait",

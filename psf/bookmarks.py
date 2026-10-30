@@ -12,12 +12,16 @@ import hashlib
 import json
 from pathlib import Path
 import re
+import struct
+import unicodedata
 
 from . import charts
 from .localization import LANGUAGES, write_localization
 from .script import quoted
 
 TOKEN = re.compile(r'\s+|#[^\n]*|"(?:\\.|[^"\\])*"|[{}]|[<>!]=|[=<>]|[^\s{}=<>!]+')
+TEXT_ICON_SIZE = 12
+LABEL_COLUMNS = 22
 
 
 @dataclass(frozen=True)
@@ -89,6 +93,51 @@ def _value(items: tuple[Field, ...], key: str) -> str | None:
     return values[0] if values else None
 
 
+def _compact_label(group: dict, language: str) -> str:
+    """Keep authored short names readable beside two percentages in 380 pixels.
+
+    Long names use the native textbox's normal wrapping after this conservative
+    label bound. No image extends beyond the 16-pixel font's text row.
+    """
+    label = group.get("short_name", group["name"])[language]
+    label = " ".join(label.split())
+    width = lambda char: 2 if unicodedata.east_asian_width(char) in {"W", "F"} else 1
+    if sum(width(char) for char in label) <= LABEL_COLUMNS:
+        return label
+    result, used = [], 0
+    for char in label:
+        if used + width(char) > LABEL_COLUMNS - 2:
+            break
+        result.append(char)
+        used += width(char)
+    return "".join(result) + "…"
+
+
+def _color_key(output: Path, group: dict) -> dict:
+    """Emit a text-sized color key, independently usable in front-end history."""
+    stem = "psf_bookmark_key_" + group["id"]
+    relative = "gfx/interface/psf/bookmarks/keys/" + group["id"] + ".tga"
+    target = output / relative
+    target.parent.mkdir(parents=True, exist_ok=True)
+    rgb = charts.color(group)
+    header = struct.pack("<BBBHHBHHHHBB", 0, 0, 2, 0, 0, 0, 0, 0,
+                         TEXT_ICON_SIZE, TEXT_ICON_SIZE, 32, 0x28)
+    target.write_bytes(header + bytes((rgb[2], rgb[1], rgb[0], 255)) * TEXT_ICON_SIZE ** 2)
+    return {"sprite": "GFX_" + stem, "texture": relative,
+            "width": TEXT_ICON_SIZE, "height": TEXT_ICON_SIZE, "color": list(rgb)}
+
+
+def _history_text(snapshot: dict, original: str, language: str) -> str:
+    header = "Support / Influence" if language == "english" else "支持率 / 影响力"
+    lines = [header]
+    for row in snapshot["rows"]:
+        icon = row["sprite"].removeprefix("GFX_")
+        lines.append(f"£{icon}£ {row['labels'][language]}  {row['support']:.1f}% / {row['influence']:.1f}%")
+    if not snapshot["rows"]:
+        lines.append("No active organizations" if language == "english" else "尚无活跃政治团体")
+    return "\n".join(lines) + f"\n\n${original}$"
+
+
 def generate_bookmark_previews(manifest: dict, output: Path, vanilla: Path | None = None) -> dict:
     """Wrap existing histories for declared country profiles, preserving DLCs.
 
@@ -98,10 +147,11 @@ def generate_bookmark_previews(manifest: dict, output: Path, vanilla: Path | Non
     """
     profile_by_tag = {profile["tag"]: profile for profile in manifest["profiles"]}
     report = {
-        "implementation": "native bookmark history localisation with static text icons",
+        "implementation": "native bookmark history with font-sized color keys and support/influence rows",
         "scope": "existing interesting-country history panels; map country-details pie is not an arbitrary-group chart",
         "profiles": sorted(profile_by_tag), "source_files": {}, "previews": [],
         "untouched_countries": [], "runtime_render_tested": False,
+        "text_icon_size": TEXT_ICON_SIZE, "label_columns": LABEL_COLUMNS,
     }
     if not profile_by_tag:
         return report
@@ -110,6 +160,7 @@ def generate_bookmark_previews(manifest: dict, output: Path, vanilla: Path | Non
         raise ValueError(f"Missing native bookmark directory: {source}")
     localisation = {language: {} for language in LANGUAGES}
     sprites: dict[str, dict] = {}
+    snapshots: dict[str, dict] = {}
     untouched = set()
     for path in sorted(source.glob("*.txt")):
         raw = path.read_bytes()
@@ -143,19 +194,27 @@ def generate_bookmark_previews(manifest: dict, output: Path, vanilla: Path | Non
                     key_id = hashlib.sha256(f"{path.name}:{date}:{country.key}:{original.value}".encode()).hexdigest()[:12]
                     key = f"psf_bookmark_history_{country.key.lower()}_{key_id}"
                     preview_id = f"{country.key}:{day}"
-                    if preview_id not in sprites:
-                        sprites[preview_id] = charts.bookmark_artwork(manifest, profile_by_tag[country.key], day, output)
-                    picture = sprites[preview_id]
-                    text_icon = picture["sprite"].removeprefix("GFX_")
+                    if preview_id not in snapshots:
+                        snapshot = charts.bookmark_values(manifest, profile_by_tag[country.key], day)
+                        rows = []
+                        for group in snapshot["organizations"]:
+                            gid = group["id"]
+                            support, influence = snapshot["support"][gid], snapshot["influence"][gid]
+                            if support == 0 and influence == 0:
+                                continue
+                            if gid not in sprites:
+                                sprites[gid] = _color_key(output, group)
+                            rows.append({"group": gid, **sprites[gid], "support": support, "influence": influence,
+                                         "labels": {language: _compact_label(group, language) for language in LANGUAGES}})
+                        snapshots[preview_id] = {"support": snapshot["support"], "influence": snapshot["influence"], "rows": rows}
+                    snapshot = snapshots[preview_id]
                     for language in LANGUAGES:
-                        label = "Support       Influence" if language == "english" else "支持率         影响力"
-                        localisation[language][key] = f"{label}\n£{text_icon}£\n\n${original.value}$"
+                        localisation[language][key] = _history_text(snapshot, original.value, language)
                     replacements.append((original.start, original.end, quoted(key)))
                     report["previews"].append({
                         "file": "common/bookmarks/" + path.name, "tag": country.key, "date": date,
                         "version": _value(country.value, "version"), "history_key": key,
-                        "original_history_key": original.value, "sprite": picture["sprite"],
-                        "texture": picture["texture"], "support": picture["support"], "influence": picture["influence"],
+                        "original_history_key": original.value, "snapshot": preview_id, **snapshot,
                     })
         if replacements:
             for start, end, replacement in sorted(replacements, reverse=True):
@@ -164,7 +223,7 @@ def generate_bookmark_previews(manifest: dict, output: Path, vanilla: Path | Non
             destination.parent.mkdir(parents=True, exist_ok=True)
             destination.write_text(text, encoding="utf-8", newline="\n")
             report["source_files"]["common/bookmarks/" + path.name] = hashlib.sha256(raw).hexdigest()
-    if sprites:
+    if snapshots:
         definitions = ["spriteTypes = {"]
         for picture in sprites.values():
             definitions.append(f'spriteType = {{ name = {quoted(picture["sprite"])} texturefile = {quoted(picture["texture"])} noOfFrames = 1 legacy_lazy_load = no }}')
@@ -175,7 +234,8 @@ def generate_bookmark_previews(manifest: dict, output: Path, vanilla: Path | Non
         write_localization(output, "psf_bookmarks", localisation)
     report["untouched_countries"] = sorted(untouched)
     report["covered_countries"] = sorted({entry["tag"] for entry in report["previews"]})
-    report["unique_snapshots"] = len(sprites)
+    report["unique_snapshots"] = len(snapshots)
+    report["unique_text_icons"] = len(sprites)
     report["unrepresented_profiles"] = sorted(set(profile_by_tag) - set(report["covered_countries"]))
     (output / "psf_bookmark_manifest.json").write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     return report

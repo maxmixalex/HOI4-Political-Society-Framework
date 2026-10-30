@@ -635,7 +635,8 @@
           "satisfaction": 93,
           "status": "legal",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#735448"
         },
         {
           "id": "ger_spd",
@@ -668,7 +669,8 @@
           "satisfaction": 3,
           "status": "underground",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#CD4A55"
         },
         {
           "id": "ger_kpd",
@@ -701,7 +703,8 @@
           "satisfaction": 1,
           "status": "underground",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#9C3047"
         },
         {
           "id": "ger_zentrum",
@@ -734,7 +737,8 @@
           "satisfaction": 18,
           "status": "inactive",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#9A84B5"
         },
         {
           "id": "ger_dnvp",
@@ -767,7 +771,8 @@
           "satisfaction": 45,
           "status": "inactive",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#557BA1"
         },
         {
           "id": "ger_daf",
@@ -800,7 +805,8 @@
           "satisfaction": 88,
           "status": "legal",
           "electoral": false,
-          "icon": "union"
+          "icon": "union",
+          "color": "#93AB86"
         },
         {
           "id": "ger_industry",
@@ -833,7 +839,8 @@
           "satisfaction": 75,
           "status": "legal",
           "electoral": false,
-          "icon": "business"
+          "icon": "business",
+          "color": "#78AC98"
         },
         {
           "id": "ger_officers",
@@ -866,7 +873,8 @@
           "satisfaction": 68,
           "status": "legal",
           "electoral": false,
-          "icon": "military"
+          "icon": "military",
+          "color": "#D9A0D5"
         },
         {
           "id": "ger_confessing",
@@ -899,7 +907,8 @@
           "satisfaction": 15,
           "status": "legal",
           "electoral": false,
-          "icon": "religious"
+          "icon": "religious",
+          "color": "#59BA5C"
         },
         {
           "id": "ger_free_unions",
@@ -932,7 +941,8 @@
           "satisfaction": 2,
           "status": "banned",
           "electoral": false,
-          "icon": "union"
+          "icon": "union",
+          "color": "#DF7165"
         }
       ],
       "alliances": [
@@ -1016,7 +1026,8 @@
           "satisfaction": 88,
           "status": "legal",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#5485BF"
         },
         {
           "id": "eng_labour",
@@ -1049,7 +1060,8 @@
           "satisfaction": 32,
           "status": "legal",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#CF5360"
         },
         {
           "id": "eng_liberal",
@@ -1082,7 +1094,8 @@
           "satisfaction": 35,
           "status": "legal",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#D2B059"
         },
         {
           "id": "eng_liberal_national",
@@ -1115,7 +1128,8 @@
           "satisfaction": 82,
           "status": "legal",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#B8954C"
         },
         {
           "id": "eng_national_labour",
@@ -1148,7 +1162,8 @@
           "satisfaction": 78,
           "status": "legal",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#A16578"
         },
         {
           "id": "eng_tuc",
@@ -1181,7 +1196,8 @@
           "satisfaction": 36,
           "status": "legal",
           "electoral": false,
-          "icon": "union"
+          "icon": "union",
+          "color": "#B66C80"
         },
         {
           "id": "eng_fbi",
@@ -1214,7 +1230,8 @@
           "satisfaction": 76,
           "status": "legal",
           "electoral": false,
-          "icon": "business"
+          "icon": "business",
+          "color": "#B9E185"
         },
         {
           "id": "eng_buf",
@@ -1247,7 +1264,8 @@
           "satisfaction": 8,
           "status": "legal",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#CD9A84"
         },
         {
           "id": "eng_cpgb",
@@ -1280,7 +1298,8 @@
           "satisfaction": 15,
           "status": "legal",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#8D6287"
         }
       ],
       "alliances": [
@@ -1381,7 +1400,8 @@
           "satisfaction": 51,
           "status": "legal",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#AF8BD0"
         },
         {
           "id": "fra_sfio",
@@ -1414,7 +1434,8 @@
           "satisfaction": 25,
           "status": "legal",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#CE6375"
         },
         {
           "id": "fra_pcf",
@@ -1447,7 +1468,8 @@
           "satisfaction": 18,
           "status": "legal",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#A74455"
         },
         {
           "id": "fra_ad",
@@ -1480,7 +1502,8 @@
           "satisfaction": 77,
           "status": "legal",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#568FBE"
         },
         {
           "id": "fra_fr",
@@ -1513,7 +1536,8 @@
           "satisfaction": 65,
           "status": "legal",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#936575"
         },
         {
           "id": "fra_cgt",
@@ -1546,7 +1570,8 @@
           "satisfaction": 26,
           "status": "legal",
           "electoral": false,
-          "icon": "union"
+          "icon": "union",
+          "color": "#8269AD"
         },
         {
           "id": "fra_cgpf",
@@ -1579,7 +1604,8 @@
           "satisfaction": 61,
           "status": "legal",
           "electoral": false,
-          "icon": "business"
+          "icon": "business",
+          "color": "#739D9F"
         },
         {
           "id": "fra_croix",
@@ -1612,7 +1638,8 @@
           "satisfaction": 16,
           "status": "legal",
           "electoral": false,
-          "icon": "civic"
+          "icon": "civic",
+          "color": "#64AD6D"
         },
         {
           "id": "fra_psf",
@@ -1645,7 +1672,8 @@
           "satisfaction": 30,
           "status": "inactive",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#579C9D"
         },
         {
           "id": "fra_af",
@@ -1678,7 +1706,8 @@
           "satisfaction": 3,
           "status": "legal",
           "electoral": false,
-          "icon": "civic"
+          "icon": "civic",
+          "color": "#887ABE"
         }
       ],
       "alliances": [
@@ -1805,7 +1834,8 @@
           "satisfaction": 89,
           "status": "legal",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#548EC4"
         },
         {
           "id": "usa_republican",
@@ -1838,7 +1868,8 @@
           "satisfaction": 25,
           "status": "legal",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#CF6262"
         },
         {
           "id": "usa_progressives",
@@ -1871,7 +1902,8 @@
           "satisfaction": 63,
           "status": "legal",
           "electoral": false,
-          "icon": "faction"
+          "icon": "faction",
+          "color": "#71A179"
         },
         {
           "id": "usa_socialist",
@@ -1904,7 +1936,8 @@
           "satisfaction": 30,
           "status": "legal",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#70C497"
         },
         {
           "id": "usa_cpusa",
@@ -1937,7 +1970,8 @@
           "satisfaction": 36,
           "status": "legal",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#C2AB61"
         },
         {
           "id": "usa_silver",
@@ -1970,7 +2004,8 @@
           "satisfaction": 1,
           "status": "legal",
           "electoral": false,
-          "icon": "civic"
+          "icon": "civic",
+          "color": "#895A8C"
         },
         {
           "id": "usa_afl",
@@ -2003,7 +2038,8 @@
           "satisfaction": 70,
           "status": "legal",
           "electoral": false,
-          "icon": "union"
+          "icon": "union",
+          "color": "#A75B68"
         },
         {
           "id": "usa_cio",
@@ -2036,7 +2072,8 @@
           "satisfaction": 77,
           "status": "legal",
           "electoral": false,
-          "icon": "union"
+          "icon": "union",
+          "color": "#C3A36D"
         },
         {
           "id": "usa_nam",
@@ -2069,7 +2106,8 @@
           "satisfaction": 18,
           "status": "legal",
           "electoral": false,
-          "icon": "business"
+          "icon": "business",
+          "color": "#8A5ED7"
         },
         {
           "id": "usa_farm",
@@ -2102,7 +2140,8 @@
           "satisfaction": 64,
           "status": "legal",
           "electoral": false,
-          "icon": "civic"
+          "icon": "civic",
+          "color": "#ABC690"
         }
       ],
       "alliances": [
@@ -2209,7 +2248,8 @@
           "satisfaction": 95,
           "status": "legal",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#6EAE93"
         },
         {
           "id": "sov_left",
@@ -2242,7 +2282,8 @@
           "satisfaction": 1,
           "status": "underground",
           "electoral": false,
-          "icon": "faction"
+          "icon": "faction",
+          "color": "#5F97A0"
         },
         {
           "id": "sov_right",
@@ -2275,7 +2316,8 @@
           "satisfaction": 3,
           "status": "underground",
           "electoral": false,
-          "icon": "faction"
+          "icon": "faction",
+          "color": "#C1C27E"
         },
         {
           "id": "sov_unions",
@@ -2308,7 +2350,8 @@
           "satisfaction": 78,
           "status": "legal",
           "electoral": false,
-          "icon": "union"
+          "icon": "union",
+          "color": "#AA638D"
         },
         {
           "id": "sov_army",
@@ -2341,7 +2384,8 @@
           "satisfaction": 51,
           "status": "legal",
           "electoral": false,
-          "icon": "military"
+          "icon": "military",
+          "color": "#BD779A"
         },
         {
           "id": "sov_security",
@@ -2374,7 +2418,8 @@
           "satisfaction": 89,
           "status": "legal",
           "electoral": false,
-          "icon": "faction"
+          "icon": "faction",
+          "color": "#B88C60"
         },
         {
           "id": "sov_managers",
@@ -2407,7 +2452,8 @@
           "satisfaction": 71,
           "status": "legal",
           "electoral": false,
-          "icon": "faction"
+          "icon": "faction",
+          "color": "#9D869D"
         },
         {
           "id": "sov_cooperatives",
@@ -2440,7 +2486,8 @@
           "satisfaction": 29,
           "status": "legal",
           "electoral": false,
-          "icon": "civic"
+          "icon": "civic",
+          "color": "#79A597"
         }
       ],
       "alliances": [
@@ -2526,7 +2573,8 @@
           "satisfaction": 91,
           "status": "legal",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#6DBCAA"
         },
         {
           "id": "ita_crown",
@@ -2559,7 +2607,8 @@
           "satisfaction": 69,
           "status": "legal",
           "electoral": false,
-          "icon": "faction"
+          "icon": "faction",
+          "color": "#5CDE9F"
         },
         {
           "id": "ita_army",
@@ -2592,7 +2641,8 @@
           "satisfaction": 67,
           "status": "legal",
           "electoral": false,
-          "icon": "military"
+          "icon": "military",
+          "color": "#756BC1"
         },
         {
           "id": "ita_industry",
@@ -2625,7 +2675,8 @@
           "satisfaction": 77,
           "status": "legal",
           "electoral": false,
-          "icon": "business"
+          "icon": "business",
+          "color": "#6560B1"
         },
         {
           "id": "ita_syndicates",
@@ -2658,7 +2709,8 @@
           "satisfaction": 79,
           "status": "legal",
           "electoral": false,
-          "icon": "union"
+          "icon": "union",
+          "color": "#BD566F"
         },
         {
           "id": "ita_catholic",
@@ -2691,7 +2743,8 @@
           "satisfaction": 48,
           "status": "legal",
           "electoral": false,
-          "icon": "religious"
+          "icon": "religious",
+          "color": "#75DCA4"
         },
         {
           "id": "ita_socialist",
@@ -2724,7 +2777,8 @@
           "satisfaction": 1,
           "status": "underground",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#9AB981"
         },
         {
           "id": "ita_communist",
@@ -2757,7 +2811,8 @@
           "satisfaction": 1,
           "status": "underground",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#667D6A"
         },
         {
           "id": "ita_liberal",
@@ -2790,7 +2845,8 @@
           "satisfaction": 14,
           "status": "inactive",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#B293C6"
         }
       ],
       "alliances": [
@@ -2873,7 +2929,8 @@
           "satisfaction": 68,
           "status": "legal",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#BE9979"
         },
         {
           "id": "jap_seiyukai",
@@ -2906,7 +2963,8 @@
           "satisfaction": 43,
           "status": "legal",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#81A25E"
         },
         {
           "id": "jap_court",
@@ -2939,7 +2997,8 @@
           "satisfaction": 75,
           "status": "legal",
           "electoral": false,
-          "icon": "faction"
+          "icon": "faction",
+          "color": "#BFA47E"
         },
         {
           "id": "jap_toseiha",
@@ -2972,7 +3031,8 @@
           "satisfaction": 65,
           "status": "legal",
           "electoral": false,
-          "icon": "military"
+          "icon": "military",
+          "color": "#84C9BB"
         },
         {
           "id": "jap_kodoha",
@@ -3005,7 +3065,8 @@
           "satisfaction": 17,
           "status": "legal",
           "electoral": false,
-          "icon": "military"
+          "icon": "military",
+          "color": "#6B7686"
         },
         {
           "id": "jap_navy",
@@ -3038,7 +3099,8 @@
           "satisfaction": 63,
           "status": "legal",
           "electoral": false,
-          "icon": "military"
+          "icon": "military",
+          "color": "#C6D1A2"
         },
         {
           "id": "jap_business",
@@ -3071,7 +3133,8 @@
           "satisfaction": 70,
           "status": "legal",
           "electoral": false,
-          "icon": "business"
+          "icon": "business",
+          "color": "#BCCAA8"
         },
         {
           "id": "jap_social_mass",
@@ -3104,7 +3167,8 @@
           "satisfaction": 29,
           "status": "legal",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#D46589"
         },
         {
           "id": "jap_jcp",
@@ -3137,7 +3201,8 @@
           "satisfaction": 1,
           "status": "underground",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#B77ABF"
         }
       ],
       "alliances": [
@@ -3258,7 +3323,8 @@
           "satisfaction": 88,
           "status": "legal",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#5289BE"
         },
         {
           "id": "chi_cc",
@@ -3291,7 +3357,8 @@
           "satisfaction": 87,
           "status": "legal",
           "electoral": false,
-          "icon": "faction"
+          "icon": "faction",
+          "color": "#C85B87"
         },
         {
           "id": "chi_reorganization",
@@ -3324,7 +3391,8 @@
           "satisfaction": 48,
           "status": "legal",
           "electoral": false,
-          "icon": "faction"
+          "icon": "faction",
+          "color": "#D7A9A0"
         },
         {
           "id": "chi_officers",
@@ -3357,7 +3425,8 @@
           "satisfaction": 76,
           "status": "legal",
           "electoral": false,
-          "icon": "military"
+          "icon": "military",
+          "color": "#6C7487"
         },
         {
           "id": "chi_regional",
@@ -3390,7 +3459,8 @@
           "satisfaction": 38,
           "status": "legal",
           "electoral": false,
-          "icon": "military"
+          "icon": "military",
+          "color": "#86B191"
         },
         {
           "id": "chi_business",
@@ -3423,7 +3493,8 @@
           "satisfaction": 58,
           "status": "legal",
           "electoral": false,
-          "icon": "business"
+          "icon": "business",
+          "color": "#DB8BD5"
         },
         {
           "id": "chi_rural",
@@ -3456,7 +3527,8 @@
           "satisfaction": 59,
           "status": "legal",
           "electoral": false,
-          "icon": "civic"
+          "icon": "civic",
+          "color": "#AA80AD"
         },
         {
           "id": "chi_ccp",
@@ -3489,7 +3561,8 @@
           "satisfaction": 2,
           "status": "underground",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#C64851"
         },
         {
           "id": "chi_youth",
@@ -3522,7 +3595,8 @@
           "satisfaction": 20,
           "status": "underground",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#86C18A"
         },
         {
           "id": "chi_democratic",
@@ -3555,7 +3629,8 @@
           "satisfaction": 25,
           "status": "inactive",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#BF9CBD"
         }
       ],
       "alliances": [
@@ -3638,7 +3713,8 @@
           "satisfaction": 70,
           "status": "legal",
           "electoral": false,
-          "icon": "faction"
+          "icon": "faction",
+          "color": "#5868B3"
         },
         {
           "id": "spr_ir",
@@ -3671,7 +3747,8 @@
           "satisfaction": 45,
           "status": "legal",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#A4E0A6"
         },
         {
           "id": "spr_ur",
@@ -3704,7 +3781,8 @@
           "satisfaction": 50,
           "status": "legal",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#BB6EDD"
         },
         {
           "id": "spr_psoe",
@@ -3737,7 +3815,8 @@
           "satisfaction": 22,
           "status": "legal",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#CE5B62"
         },
         {
           "id": "spr_pce",
@@ -3770,7 +3849,8 @@
           "satisfaction": 18,
           "status": "legal",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#A13F55"
         },
         {
           "id": "spr_ceda",
@@ -3803,7 +3883,8 @@
           "satisfaction": 30,
           "status": "legal",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#A49382"
         },
         {
           "id": "spr_falange",
@@ -3836,7 +3917,8 @@
           "satisfaction": 3,
           "status": "legal",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#859589"
         },
         {
           "id": "spr_carlists",
@@ -3869,7 +3951,8 @@
           "satisfaction": 4,
           "status": "legal",
           "electoral": false,
-          "icon": "civic"
+          "icon": "civic",
+          "color": "#B3A5D7"
         },
         {
           "id": "spr_cnt",
@@ -3902,7 +3985,8 @@
           "satisfaction": 8,
           "status": "legal",
           "electoral": false,
-          "icon": "union"
+          "icon": "union",
+          "color": "#B375B8"
         },
         {
           "id": "spr_ugt",
@@ -3935,7 +4019,8 @@
           "satisfaction": 23,
           "status": "legal",
           "electoral": false,
-          "icon": "union"
+          "icon": "union",
+          "color": "#A1BE74"
         },
         {
           "id": "spr_army",
@@ -3968,7 +4053,8 @@
           "satisfaction": 22,
           "status": "legal",
           "electoral": false,
-          "icon": "military"
+          "icon": "military",
+          "color": "#A063B2"
         },
         {
           "id": "spr_unification",
@@ -4001,7 +4087,8 @@
           "satisfaction": 70,
           "status": "inactive",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#9A7DC7"
         }
       ],
       "alliances": [
@@ -4189,7 +4276,8 @@
           "satisfaction": 87,
           "status": "legal",
           "electoral": false,
-          "icon": "faction"
+          "icon": "faction",
+          "color": "#79749E"
         },
         {
           "id": "pol_military",
@@ -4222,7 +4310,8 @@
           "satisfaction": 83,
           "status": "legal",
           "electoral": false,
-          "icon": "military"
+          "icon": "military",
+          "color": "#5A8559"
         },
         {
           "id": "pol_national",
@@ -4255,7 +4344,8 @@
           "satisfaction": 23,
           "status": "legal",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#9FBEE1"
         },
         {
           "id": "pol_pps",
@@ -4288,7 +4378,8 @@
           "satisfaction": 16,
           "status": "legal",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#68D1CD"
         },
         {
           "id": "pol_peasant",
@@ -4321,7 +4412,8 @@
           "satisfaction": 19,
           "status": "legal",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#9EC094"
         },
         {
           "id": "pol_christian",
@@ -4354,7 +4446,8 @@
           "satisfaction": 28,
           "status": "legal",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#7EA88C"
         },
         {
           "id": "pol_kpp",
@@ -4387,7 +4480,8 @@
           "satisfaction": 1,
           "status": "underground",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#A764B8"
         },
         {
           "id": "pol_industry",
@@ -4420,7 +4514,8 @@
           "satisfaction": 73,
           "status": "legal",
           "electoral": false,
-          "icon": "business"
+          "icon": "business",
+          "color": "#E167BA"
         },
         {
           "id": "pol_unions",
@@ -4453,7 +4548,8 @@
           "satisfaction": 24,
           "status": "legal",
           "electoral": false,
-          "icon": "union"
+          "icon": "union",
+          "color": "#8F9F77"
         },
         {
           "id": "pol_ozon",
@@ -4486,7 +4582,8 @@
           "satisfaction": 82,
           "status": "inactive",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#E0B3B7"
         }
       ],
       "alliances": [
@@ -4601,7 +4698,8 @@
           "satisfaction": 85,
           "status": "legal",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#8BB8D0"
         },
         {
           "id": "generic_democratic_reform",
@@ -4634,7 +4732,8 @@
           "satisfaction": 30,
           "status": "legal",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#B8C9AA"
         },
         {
           "id": "generic_democratic_traditional",
@@ -4667,7 +4766,8 @@
           "satisfaction": 40,
           "status": "legal",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#C3B1DF"
         },
         {
           "id": "generic_democratic_labor",
@@ -4700,7 +4800,8 @@
           "satisfaction": 45,
           "status": "legal",
           "electoral": false,
-          "icon": "union"
+          "icon": "union",
+          "color": "#666F6A"
         },
         {
           "id": "generic_democratic_business",
@@ -4733,7 +4834,8 @@
           "satisfaction": 65,
           "status": "legal",
           "electoral": false,
-          "icon": "business"
+          "icon": "business",
+          "color": "#7BB884"
         },
         {
           "id": "generic_democratic_military",
@@ -4766,7 +4868,8 @@
           "satisfaction": 60,
           "status": "legal",
           "electoral": false,
-          "icon": "military"
+          "icon": "military",
+          "color": "#69A776"
         },
         {
           "id": "generic_democratic_civic",
@@ -4799,7 +4902,8 @@
           "satisfaction": 40,
           "status": "inactive",
           "electoral": false,
-          "icon": "civic"
+          "icon": "civic",
+          "color": "#6193B8"
         }
       ],
       "alliances": [
@@ -4859,7 +4963,8 @@
           "satisfaction": 85,
           "status": "legal",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#7A7C57"
         },
         {
           "id": "generic_fascism_reform",
@@ -4892,7 +4997,8 @@
           "satisfaction": 30,
           "status": "underground",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#877CC0"
         },
         {
           "id": "generic_fascism_traditional",
@@ -4925,7 +5031,8 @@
           "satisfaction": 40,
           "status": "banned",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#A687CE"
         },
         {
           "id": "generic_fascism_labor",
@@ -4958,7 +5065,8 @@
           "satisfaction": 45,
           "status": "legal",
           "electoral": false,
-          "icon": "union"
+          "icon": "union",
+          "color": "#5CAF90"
         },
         {
           "id": "generic_fascism_business",
@@ -4991,7 +5099,8 @@
           "satisfaction": 65,
           "status": "legal",
           "electoral": false,
-          "icon": "business"
+          "icon": "business",
+          "color": "#5A5C5A"
         },
         {
           "id": "generic_fascism_military",
@@ -5024,7 +5133,8 @@
           "satisfaction": 60,
           "status": "legal",
           "electoral": false,
-          "icon": "military"
+          "icon": "military",
+          "color": "#78B484"
         },
         {
           "id": "generic_fascism_civic",
@@ -5057,7 +5167,8 @@
           "satisfaction": 40,
           "status": "inactive",
           "electoral": false,
-          "icon": "civic"
+          "icon": "civic",
+          "color": "#81D68A"
         }
       ],
       "alliances": [
@@ -5117,7 +5228,8 @@
           "satisfaction": 85,
           "status": "legal",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#AA8E99"
         },
         {
           "id": "generic_communism_reform",
@@ -5150,7 +5262,8 @@
           "satisfaction": 30,
           "status": "underground",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#62C69C"
         },
         {
           "id": "generic_communism_traditional",
@@ -5183,7 +5296,8 @@
           "satisfaction": 40,
           "status": "banned",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#B6DCDB"
         },
         {
           "id": "generic_communism_labor",
@@ -5216,7 +5330,8 @@
           "satisfaction": 45,
           "status": "legal",
           "electoral": false,
-          "icon": "union"
+          "icon": "union",
+          "color": "#6C82C2"
         },
         {
           "id": "generic_communism_business",
@@ -5249,7 +5364,8 @@
           "satisfaction": 65,
           "status": "legal",
           "electoral": false,
-          "icon": "business"
+          "icon": "business",
+          "color": "#A9A871"
         },
         {
           "id": "generic_communism_military",
@@ -5282,7 +5398,8 @@
           "satisfaction": 60,
           "status": "legal",
           "electoral": false,
-          "icon": "military"
+          "icon": "military",
+          "color": "#77BCA9"
         },
         {
           "id": "generic_communism_civic",
@@ -5315,7 +5432,8 @@
           "satisfaction": 40,
           "status": "inactive",
           "electoral": false,
-          "icon": "civic"
+          "icon": "civic",
+          "color": "#9C5978"
         }
       ],
       "alliances": [
@@ -5375,7 +5493,8 @@
           "satisfaction": 85,
           "status": "legal",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#5D605E"
         },
         {
           "id": "generic_neutrality_reform",
@@ -5408,7 +5527,8 @@
           "satisfaction": 30,
           "status": "underground",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#9C7998"
         },
         {
           "id": "generic_neutrality_traditional",
@@ -5441,7 +5561,8 @@
           "satisfaction": 40,
           "status": "banned",
           "electoral": true,
-          "icon": "party"
+          "icon": "party",
+          "color": "#9D67D7"
         },
         {
           "id": "generic_neutrality_labor",
@@ -5474,7 +5595,8 @@
           "satisfaction": 45,
           "status": "legal",
           "electoral": false,
-          "icon": "union"
+          "icon": "union",
+          "color": "#9A9BA8"
         },
         {
           "id": "generic_neutrality_business",
@@ -5507,7 +5629,8 @@
           "satisfaction": 65,
           "status": "legal",
           "electoral": false,
-          "icon": "business"
+          "icon": "business",
+          "color": "#9C9F74"
         },
         {
           "id": "generic_neutrality_military",
@@ -5540,7 +5663,8 @@
           "satisfaction": 60,
           "status": "legal",
           "electoral": false,
-          "icon": "military"
+          "icon": "military",
+          "color": "#7D847A"
         },
         {
           "id": "generic_neutrality_civic",
@@ -5573,7 +5697,8 @@
           "satisfaction": 40,
           "status": "inactive",
           "electoral": false,
-          "icon": "civic"
+          "icon": "civic",
+          "color": "#66AA79"
         }
       ],
       "alliances": [
@@ -7585,6 +7710,1706 @@
           ]
         }
       ]
+    },
+    {
+      "id": "ger_coordination_settlement",
+      "profile": "ger",
+      "date": "1939.10.1",
+      "title": {
+        "english": "Production and independent representation",
+        "simp_chinese": "生产与独立代表权"
+      },
+      "description": {
+        "english": "Employers seek a predictable production agreement while officers and independent labor networks contest who may speak for society. This is an authored alternate-history negotiation; its date is a gameplay opportunity.",
+        "simp_chinese": "工商组织希望订立稳定的生产协议，军官团与独立劳工网络则对谁有权代表社会提出不同要求。本事件为架空协商机会，日期仅用于玩法安排。"
+      },
+      "options": [
+        {
+          "id": "shared_council",
+          "label": {
+            "english": "Negotiate a joint consultation council",
+            "simp_chinese": "协商建立共同委员会"
+          },
+          "ai_chance": 45,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "ger_industry",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ger_free_unions",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ger_officers",
+              "modifier": "executive_coordination"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ger_free_unions",
+              "modifier": "independent_civic_charter"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ger_free_unions",
+              "modifier": "excluded_from_consultation"
+            },
+            {
+              "op": "legalize",
+              "group": "ger_free_unions"
+            },
+            {
+              "op": "add_modifier",
+              "group": "ger_industry",
+              "modifier": "production_council"
+            },
+            {
+              "op": "add_modifier",
+              "group": "ger_free_unions",
+              "modifier": "production_council"
+            },
+            {
+              "op": "legitimacy",
+              "value": 3
+            }
+          ]
+        },
+        {
+          "id": "executive_mandate",
+          "label": {
+            "english": "Concentrate the coordinating mandate",
+            "simp_chinese": "集中协调授权"
+          },
+          "ai_chance": 30,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "ger_industry",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ger_free_unions",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ger_officers",
+              "modifier": "executive_coordination"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ger_free_unions",
+              "modifier": "independent_civic_charter"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ger_free_unions",
+              "modifier": "excluded_from_consultation"
+            },
+            {
+              "op": "add_modifier",
+              "group": "ger_officers",
+              "modifier": "executive_coordination"
+            },
+            {
+              "op": "add_modifier",
+              "group": "ger_free_unions",
+              "modifier": "excluded_from_consultation"
+            },
+            {
+              "op": "legitimacy",
+              "value": -3
+            }
+          ]
+        },
+        {
+          "id": "independent_charter",
+          "label": {
+            "english": "Guarantee independent representation",
+            "simp_chinese": "保障独立代表权"
+          },
+          "ai_chance": 25,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "ger_industry",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ger_free_unions",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ger_officers",
+              "modifier": "executive_coordination"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ger_free_unions",
+              "modifier": "independent_civic_charter"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ger_free_unions",
+              "modifier": "excluded_from_consultation"
+            },
+            {
+              "op": "legalize",
+              "group": "ger_free_unions"
+            },
+            {
+              "op": "add_modifier",
+              "group": "ger_free_unions",
+              "modifier": "independent_civic_charter"
+            },
+            {
+              "op": "influence",
+              "group": "ger_officers",
+              "value": -4
+            },
+            {
+              "op": "legitimacy",
+              "value": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "eng_coordination_settlement",
+      "profile": "eng",
+      "date": "1939.10.2",
+      "title": {
+        "english": "The terms of national coordination",
+        "simp_chinese": "全国协调的条件"
+      },
+      "description": {
+        "english": "Employers, the governing party and the trade unions propose different limits on the institutions coordinating national resources. This is an authored alternate-history negotiation; its date is a gameplay opportunity.",
+        "simp_chinese": "工商联合会、执政党与工会分别提出全国资源协调机构的权限边界。本事件为架空协商机会，日期仅用于玩法安排。"
+      },
+      "options": [
+        {
+          "id": "shared_council",
+          "label": {
+            "english": "Negotiate a joint consultation council",
+            "simp_chinese": "协商建立共同委员会"
+          },
+          "ai_chance": 45,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "eng_fbi",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "eng_tuc",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "eng_conservative",
+              "modifier": "executive_coordination"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "eng_tuc",
+              "modifier": "independent_civic_charter"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "eng_tuc",
+              "modifier": "excluded_from_consultation"
+            },
+            {
+              "op": "legalize",
+              "group": "eng_tuc"
+            },
+            {
+              "op": "add_modifier",
+              "group": "eng_fbi",
+              "modifier": "production_council"
+            },
+            {
+              "op": "add_modifier",
+              "group": "eng_tuc",
+              "modifier": "production_council"
+            },
+            {
+              "op": "legitimacy",
+              "value": 3
+            }
+          ]
+        },
+        {
+          "id": "executive_mandate",
+          "label": {
+            "english": "Concentrate the coordinating mandate",
+            "simp_chinese": "集中协调授权"
+          },
+          "ai_chance": 30,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "eng_fbi",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "eng_tuc",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "eng_conservative",
+              "modifier": "executive_coordination"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "eng_tuc",
+              "modifier": "independent_civic_charter"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "eng_tuc",
+              "modifier": "excluded_from_consultation"
+            },
+            {
+              "op": "add_modifier",
+              "group": "eng_conservative",
+              "modifier": "executive_coordination"
+            },
+            {
+              "op": "add_modifier",
+              "group": "eng_tuc",
+              "modifier": "excluded_from_consultation"
+            },
+            {
+              "op": "legitimacy",
+              "value": -3
+            }
+          ]
+        },
+        {
+          "id": "independent_charter",
+          "label": {
+            "english": "Guarantee independent representation",
+            "simp_chinese": "保障独立代表权"
+          },
+          "ai_chance": 25,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "eng_fbi",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "eng_tuc",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "eng_conservative",
+              "modifier": "executive_coordination"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "eng_tuc",
+              "modifier": "independent_civic_charter"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "eng_tuc",
+              "modifier": "excluded_from_consultation"
+            },
+            {
+              "op": "legalize",
+              "group": "eng_tuc"
+            },
+            {
+              "op": "add_modifier",
+              "group": "eng_tuc",
+              "modifier": "independent_civic_charter"
+            },
+            {
+              "op": "influence",
+              "group": "eng_conservative",
+              "value": -4
+            },
+            {
+              "op": "legitimacy",
+              "value": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fra_coordination_settlement",
+      "profile": "fra",
+      "date": "1939.10.3",
+      "title": {
+        "english": "Industry, labor and public authority",
+        "simp_chinese": "工业、劳工与公共权力"
+      },
+      "description": {
+        "english": "Industry representatives and organized labor seek a new agreement, while parliamentary conservatives argue for a single accountable executive. This is an authored alternate-history negotiation; its date is a gameplay opportunity.",
+        "simp_chinese": "工商代表与有组织的劳工希望达成新协议，议会保守派则主张将责任集中于统一的行政机构。本事件为架空协商机会，日期仅用于玩法安排。"
+      },
+      "options": [
+        {
+          "id": "shared_council",
+          "label": {
+            "english": "Negotiate a joint consultation council",
+            "simp_chinese": "协商建立共同委员会"
+          },
+          "ai_chance": 45,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "fra_cgpf",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "fra_cgt",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "fra_ad",
+              "modifier": "executive_coordination"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "fra_cgt",
+              "modifier": "independent_civic_charter"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "fra_cgt",
+              "modifier": "excluded_from_consultation"
+            },
+            {
+              "op": "legalize",
+              "group": "fra_cgt"
+            },
+            {
+              "op": "add_modifier",
+              "group": "fra_cgpf",
+              "modifier": "production_council"
+            },
+            {
+              "op": "add_modifier",
+              "group": "fra_cgt",
+              "modifier": "production_council"
+            },
+            {
+              "op": "legitimacy",
+              "value": 3
+            }
+          ]
+        },
+        {
+          "id": "executive_mandate",
+          "label": {
+            "english": "Concentrate the coordinating mandate",
+            "simp_chinese": "集中协调授权"
+          },
+          "ai_chance": 30,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "fra_cgpf",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "fra_cgt",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "fra_ad",
+              "modifier": "executive_coordination"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "fra_cgt",
+              "modifier": "independent_civic_charter"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "fra_cgt",
+              "modifier": "excluded_from_consultation"
+            },
+            {
+              "op": "add_modifier",
+              "group": "fra_ad",
+              "modifier": "executive_coordination"
+            },
+            {
+              "op": "add_modifier",
+              "group": "fra_cgt",
+              "modifier": "excluded_from_consultation"
+            },
+            {
+              "op": "legitimacy",
+              "value": -3
+            }
+          ]
+        },
+        {
+          "id": "independent_charter",
+          "label": {
+            "english": "Guarantee independent representation",
+            "simp_chinese": "保障独立代表权"
+          },
+          "ai_chance": 25,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "fra_cgpf",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "fra_cgt",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "fra_ad",
+              "modifier": "executive_coordination"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "fra_cgt",
+              "modifier": "independent_civic_charter"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "fra_cgt",
+              "modifier": "excluded_from_consultation"
+            },
+            {
+              "op": "legalize",
+              "group": "fra_cgt"
+            },
+            {
+              "op": "add_modifier",
+              "group": "fra_cgt",
+              "modifier": "independent_civic_charter"
+            },
+            {
+              "op": "influence",
+              "group": "fra_ad",
+              "value": -4
+            },
+            {
+              "op": "legitimacy",
+              "value": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "usa_coordination_settlement",
+      "profile": "usa",
+      "date": "1939.10.4",
+      "title": {
+        "english": "The mandate for industrial coordination",
+        "simp_chinese": "工业协调的授权"
+      },
+      "description": {
+        "english": "Manufacturers, the governing party and industrial unions disagree over how a national coordination program should distribute influence. This is an authored alternate-history negotiation; its date is a gameplay opportunity.",
+        "simp_chinese": "制造商、执政党与产业工会对全国协调计划应当如何分配政治影响力存在分歧。本事件为架空协商机会，日期仅用于玩法安排。"
+      },
+      "options": [
+        {
+          "id": "shared_council",
+          "label": {
+            "english": "Negotiate a joint consultation council",
+            "simp_chinese": "协商建立共同委员会"
+          },
+          "ai_chance": 45,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "usa_nam",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "usa_cio",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "usa_democratic",
+              "modifier": "executive_coordination"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "usa_cio",
+              "modifier": "independent_civic_charter"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "usa_cio",
+              "modifier": "excluded_from_consultation"
+            },
+            {
+              "op": "legalize",
+              "group": "usa_cio"
+            },
+            {
+              "op": "add_modifier",
+              "group": "usa_nam",
+              "modifier": "production_council"
+            },
+            {
+              "op": "add_modifier",
+              "group": "usa_cio",
+              "modifier": "production_council"
+            },
+            {
+              "op": "legitimacy",
+              "value": 3
+            }
+          ]
+        },
+        {
+          "id": "executive_mandate",
+          "label": {
+            "english": "Concentrate the coordinating mandate",
+            "simp_chinese": "集中协调授权"
+          },
+          "ai_chance": 30,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "usa_nam",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "usa_cio",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "usa_democratic",
+              "modifier": "executive_coordination"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "usa_cio",
+              "modifier": "independent_civic_charter"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "usa_cio",
+              "modifier": "excluded_from_consultation"
+            },
+            {
+              "op": "add_modifier",
+              "group": "usa_democratic",
+              "modifier": "executive_coordination"
+            },
+            {
+              "op": "add_modifier",
+              "group": "usa_cio",
+              "modifier": "excluded_from_consultation"
+            },
+            {
+              "op": "legitimacy",
+              "value": -3
+            }
+          ]
+        },
+        {
+          "id": "independent_charter",
+          "label": {
+            "english": "Guarantee independent representation",
+            "simp_chinese": "保障独立代表权"
+          },
+          "ai_chance": 25,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "usa_nam",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "usa_cio",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "usa_democratic",
+              "modifier": "executive_coordination"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "usa_cio",
+              "modifier": "independent_civic_charter"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "usa_cio",
+              "modifier": "excluded_from_consultation"
+            },
+            {
+              "op": "legalize",
+              "group": "usa_cio"
+            },
+            {
+              "op": "add_modifier",
+              "group": "usa_cio",
+              "modifier": "independent_civic_charter"
+            },
+            {
+              "op": "influence",
+              "group": "usa_democratic",
+              "value": -4
+            },
+            {
+              "op": "legitimacy",
+              "value": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sov_coordination_settlement",
+      "profile": "sov",
+      "date": "1939.10.5",
+      "title": {
+        "english": "Administration and social representation",
+        "simp_chinese": "行政管理与社会代表"
+      },
+      "description": {
+        "english": "Industrial managers, security officials and cooperative associations put forward competing arrangements for supervision and consultation. This is an authored alternate-history negotiation; its date is a gameplay opportunity.",
+        "simp_chinese": "工业管理者、安全机构与合作社团体提出了彼此竞争的监督和协商方案。本事件为架空协商机会，日期仅用于玩法安排。"
+      },
+      "options": [
+        {
+          "id": "shared_council",
+          "label": {
+            "english": "Negotiate a joint consultation council",
+            "simp_chinese": "协商建立共同委员会"
+          },
+          "ai_chance": 45,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "sov_managers",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "sov_cooperatives",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "sov_security",
+              "modifier": "executive_coordination"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "sov_cooperatives",
+              "modifier": "independent_civic_charter"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "sov_cooperatives",
+              "modifier": "excluded_from_consultation"
+            },
+            {
+              "op": "legalize",
+              "group": "sov_cooperatives"
+            },
+            {
+              "op": "add_modifier",
+              "group": "sov_managers",
+              "modifier": "production_council"
+            },
+            {
+              "op": "add_modifier",
+              "group": "sov_cooperatives",
+              "modifier": "production_council"
+            },
+            {
+              "op": "legitimacy",
+              "value": 3
+            }
+          ]
+        },
+        {
+          "id": "executive_mandate",
+          "label": {
+            "english": "Concentrate the coordinating mandate",
+            "simp_chinese": "集中协调授权"
+          },
+          "ai_chance": 30,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "sov_managers",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "sov_cooperatives",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "sov_security",
+              "modifier": "executive_coordination"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "sov_cooperatives",
+              "modifier": "independent_civic_charter"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "sov_cooperatives",
+              "modifier": "excluded_from_consultation"
+            },
+            {
+              "op": "add_modifier",
+              "group": "sov_security",
+              "modifier": "executive_coordination"
+            },
+            {
+              "op": "add_modifier",
+              "group": "sov_cooperatives",
+              "modifier": "excluded_from_consultation"
+            },
+            {
+              "op": "legitimacy",
+              "value": -3
+            }
+          ]
+        },
+        {
+          "id": "independent_charter",
+          "label": {
+            "english": "Guarantee independent representation",
+            "simp_chinese": "保障独立代表权"
+          },
+          "ai_chance": 25,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "sov_managers",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "sov_cooperatives",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "sov_security",
+              "modifier": "executive_coordination"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "sov_cooperatives",
+              "modifier": "independent_civic_charter"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "sov_cooperatives",
+              "modifier": "excluded_from_consultation"
+            },
+            {
+              "op": "legalize",
+              "group": "sov_cooperatives"
+            },
+            {
+              "op": "add_modifier",
+              "group": "sov_cooperatives",
+              "modifier": "independent_civic_charter"
+            },
+            {
+              "op": "influence",
+              "group": "sov_security",
+              "value": -4
+            },
+            {
+              "op": "legitimacy",
+              "value": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ita_coordination_settlement",
+      "profile": "ita",
+      "date": "1939.10.6",
+      "title": {
+        "english": "The limits of institutional coordination",
+        "simp_chinese": "制度协调的边界"
+      },
+      "description": {
+        "english": "Industry, the army and Catholic associations each seek guarantees that a new coordination agreement will not erase their own institutional voice. This is an authored alternate-history negotiation; its date is a gameplay opportunity.",
+        "simp_chinese": "工商组织、军队与天主教社团都希望新协调协议保障其自身的制度发言权。本事件为架空协商机会，日期仅用于玩法安排。"
+      },
+      "options": [
+        {
+          "id": "shared_council",
+          "label": {
+            "english": "Negotiate a joint consultation council",
+            "simp_chinese": "协商建立共同委员会"
+          },
+          "ai_chance": 45,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "ita_industry",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ita_catholic",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ita_army",
+              "modifier": "executive_coordination"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ita_catholic",
+              "modifier": "independent_civic_charter"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ita_catholic",
+              "modifier": "excluded_from_consultation"
+            },
+            {
+              "op": "legalize",
+              "group": "ita_catholic"
+            },
+            {
+              "op": "add_modifier",
+              "group": "ita_industry",
+              "modifier": "production_council"
+            },
+            {
+              "op": "add_modifier",
+              "group": "ita_catholic",
+              "modifier": "production_council"
+            },
+            {
+              "op": "legitimacy",
+              "value": 3
+            }
+          ]
+        },
+        {
+          "id": "executive_mandate",
+          "label": {
+            "english": "Concentrate the coordinating mandate",
+            "simp_chinese": "集中协调授权"
+          },
+          "ai_chance": 30,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "ita_industry",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ita_catholic",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ita_army",
+              "modifier": "executive_coordination"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ita_catholic",
+              "modifier": "independent_civic_charter"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ita_catholic",
+              "modifier": "excluded_from_consultation"
+            },
+            {
+              "op": "add_modifier",
+              "group": "ita_army",
+              "modifier": "executive_coordination"
+            },
+            {
+              "op": "add_modifier",
+              "group": "ita_catholic",
+              "modifier": "excluded_from_consultation"
+            },
+            {
+              "op": "legitimacy",
+              "value": -3
+            }
+          ]
+        },
+        {
+          "id": "independent_charter",
+          "label": {
+            "english": "Guarantee independent representation",
+            "simp_chinese": "保障独立代表权"
+          },
+          "ai_chance": 25,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "ita_industry",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ita_catholic",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ita_army",
+              "modifier": "executive_coordination"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ita_catholic",
+              "modifier": "independent_civic_charter"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "ita_catholic",
+              "modifier": "excluded_from_consultation"
+            },
+            {
+              "op": "legalize",
+              "group": "ita_catholic"
+            },
+            {
+              "op": "add_modifier",
+              "group": "ita_catholic",
+              "modifier": "independent_civic_charter"
+            },
+            {
+              "op": "influence",
+              "group": "ita_army",
+              "value": -4
+            },
+            {
+              "op": "legitimacy",
+              "value": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "jap_coordination_settlement",
+      "profile": "jap",
+      "date": "1939.10.7",
+      "title": {
+        "english": "Production councils and political authority",
+        "simp_chinese": "生产协商与政治权力"
+      },
+      "description": {
+        "english": "Business circles, military organizers and the Social Mass Party disagree on whether social participation should accompany stronger economic coordination. This is an authored alternate-history negotiation; its date is a gameplay opportunity.",
+        "simp_chinese": "工商界、军方组织者与社会大众党对加强经济协调是否应当同时扩大社会参与意见不一。本事件为架空协商机会，日期仅用于玩法安排。"
+      },
+      "options": [
+        {
+          "id": "shared_council",
+          "label": {
+            "english": "Negotiate a joint consultation council",
+            "simp_chinese": "协商建立共同委员会"
+          },
+          "ai_chance": 45,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "jap_business",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "jap_social_mass",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "jap_toseiha",
+              "modifier": "executive_coordination"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "jap_social_mass",
+              "modifier": "independent_civic_charter"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "jap_social_mass",
+              "modifier": "excluded_from_consultation"
+            },
+            {
+              "op": "legalize",
+              "group": "jap_social_mass"
+            },
+            {
+              "op": "add_modifier",
+              "group": "jap_business",
+              "modifier": "production_council"
+            },
+            {
+              "op": "add_modifier",
+              "group": "jap_social_mass",
+              "modifier": "production_council"
+            },
+            {
+              "op": "legitimacy",
+              "value": 3
+            }
+          ]
+        },
+        {
+          "id": "executive_mandate",
+          "label": {
+            "english": "Concentrate the coordinating mandate",
+            "simp_chinese": "集中协调授权"
+          },
+          "ai_chance": 30,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "jap_business",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "jap_social_mass",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "jap_toseiha",
+              "modifier": "executive_coordination"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "jap_social_mass",
+              "modifier": "independent_civic_charter"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "jap_social_mass",
+              "modifier": "excluded_from_consultation"
+            },
+            {
+              "op": "add_modifier",
+              "group": "jap_toseiha",
+              "modifier": "executive_coordination"
+            },
+            {
+              "op": "add_modifier",
+              "group": "jap_social_mass",
+              "modifier": "excluded_from_consultation"
+            },
+            {
+              "op": "legitimacy",
+              "value": -3
+            }
+          ]
+        },
+        {
+          "id": "independent_charter",
+          "label": {
+            "english": "Guarantee independent representation",
+            "simp_chinese": "保障独立代表权"
+          },
+          "ai_chance": 25,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "jap_business",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "jap_social_mass",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "jap_toseiha",
+              "modifier": "executive_coordination"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "jap_social_mass",
+              "modifier": "independent_civic_charter"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "jap_social_mass",
+              "modifier": "excluded_from_consultation"
+            },
+            {
+              "op": "legalize",
+              "group": "jap_social_mass"
+            },
+            {
+              "op": "add_modifier",
+              "group": "jap_social_mass",
+              "modifier": "independent_civic_charter"
+            },
+            {
+              "op": "influence",
+              "group": "jap_toseiha",
+              "value": -4
+            },
+            {
+              "op": "legitimacy",
+              "value": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chi_coordination_settlement",
+      "profile": "chi",
+      "date": "1939.10.8",
+      "title": {
+        "english": "Regional resources and public participation",
+        "simp_chinese": "地区资源与公众参与"
+      },
+      "description": {
+        "english": "Business networks, central officers and rural associations propose rival ways to coordinate resources without dissolving their separate organizations. This is an authored alternate-history negotiation; its date is a gameplay opportunity.",
+        "simp_chinese": "工商网络、中央军官与乡村社团提出不同的资源协调方案，并希望维持各自组织的独立身份。本事件为架空协商机会，日期仅用于玩法安排。"
+      },
+      "options": [
+        {
+          "id": "shared_council",
+          "label": {
+            "english": "Negotiate a joint consultation council",
+            "simp_chinese": "协商建立共同委员会"
+          },
+          "ai_chance": 45,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "chi_business",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "chi_rural",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "chi_officers",
+              "modifier": "executive_coordination"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "chi_rural",
+              "modifier": "independent_civic_charter"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "chi_rural",
+              "modifier": "excluded_from_consultation"
+            },
+            {
+              "op": "legalize",
+              "group": "chi_rural"
+            },
+            {
+              "op": "add_modifier",
+              "group": "chi_business",
+              "modifier": "production_council"
+            },
+            {
+              "op": "add_modifier",
+              "group": "chi_rural",
+              "modifier": "production_council"
+            },
+            {
+              "op": "legitimacy",
+              "value": 3
+            }
+          ]
+        },
+        {
+          "id": "executive_mandate",
+          "label": {
+            "english": "Concentrate the coordinating mandate",
+            "simp_chinese": "集中协调授权"
+          },
+          "ai_chance": 30,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "chi_business",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "chi_rural",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "chi_officers",
+              "modifier": "executive_coordination"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "chi_rural",
+              "modifier": "independent_civic_charter"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "chi_rural",
+              "modifier": "excluded_from_consultation"
+            },
+            {
+              "op": "add_modifier",
+              "group": "chi_officers",
+              "modifier": "executive_coordination"
+            },
+            {
+              "op": "add_modifier",
+              "group": "chi_rural",
+              "modifier": "excluded_from_consultation"
+            },
+            {
+              "op": "legitimacy",
+              "value": -3
+            }
+          ]
+        },
+        {
+          "id": "independent_charter",
+          "label": {
+            "english": "Guarantee independent representation",
+            "simp_chinese": "保障独立代表权"
+          },
+          "ai_chance": 25,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "chi_business",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "chi_rural",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "chi_officers",
+              "modifier": "executive_coordination"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "chi_rural",
+              "modifier": "independent_civic_charter"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "chi_rural",
+              "modifier": "excluded_from_consultation"
+            },
+            {
+              "op": "legalize",
+              "group": "chi_rural"
+            },
+            {
+              "op": "add_modifier",
+              "group": "chi_rural",
+              "modifier": "independent_civic_charter"
+            },
+            {
+              "op": "influence",
+              "group": "chi_officers",
+              "value": -4
+            },
+            {
+              "op": "legitimacy",
+              "value": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "spr_coordination_settlement",
+      "profile": "spr",
+      "date": "1939.10.9",
+      "title": {
+        "english": "Organizational autonomy after upheaval",
+        "simp_chinese": "动荡后的组织自主"
+      },
+      "description": {
+        "english": "Traditionalist networks, military officers and labor representatives contest the future of political participation. Restoring independent labor activity would be an explicit alternative to the later bookmark's restrictions. This is an authored alternate-history negotiation; its date is a gameplay opportunity.",
+        "simp_chinese": "传统主义网络、军官团与劳工代表争论未来的政治参与方式。恢复独立劳工活动将明确改变后期开局中的限制，而非复述历史结果。本事件为架空协商机会，日期仅用于玩法安排。"
+      },
+      "options": [
+        {
+          "id": "shared_council",
+          "label": {
+            "english": "Negotiate a joint consultation council",
+            "simp_chinese": "协商建立共同委员会"
+          },
+          "ai_chance": 45,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "spr_carlists",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "spr_ugt",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "spr_army",
+              "modifier": "executive_coordination"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "spr_ugt",
+              "modifier": "independent_civic_charter"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "spr_ugt",
+              "modifier": "excluded_from_consultation"
+            },
+            {
+              "op": "legalize",
+              "group": "spr_ugt"
+            },
+            {
+              "op": "add_modifier",
+              "group": "spr_carlists",
+              "modifier": "production_council"
+            },
+            {
+              "op": "add_modifier",
+              "group": "spr_ugt",
+              "modifier": "production_council"
+            },
+            {
+              "op": "legitimacy",
+              "value": 3
+            }
+          ]
+        },
+        {
+          "id": "executive_mandate",
+          "label": {
+            "english": "Concentrate the coordinating mandate",
+            "simp_chinese": "集中协调授权"
+          },
+          "ai_chance": 30,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "spr_carlists",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "spr_ugt",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "spr_army",
+              "modifier": "executive_coordination"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "spr_ugt",
+              "modifier": "independent_civic_charter"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "spr_ugt",
+              "modifier": "excluded_from_consultation"
+            },
+            {
+              "op": "add_modifier",
+              "group": "spr_army",
+              "modifier": "executive_coordination"
+            },
+            {
+              "op": "add_modifier",
+              "group": "spr_ugt",
+              "modifier": "excluded_from_consultation"
+            },
+            {
+              "op": "legitimacy",
+              "value": -3
+            }
+          ]
+        },
+        {
+          "id": "independent_charter",
+          "label": {
+            "english": "Guarantee independent representation",
+            "simp_chinese": "保障独立代表权"
+          },
+          "ai_chance": 25,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "spr_carlists",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "spr_ugt",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "spr_army",
+              "modifier": "executive_coordination"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "spr_ugt",
+              "modifier": "independent_civic_charter"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "spr_ugt",
+              "modifier": "excluded_from_consultation"
+            },
+            {
+              "op": "legalize",
+              "group": "spr_ugt"
+            },
+            {
+              "op": "add_modifier",
+              "group": "spr_ugt",
+              "modifier": "independent_civic_charter"
+            },
+            {
+              "op": "influence",
+              "group": "spr_army",
+              "value": -4
+            },
+            {
+              "op": "legitimacy",
+              "value": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pol_coordination_settlement",
+      "profile": "pol",
+      "date": "1939.10.10",
+      "title": {
+        "english": "The distribution of public responsibility",
+        "simp_chinese": "公共责任的分配"
+      },
+      "description": {
+        "english": "Industry, military circles and the unions seek a settlement over who receives institutional access and who bears the political cost of coordination. This is an authored alternate-history negotiation; its date is a gameplay opportunity.",
+        "simp_chinese": "工商界、军方集团与工会尝试就制度参与渠道及协调政策的政治代价达成安排。本事件为架空协商机会，日期仅用于玩法安排。"
+      },
+      "options": [
+        {
+          "id": "shared_council",
+          "label": {
+            "english": "Negotiate a joint consultation council",
+            "simp_chinese": "协商建立共同委员会"
+          },
+          "ai_chance": 45,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "pol_industry",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "pol_unions",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "pol_military",
+              "modifier": "executive_coordination"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "pol_unions",
+              "modifier": "independent_civic_charter"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "pol_unions",
+              "modifier": "excluded_from_consultation"
+            },
+            {
+              "op": "legalize",
+              "group": "pol_unions"
+            },
+            {
+              "op": "add_modifier",
+              "group": "pol_industry",
+              "modifier": "production_council"
+            },
+            {
+              "op": "add_modifier",
+              "group": "pol_unions",
+              "modifier": "production_council"
+            },
+            {
+              "op": "legitimacy",
+              "value": 3
+            }
+          ]
+        },
+        {
+          "id": "executive_mandate",
+          "label": {
+            "english": "Concentrate the coordinating mandate",
+            "simp_chinese": "集中协调授权"
+          },
+          "ai_chance": 30,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "pol_industry",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "pol_unions",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "pol_military",
+              "modifier": "executive_coordination"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "pol_unions",
+              "modifier": "independent_civic_charter"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "pol_unions",
+              "modifier": "excluded_from_consultation"
+            },
+            {
+              "op": "add_modifier",
+              "group": "pol_military",
+              "modifier": "executive_coordination"
+            },
+            {
+              "op": "add_modifier",
+              "group": "pol_unions",
+              "modifier": "excluded_from_consultation"
+            },
+            {
+              "op": "legitimacy",
+              "value": -3
+            }
+          ]
+        },
+        {
+          "id": "independent_charter",
+          "label": {
+            "english": "Guarantee independent representation",
+            "simp_chinese": "保障独立代表权"
+          },
+          "ai_chance": 25,
+          "effects": [
+            {
+              "op": "remove_modifier",
+              "group": "pol_industry",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "pol_unions",
+              "modifier": "production_council"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "pol_military",
+              "modifier": "executive_coordination"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "pol_unions",
+              "modifier": "independent_civic_charter"
+            },
+            {
+              "op": "remove_modifier",
+              "group": "pol_unions",
+              "modifier": "excluded_from_consultation"
+            },
+            {
+              "op": "legalize",
+              "group": "pol_unions"
+            },
+            {
+              "op": "add_modifier",
+              "group": "pol_unions",
+              "modifier": "independent_civic_charter"
+            },
+            {
+              "op": "influence",
+              "group": "pol_military",
+              "value": -4
+            },
+            {
+              "op": "legitimacy",
+              "value": 2
+            }
+          ]
+        }
+      ]
     }
   ],
   "modifiers": [
@@ -8068,6 +9893,171 @@
         },
         "satisfaction": {
           "add": 4
+        }
+      }
+    },
+    {
+      "id": "production_council",
+      "name": {
+        "english": "Production consultation council",
+        "simp_chinese": "生产协商委员会"
+      },
+      "description": {
+        "english": "A 180-day agreement grants institutional access and builds public support through continuing consultation.",
+        "simp_chinese": "为期180天的协定提供制度参与渠道，并通过持续协商积累社会支持。"
+      },
+      "duration_days": 180,
+      "groups": [
+        "ger_industry",
+        "eng_fbi",
+        "fra_cgpf",
+        "usa_nam",
+        "sov_managers",
+        "ita_industry",
+        "jap_business",
+        "chi_business",
+        "spr_carlists",
+        "pol_industry",
+        "ger_free_unions",
+        "eng_tuc",
+        "fra_cgt",
+        "usa_cio",
+        "sov_cooperatives",
+        "ita_catholic",
+        "jap_social_mass",
+        "chi_rural",
+        "spr_ugt",
+        "pol_unions"
+      ],
+      "attributes": {
+        "influence": {
+          "add": 6,
+          "factor": 0.08
+        },
+        "satisfaction": {
+          "add": 8
+        },
+        "support": {
+          "daily": 0.015
+        }
+      },
+      "positions": {
+        "economy": {
+          "add": -4
+        }
+      }
+    },
+    {
+      "id": "executive_coordination",
+      "name": {
+        "english": "Central coordination mandate",
+        "simp_chinese": "集中协调授权"
+      },
+      "description": {
+        "english": "A 120-day mandate expands the designated organization's influence while shifting its current policy toward concentrated authority.",
+        "simp_chinese": "120天的授权扩大指定组织的影响力，使其当前政策偏向集中权力。"
+      },
+      "duration_days": 120,
+      "groups": [
+        "ger_officers",
+        "eng_conservative",
+        "fra_ad",
+        "usa_democratic",
+        "sov_security",
+        "ita_army",
+        "jap_toseiha",
+        "chi_officers",
+        "spr_army",
+        "pol_military"
+      ],
+      "attributes": {
+        "influence": {
+          "add": 12,
+          "factor": 0.12
+        },
+        "satisfaction": {
+          "add": 6
+        }
+      },
+      "positions": {
+        "authority": {
+          "add": 12
+        },
+        "liberties": {
+          "add": 8
+        }
+      }
+    },
+    {
+      "id": "independent_civic_charter",
+      "name": {
+        "english": "Independent representation charter",
+        "simp_chinese": "独立代表权章程"
+      },
+      "description": {
+        "english": "A permanent charter protects an organization's institutional voice without making it a government member.",
+        "simp_chinese": "常设章程保障组织的制度发言权，不强制其加入执政联盟。"
+      },
+      "duration_days": -1,
+      "groups": [
+        "ger_free_unions",
+        "eng_tuc",
+        "fra_cgt",
+        "usa_cio",
+        "sov_cooperatives",
+        "ita_catholic",
+        "jap_social_mass",
+        "chi_rural",
+        "spr_ugt",
+        "pol_unions"
+      ],
+      "attributes": {
+        "influence": {
+          "add": 5
+        },
+        "satisfaction": {
+          "add": 10
+        }
+      },
+      "positions": {
+        "authority": {
+          "add": -8
+        },
+        "liberties": {
+          "add": -10
+        }
+      }
+    },
+    {
+      "id": "excluded_from_consultation",
+      "name": {
+        "english": "Excluded from consultation",
+        "simp_chinese": "被排除在协商之外"
+      },
+      "description": {
+        "english": "Exclusion temporarily reduces institutional access and gradually lowers acceptance of the government over 90 days.",
+        "simp_chinese": "被排除的组织暂时失去部分制度参与渠道，对政府的认可将在90天内逐步下降。"
+      },
+      "duration_days": 90,
+      "groups": [
+        "ger_free_unions",
+        "eng_tuc",
+        "fra_cgt",
+        "usa_cio",
+        "sov_cooperatives",
+        "ita_catholic",
+        "jap_social_mass",
+        "chi_rural",
+        "spr_ugt",
+        "pol_unions"
+      ],
+      "attributes": {
+        "influence": {
+          "add": -4
+        },
+        "satisfaction": {
+          "add": -8,
+          "daily": -0.02
         }
       }
     }

@@ -31,6 +31,11 @@ class CompilerTests(unittest.TestCase):
         self.assertIn('dependencies={ "Political Society Framework" }', (self.output / "psf_vanilla_example" / "descriptor.mod").read_text())
         self.assertIn('path="mod/psf"', (self.output / "psf.mod").read_text())
 
+    def test_registry_exposes_the_authored_color_used_by_generated_assets(self):
+        registry = json.loads((self.output / "psf-registry.json").read_text())
+        self.assertEqual(registry["groups"]["eng_labour"]["color"], [207, 83, 96])
+        self.assertEqual(registry["groups"]["eng_conservative"]["color"], [84, 133, 191])
+
     def test_launcher_version_is_optional_and_engine_compatible(self):
         self.assertNotIn("supported_version", descriptor("Example"))
         self.assertIn('supported_version="1.19.*"', descriptor("Example", supported_version="1.19.*"))

@@ -81,6 +81,15 @@ def file_findings(path: Path) -> list[dict[str, str | int]]:
         required = NATIVE_GUI_WINDOWS.get(path.name)
         if required and required not in gui_windows(text):
             fail("PSF_NATIVE_GUI", f"Missing independent native window {required!r}; replacing this file without its engine window can crash HOI4.")
+    elif path.suffix.lower() == ".gfx" and path.name.startswith("psf_"):
+        # Our generated sprite files always use this root. The supplied CWT
+        # indexes sprite declarations under *any* root to cover vanilla's
+        # bitmapfonts imports, so it cannot reject a misspelled engine token.
+        # Restrict this guard to PSF-owned files rather than forbidding other
+        # legitimate native GFX roots in third-party files.
+        tokens = [m.group() for m in TOKEN.finditer(text) if not m.group().startswith("#")]
+        if tokens[:3] != ["spriteTypes", "=", "{"]:
+            fail("PSF_GFX_ROOT", "Generated PSF sprite file must begin with the spriteTypes root after comments and whitespace.")
     elif path.suffix.lower() == ".mod":
         for version in re.findall(r'(?m)^\s*supported_version\s*=\s*"([^"\n]*)"', text):
             if not re.fullmatch(r"\d+\.\d+\.(?:\d+(?:\.\d+)?|\*)", version):

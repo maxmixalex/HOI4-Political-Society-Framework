@@ -122,7 +122,15 @@ Add that record to the Germany profile's `groups`, not the top level. Its indepe
 
 Optional `small_icon` and `large_icon` values name existing `GFX_...` sprites. Provide the corresponding `.gfx` definitions and textures in a hand-written companion mod or your own packaging integration. The compiler references these identifiers; it does not read a filesystem image path from the manifest or copy arbitrary assets automatically.
 
-The default small badge uses a 24×24 logical canvas and the large one 64×64. A chart scales the small badge for its organization lane. If custom icons are omitted, deterministic original badges are generated from the organization ID and icon category. See [UI.md](UI.md).
+The default small badge uses a 24×24 logical canvas and the large one 64×64. A chart scales the small badge for its organization lane. If custom icons are omitted, original badges are generated from the organization color and icon category. See [UI.md](UI.md).
+
+### Custom organization colors
+
+Each organization can specify its own `color`. Use either a six-digit hexadecimal string such as `"color": "#C43B45"` or an RGB array such as `"color": [196, 59, 69]`. Both forms produce the same artwork. Keep hex strings quoted in YAML and TOML, where an unquoted `#` starts a comment. Channels are integers from 0 through 255; short hex notation, alpha channels, booleans and out-of-range values are rejected. This field belongs to the organization record, alongside `support` and `influence`.
+
+The specified color is used consistently in the support pie, influence pie, generated identity badges, list/detail color keys and the 1936/1939 country-selection snapshots. Custom `small_icon` or `large_icon` artwork retains its own appearance; a separate 8×8 key still identifies the organization's chart color. Two organizations may intentionally use the same RGB value, and colors are independent of engine ideology and coalition membership.
+
+Omitting `color` preserves the previous deterministic color derived from the organization's ID. Existing manifests therefore remain valid and keep their previous colors. Prefer explicit colors in authored country content so identity colors remain deliberate when IDs or organization names change. Colors are compiled into native textures: edit the source record and rebuild the mod to change them. They are not limited to a preset palette and do not rely on an unsupported scripted-GUI `color` property.
 
 ## Define alliances and institutions
 

@@ -4,15 +4,17 @@
 
 框架以经过 JSON Schema 和语义检查的数据文件为源，生成原生 HOI4 脚本、界面、本地化及可复用接口。仓库同时提供适用于原版的政治社会示例内容。
 
-**直接安装：** [下载 PSF 0.2.0 安装包](distributions/psf-0.2.0.zip)。包内包含框架、原版示例、两个启动器描述文件和中英文安装说明；无需先安装 Python。
+**直接安装：** [下载 PSF 0.3.1 安装包](distributions/psf-0.3.1.zip)。包内包含框架、原版示例、两个启动器描述文件和中英文安装说明；无需先安装 Python。
 
 > **验证边界：** 这里提供实际生成的模组、HOI4 加载格式检查和执行真实 Rust CWTools 的 CI，并通过测试执行生成脚本的受支持语义。开发环境未运行 HOI4 游戏客户端，因此不将静态校验、脚本测试或界面结构检查描述为已完成的游戏内实测。原版界面快照具有版本依赖；其版本号未随脚本提供，因此默认省略可选的 `supported_version`。作者可用 `--supported-version 1.19.*` 指定自己核实的目标版本。
 
 **0.2.0 修复了 0.1.0 的启动故障：** GUI/GFX 的 UTF-8 BOM 会令引擎拒绝整个文件，进而缺失 `frontendgamesetupview`。现在这些文件使用无 BOM UTF-8，只有本地化 YML 使用 BOM；构建在调用 CWTools 前检查原始字节和必需的原生窗口。请替换原来的同名模组目录与描述符。
 
+**0.3.1 修复界面挂接与页面重叠：** 政治、外交界面挂接游戏原生窗口，每页和团体详情独立控制显隐；修正文本引用、列表列宽、光谱标记和书签历史栏的大图重叠。团体可声明任意 `#RRGGBB` 或 `[R,G,B]` 颜色，支持率、影响力、列表色块及开局预览保持一致。新增十场后期协商和四种持续修正，1939 开局也有后续内容。
+
 ## 已实现的系统
 
-- **政治团体：** 全名、短名、描述、大小图标、类型、独立支持率、基础与有效影响力、对当前政府的满意度。
+- **政治团体：** 全名、短名、描述、大小图标、自定义 RGB 颜色、类型、独立支持率、基础与有效影响力、对当前政府的满意度。颜色独立于意识形态、联盟和活动状态。
 - **可配置政治光谱：** 内容作者声明维度、两端含义与权重。组织立场决定其最接近的意识形态原型；多个组织可以得到相同分类。
 - **组织活动状态：** 尚未活动、合法、地下、遭查禁。查禁削弱制度影响，不会删除支持者或改变组织的内在立场。
 - **政治联盟：** 执政、反对派与选举合作；成员关系相互独立，同一组织可参与多个协议。月度凝聚力变化、成员退出和解散都已实现。
@@ -26,7 +28,7 @@
 
 ## 原版示例内容
 
-示例包含 **125 个政治组织、21 个声明联盟、9 个政治维度、11 个意识形态原型、9 种制度、30 个日期事件和 60 个选项**，以及 **16 种具名修正、4,500 个按团体及属性生成的原生 modifier**。编译器另外为每个档案生成可用于选举和政府更替的过渡内阁协议。
+示例包含 **125 个政治组织、21 个声明联盟、9 个政治维度、11 个意识形态原型、9 种制度、40 个日期事件和 90 个选项**，以及 **20 种具名修正、4,500 个按团体及属性生成的原生 modifier**。所有示例团体均有显式颜色。编译器另外为每个档案生成可用于选举和政府更替的过渡内阁协议。
 
 德国、英国、法国、美国、苏联、意大利、日本、中国、西班牙和波兰有定制的 1936 档案及 1939 开局覆盖。其他国家使用四套通用模板之一，确保它们也拥有可操作的政治组织。所有名称、描述、事件与选项均有英文和简体中文。
 
@@ -92,6 +94,8 @@ python -m psf inspect examples/vanilla/manifest.json --group ger_spd
 
 在同一个播放集中启用 **Political Society Framework** 和 **PSF — Vanilla Political Societies**。示例描述符声明对框架的依赖，内容需要在框架之后生效。启动新游戏；首次游戏内验证建议从原版 1936 年开局开始。
 
+**旧版升级：** 先移走旧的 `psf/`、`psf_vanilla_example/`，再复制本包的同名目录与两个 `.mod`。只覆盖文件可能残留旧的 GUI 分块，使新旧窗口同时加载；不需要改动其他模组。
+
 在本国政治面板打开团体或光谱侧栏。选中团体后，政治社会决议分类会显示该组织的行动。查看外国外交面板可以检查其政治社会；外国面板中的选择与浏览不会授权修改对方的政治状态。
 
 本仓库不提供已经验证的旧存档迁移。已有的 PSF 存档不会在加载时自动重置组织数值；内容 ID、维度和状态结构发生变化时，应提供显式迁移或使用新存档。
@@ -147,4 +151,4 @@ python tools/ci/validate.py --root dist \
 
 PSF models political organizations independently of HOI4's native ideology slots. Declarative JSON, YAML or TOML manifests compile into a reusable framework mod and one dependent content mod, including generated effects, triggers, bilingual localization and native scripted UI. Organizations have multidimensional positions, independent support and influence, government satisfaction, legal status and multiple alliance memberships. Actual institutions remain separate from the governing coalition's political preferences.
 
-The vanilla example supplies ten authored country profiles, four generic fallback templates, 125 organizations, thirty alternative-choice scenarios, sixteen named modifier sources and 4,500 native organization modifier keys. The repository includes loader-byte/root-window checks, real pinned Rust CWTools validation and semantic negative controls. Native ideology categories remain as a compatibility projection; the game executable has not been run in the development environment, so static validation is not represented as an in-game rendering or playtest result.
+The vanilla example supplies ten authored country profiles, four generic fallback templates, 125 organizations, forty alternative-choice scenarios, twenty named modifier sources and 4,500 native organization modifier keys. The repository includes loader-byte/root-window checks, real pinned Rust CWTools validation and semantic negative controls. Native ideology categories remain as a compatibility projection; the game executable has not been run in the development environment, so static validation is not represented as an in-game rendering or playtest result.

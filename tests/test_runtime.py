@@ -73,6 +73,51 @@ class GeneratedRuntimeTests(unittest.TestCase):
         vm.run_effect("psf_init_eng")
         self.assertEqual(vm.state.variables, before)
 
+    def test_legitimacy_change_refreshes_ui_and_native_modifier_without_a_daily_tick(self):
+        vm = self.vm()
+        revision = vm.state.variables["psf_ui_revision"]
+        vm.state.callbacks.clear()
+        vm.run_effect("psf_add_legitimacy", {"psf_amount": -5})
+        self.assertGreater(vm.state.variables["psf_ui_revision"], revision)
+        self.assertIn(("force_update_dynamic_modifier", "yes"), vm.state.callbacks)
+        self.assertAlmostEqual(vm.state.variables["psf_stability_modifier"],
+                               (vm.state.variables["psf_legitimacy"] - 60) / 500)
+        vm.state.callbacks.clear()
+        vm.run_effect("psf_refresh_modifiers")
+        self.assertNotIn(("force_update_dynamic_modifier", "yes"), vm.state.callbacks,
+                         "Unchanged inputs must not force all native dynamic modifiers again")
+
+    def test_election_inside_transaction_uses_new_support_and_preserves_batch_owner(self):
+        vm = self.vm()
+        vm.run_effect("psf_begin_transaction")
+        for group in self.profile_map["eng"]["groups"]:
+            if group["electoral"]:
+                vm.run_effect("psf_set_" + group["id"] + "_support", {"psf_amount": 0})
+        vm.run_effect("psf_set_eng_labour_support", {"psf_amount": 90})
+        vm.run_effect("psf_hold_election")
+        winner = next(g for g in self.profile_map["eng"]["groups"] if g["id"] == "eng_labour")
+        self.assertEqual(vm.state.variables["psf_winning_group"], winner["_index"])
+        self.assertAlmostEqual(vm.state.variables[group_var("eng_labour", "vote_share")], 100)
+        self.assertIn("psf_batch_update", vm.state.flags)
+        vm.run_effect("psf_commit_transaction")
+        self.assertNotIn("psf_batch_update", vm.state.flags)
+
+    def test_election_permission_tracks_regime_changes_inside_transaction(self):
+        vm = self.vm()
+        unelected = next(r for r in self.manifest["regimes"] if not r.get("elections", False))
+        elected = next(r for r in self.manifest["regimes"] if r.get("elections", False))
+        vm.run_effect("psf_begin_transaction")
+        vm.run_effect("psf_set_regime_" + unelected["id"])
+        vm.run_effect("psf_hold_election")
+        self.assertEqual(vm.state.variables["psf_election_count"], 0)
+        self.assertEqual(vm.state.variables["psf_elections_enabled"], 0)
+        self.assertIn("psf_batch_update", vm.state.flags)
+        vm.run_effect("psf_set_regime_" + elected["id"])
+        vm.run_effect("psf_hold_election")
+        self.assertEqual(vm.state.variables["psf_election_count"], 1)
+        self.assertEqual(vm.state.variables["psf_elections_enabled"], 1)
+        self.assertIn("psf_batch_update", vm.state.flags)
+
     def test_same_ideology_parties_remain_separate_organizations(self):
         vm = self.vm()
         buckets = {}

@@ -46,8 +46,8 @@ jobs:
 
       - name: Verify downloadable package matches this source
         run: |
-          python -m psf pack --root dist --output build/psf-0.2.0.zip
-          cmp distributions/psf-0.2.0.zip build/psf-0.2.0.zip
+          python -m psf pack --root dist --output build/psf-0.3.1.zip
+          cmp distributions/psf-0.3.1.zip build/psf-0.3.1.zip
 
       - name: Validate custom pack and equivalent JSON, TOML and YAML inputs
         run: |

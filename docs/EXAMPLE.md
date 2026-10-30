@@ -23,7 +23,7 @@ The vanilla example is a complete declarative content pack for PSF. Its source i
 | Generic communist | 7 | 1 | Soviet party-state | Overlapping public support and party-state institutions |
 | Generic non-aligned | 7 | 1 | Authoritarian republic | Institutional bargaining outside competitive party government |
 
-There are **125 declared organizations, 21 declared alliances, nine axes, 11 ideology prototypes, nine regime definitions, and 30 dated scenarios with 60 choices**. The pack also declares **16 named modifier sources** and generates **4,500 native group/attribute modifier keys**. Compiler-generated working cabinets and framework actions are additional to these content counts.
+There are **125 declared organizations, 21 declared alliances, nine axes, 11 ideology prototypes, nine regime definitions, and 40 dated scenarios with 90 choices**. The pack also declares **20 named modifier sources** and generates **4,500 native group/attribute modifier keys**. Compiler-generated working cabinets and framework actions are additional to these content counts.
 
 Every country outside the ten authored profiles receives an abstract fallback selected from its initial native ideological compatibility state. The four generic profiles are reusable templates, not four extra countries. They provide playable political organizations for minor countries, releasable nations and new countries initialized by the framework. They do not claim to identify every minor country's historical parties or exact constitutional structure.
 
@@ -89,7 +89,7 @@ The initial January snapshots are compact political models, rather than a day-by
 
 ## Dated scenarios and alternatives
 
-Each authored profile contains three one-time scenarios. Their dates provide the earliest eligibility for a 1936 campaign; delivery occurs on the first weekly framework pulse after that date. Some coincide with a historical electoral or organizational milestone; others are explicitly authored opportunities for bargaining. Their choices are not scripts claiming that every offered action historically occurred.
+Each authored profile contains four one-time scenarios, including a new post-bookmark negotiation in October 1939. Their dates provide the earliest eligibility for a 1936 campaign; delivery occurs on the first weekly framework pulse after that date. Some coincide with a historical electoral or organizational milestone; others are explicitly authored opportunities for bargaining. Their choices are not scripts claiming that every offered action historically occurred.
 
 | Country | Date | Scenario | Mechanics exercised |
 | --- | --- | --- | --- |
@@ -138,6 +138,22 @@ The sixteen source definitions include temporary score offsets, proportional bon
 Historical examples can be disabled through the framework's example-events game rule. Framework decisions remain available. Dates before a campaign's initial bookmark are excluded, so the 1939 bookmark does not immediately replay the 1936–1938 sequence.
 
 本示例事件可通过开局规则关闭。关闭历史示例事件不会移除框架的通用决议。1939 年开局不会补播开局日期之前的 1936—1938 年事件。
+
+## 后期协商：1939 年的协调安排（0.3.1）
+
+十个定制国家各新增一场三选一的后期协商，最早触发日期分别为 1939 年 10 月 1—10 日，仍由每周更新派发。它们在 1939 剧本初始化时尚未过期，因此也可在后期开局中触发。所有新增事件明确标注为架空政治协商，日期不代表史实，也不假设特定战争、领土或政权更替已经发生。
+
+| 方案 | 真实游戏效果 | 取舍 |
+| --- | --- | --- |
+| 共同委员会 | 工商或生产组织与社会团体获得 180 天 `production_council`；各有影响力加成、满意度加成及每日支持增长 | 共享制度参与权；若社会团体此前遭查禁，会明确恢复合法活动 |
+| 集中协调授权 | 指定行政、执政党或军方团体获得 120 天 `executive_coordination`；被排除的社会团体获得 90 天 `excluded_from_consultation` | 集中组织的影响力提高，权力与自由度立场偏向集中和安全优先；社会团体的满意度逐日下降 |
+| 独立代表权章程 | 社会团体恢复合法活动并获得永久 `independent_civic_charter`；集中组织基础影响力降低 4 点 | 为独立组织提供参与保障，同时削弱集中权力；不会强制把该组织加入执政联盟 |
+
+这三种安排会撤销同一协商链中互相冲突的修正，避免换选项或作者重新触发时留下两套相反的授权。它们不清除无关的组织修正。永久章程通过对应的 `psf_remove_<group>_modifier_independent_civic_charter` 撤销；临时委员会到期后取消加成，但保留期间累积的基础支持。
+
+各国参与者使用已有的稳定团体 ID：德国的工商组织、军官团与独立工会；英国的工商联合会、保守党与 TUC；法国的工商联合会、民主联盟与 CGT；美国的制造商协会、民主党与 CIO；苏联的工业管理者、安全机构与合作社；意大利的工商组织、军队与天主教社团；日本的工商界、统制派与社会大众党；中国的工商网络、中央军官与乡村社团；西班牙的卡洛斯派、军队与 UGT；波兰的工商组织、军方集团与工会。
+
+These ten fictional negotiations extend play beyond the later opening bookmark. Their three choices implement shared consultation, concentrated authority, or independent representation through real timed/permanent sources, daily changes, legality changes and legitimacy trade-offs. They preserve organization identities and coalition memberships. Political participation does not imply cabinet membership.
 
 ## 1939 starting overrides
 

@@ -92,6 +92,12 @@ def recalculate_group(manifest: dict, group: dict) -> list[Block | str]:
                 setv(current, base), addv(current, "psf_attribute_add"), mulv(current, "psf_attribute_factor"),
                 clamp(current, *bounds(field))]
         if field.startswith("position_"):
+            # The spectrum marker is a flat page child: scripted GUI x values
+            # replace its position, rather than adding to its authored offset.
+            # Keep the persisted UI coordinate in sync with the clamped value,
+            # including native sources, timed expiry and loaded saves.
+            coordinate = gv(gid, "ui_" + field)
+            out += [setv(coordinate, current), addv(coordinate, 184)]
             out.append(conditional([block("NOT", check(current, "psf_previous_attribute"))], setv("psf_position_changed", 1, True)))
     out.append(conditional([block("OR", check("psf_position_changed", 1), "NOT = { has_variable = " + gv(gid, "ideology") + " }")],
                            f"psf_classify_g_{gid} = yes"))

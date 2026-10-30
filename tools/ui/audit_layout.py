@@ -43,46 +43,80 @@ def society_nodes(mod: Path) -> list[Node]:
             for node in gui_nodes(path.read_text(encoding="utf-8"))]
 
 
+def script_bindings(mod: Path) -> dict[str, Node]:
+    return {node.properties["window_name"][2].strip('"'): node
+            for path in sorted((mod / "common/scripted_guis").glob("psf_society*.txt"))
+            for node in gui_nodes(path.read_text(encoding="utf-8"))
+            if "window_name" in node.properties}
+
+
 def audit(mod: Path) -> dict:
     politics = gui_nodes((mod / "interface/countrypoliticsview.gui").read_text(encoding="utf-8-sig"))
     diplomacy = gui_nodes((mod / "interface/countrydiplomacyview.gui").read_text(encoding="utf-8-sig"))
     society = society_nodes(mod)
-    pol_mount = named(politics, "psf_political_summary_mount")
-    pol_summary = named(society, "psf_political_summary")
-    pol_bottom = point(pol_mount)[1] + size(pol_summary)[1]
+    bindings = script_bindings(mod)
+    windows = {n.name: n for n in society if n.kind == "containerWindowType" and n.parent and n.parent.kind == "guiTypes"}
+    pol_summary = windows["psf_political_summary"]
+    dip_summary = windows["psf_diplomatic_summary"]
+    pol_bottom = point(pol_summary)[1] + size(pol_summary)[1]
     native_bottom_start = point(named(politics, "politics_bottom"))[1]
-    dip_mount = named(diplomacy, "psf_diplomatic_summary_mount")
-    dip_summary = named(society, "psf_diplomatic_summary")
-    dip_bottom = point(dip_mount)[1] + size(dip_summary)[1]
-    focus_start = point(named(diplomacy, "active_national_focus_info", "diplomacy_tab_top"))[1]
+    dip_bottom = point(dip_summary)[1] + size(dip_summary)[1]
+    focus_start = (point(named(diplomacy, "country_info"))[1]
+                   + point(named(diplomacy, "diplomacy_tab_top"))[1]
+                   + point(named(diplomacy, "active_national_focus_info", "diplomacy_tab_top"))[1])
     checks = {
         "political_summary_precedes_native_management_strip": pol_bottom <= native_bottom_start,
         "diplomatic_summary_precedes_native_focus": dip_bottom <= focus_start,
+        "every_script_owns_one_top_level_window": set(bindings) == set(windows),
     }
-    for mode, nodes in (("political", politics), ("diplomatic", diplomacy)):
-        checks[mode + "_sidebar_outside_native_panel"] = point(named(nodes, f"psf_{mode}_side_mount"))[0] >= 550
-        summary = named(society, f"psf_{mode}_summary")
+    for mode, token in (("political", "politics_tab"), ("diplomatic", "selected_country_view_diplomacy")):
+        sidebar = windows[f"psf_{mode}_society_side"]
+        sw, sh = size(sidebar)
+        checks[mode + "_sidebar_outside_native_panel"] = point(sidebar)[0] >= 550
+        for view in ("summary", "society_side"):
+            binding = bindings[f"psf_{mode}_{view}"]
+            checks[mode + "_" + view + "_native_token"] = binding.properties.get("parent_window_token", (0, 0, ""))[2] == token
+            checks[mode + "_" + view + "_no_fabricated_instance"] = "parent_window_name" not in binding.properties
+        summary = windows[f"psf_{mode}_summary"]
         width, height = size(summary)
         for child in summary.children:
             x, y = point(child)
             if child.kind.lower() == "instanttextboxtype":
-                w = int(child.properties["maxwidth"][2])
-                h = int(child.properties["maxheight"][2])
-                checks[child.name + "_in_summary"] = 0 <= x and 0 <= y and x + w <= width and y + h <= height
+                w = int(child.properties["maxwidth"][2]); h = int(child.properties["maxheight"][2])
             elif child.kind.lower() == "buttontype":
-                w, h = size(child) if any(n.kind.lower() == "size" for n in child.children) else (123, 34)
-                checks[mode + child.name + "_in_summary"] = x + w <= width and y + h <= height
-            elif child.kind.lower() == "containerwindowtype":
-                w, h = size(child)
-                checks[child.name + "_in_summary"] = 0 <= x and 0 <= y and x + w <= width and y + h <= height
-    sidebar = named(society, "psf_society_side")
-    sw, sh = size(sidebar)
-    for page in ("psf_groups_page", "psf_detail_page", "psf_spectrum_page", "psf_alliances_page"):
-        node = named(society, page, "psf_society_side")
-        x, y = point(node)
-        w, h = size(node)
-        checks[page + "_viewport_inside_sidebar"] = x + w <= sw and y + h <= sh
-        checks[page + "_has_native_scrollbar"] = node.properties.get("verticalscrollbar", (0, 0, ""))[2] == '"right_vertical_slider"'
+                if child.name.startswith("psf_open_") and child.name.endswith(("support", "influence")):
+                    w, h = 63, 63
+                else:
+                    w, h = size(child) if any(n.kind.lower() == "size" for n in child.children) else (123, 34)
+            else:
+                continue
+            checks[f"{mode}/{child.name}_in_summary"] = 0 <= x and 0 <= y and x + w <= width and y + h <= height
+        for name, node in windows.items():
+            if not name.startswith(f"psf_{mode}_") or name in (f"psf_{mode}_summary", f"psf_{mode}_society_side"):
+                continue
+            x, y = point(node); w, h = size(node)
+            checks[name + "_viewport_inside_sidebar"] = x >= 0 and y >= 0 and x + w <= sw and y + h <= sh
+            checks[name + "_native_scrollbar"] = node.properties.get("verticalscrollbar", (0, 0, ""))[2] == '"right_vertical_slider"'
+            checks[name + "_clips_to_viewport"] = node.properties.get("clipping", (0, 0, ""))[2] == "yes"
+            binding = bindings[name]
+            checks[name + "_explicit_parent"] = binding.properties.get("parent_scripted_gui", (0, 0, ""))[2] == f"psf_{mode}_society_side_gui"
+            checks[name + "_own_visibility"] = any(n.kind == "visible" for n in binding.children)
+            checks[name + "_reacts_to_ui_state"] = "dirty" not in binding.properties
+        for name, binding in bindings.items():
+            if not name.startswith(f"psf_{mode}_"):
+                continue
+            window = windows[name]
+            direct_names = {n.name for n in window.children if n.name}
+            for section in binding.children:
+                if section.kind not in ("triggers", "effects", "properties"):
+                    continue
+                for entry in section.children:
+                    element = entry.kind
+                    for suffix in ("_click_enabled", "_visible", "_click"):
+                        if element.endswith(suffix):
+                            element = element[:-len(suffix)]
+                            break
+                    checks[f"{name}/{entry.kind}_is_direct_control"] = element in direct_names
     for filename, nodes in (("politics", politics), ("diplomacy", diplomacy)):
         for node in nodes:
             if node.properties.get("hide", (0, 0, ""))[2] == "yes":
@@ -93,8 +127,9 @@ def audit(mod: Path) -> dict:
         "passed": all(checks.values()), "checks": checks,
         "political_summary_bottom": pol_bottom, "native_management_top": native_bottom_start,
         "diplomatic_summary_bottom": dip_bottom, "native_focus_top": focus_start,
-        "sidebar_logical_size": [sw, sh],
-        "limitation": "Geometric audit only. Engine rendering, native fonts and input are not executed.",
+        "sidebar_logical_size": [414, 590], "minimum_logical_resolution": [966, 668],
+        "scripted_windows": len(windows),
+        "limitation": "Geometric and binding audit only. Engine rendering, native fonts and input are not executed.",
     }
 
 
@@ -121,13 +156,11 @@ def projection(mod: Path, destination: Path) -> None:
             rect(ox+10, oy+44, 520, 245, "#303b3e", "Existing leader, national focus, spirits, faction and BOP controls")
             rect(ox, oy+383, 550, 42, "#564b32", "Existing occupation / exiles / subject controls")
             rect(ox, oy+430, 550, 160, "#303b3e", "Existing ideas, laws, advisers, autonomy")
-            sx, sy = point(named(native, "psf_political_summary_mount"))
+            sx, sy = point(named(society, "psf_political_summary"))
         else:
             rect(ox+13, oy+160, 125, 138, "#303b3e", "Native leader")
             rect(ox+144, oy+248, 376, 76, "#564b32", "Existing national focus")
-            sx, sy = point(named(native, "psf_diplomatic_summary_mount"))
-            # The mount is inside diplomacy_tab_top inside country_info.
-            sy += point(named(native, "diplomacy_tab_top"))[1] + point(named(native, "country_info"))[1]
+            sx, sy = point(named(society, "psf_diplomatic_summary"))
         summary = named(society, f"psf_{mode}_summary")
         w, h = size(summary)
         rect(ox+sx, oy+sy, w, h, "#273e34", "")
@@ -139,16 +172,20 @@ def projection(mod: Path, destination: Path) -> None:
                 label = next((v for k, v in labels.items() if child.name.endswith("_"+k)), child.name)
                 rect(ox+sx+x, oy+sy+y, width, height, "#304e40", label, "#456250")
             elif child.kind.lower() == "buttontype":
-                rect(ox+sx+x, oy+sy+y, 123, 34, "#5b5b43", "Groups" if child.name.endswith("groups") else "Spectrum")
-        mx, my = point(named(native, f"psf_{mode}_side_mount"))
-        side_name = "psf_society_side" if mode == "political" else "psf_society_side_diplomatic"
+                if child.name.endswith(("support", "influence")):
+                    rect(ox+sx+x, oy+sy+y, 63, 63, "#426354", child.name.removeprefix("psf_open_").title())
+                else:
+                    bw,bh=size(child) if any(n.kind.lower()=="size" for n in child.children) else (123,34)
+                    rect(ox+sx+x, oy+sy+y, bw,bh, "#5b5b43", "Groups" if child.name.endswith("groups") else "Spectrum")
+        side_name = f"psf_{mode}_society_side"
+        mx, my = point(named(society, side_name))
         side = named(society, side_name)
         sw, sh = size(side)
         rect(ox+mx, oy+my, sw, sh, "#273331", "Optional sidebar; opens on request")
         for name in ("psf_tab_groups", "psf_tab_spectrum", "psf_tab_alliances"):
             n=named(society,name,side_name);x,y=point(n)
             rect(ox+mx+x,oy+my+y,123,34,"#5b5b43",name.removeprefix("psf_tab_").title())
-        page=named(society,"psf_groups_page",side_name);px,py=point(page);pw,ph=size(page)
+        page=next(n for n in society if n.name.startswith(f"psf_{mode}_groups_") and n.kind == "containerWindowType");px,py=point(page);pw,ph=size(page)
         rect(ox+mx+px,oy+my+py,pw,ph,"#202b29","Native scroll viewport; one page visible")
         rect(ox+mx+px+pw-15,oy+my+py+24,10,ph-30,"#44524a","")
         rect(ox+mx+px+pw-15,oy+my+py+24,10,115,"#b4b29a","")

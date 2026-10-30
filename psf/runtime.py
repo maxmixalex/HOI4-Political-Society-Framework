@@ -65,14 +65,22 @@ def classify(manifest: dict, prefix: str, effect: str) -> Block:
 
 def core_effects() -> str:
     return emit([
-        block("psf_add_legitimacy", "custom_effect_tooltip = psf_effect_legitimacy", addv("psf_legitimacy", "psf_amount"), clamp("psf_legitimacy", 0, 100), "psf_refresh_modifiers = yes"),
+        block("psf_add_legitimacy", "custom_effect_tooltip = psf_effect_legitimacy", addv("psf_legitimacy", "psf_amount"), clamp("psf_legitimacy", 0, 100), "psf_refresh_modifiers = yes", addv("psf_ui_revision", 1)),
         block("psf_refresh_modifiers",
+              setv("psf_previous_stability_modifier", "psf_stability_modifier", True),
+              setv("psf_previous_political_power_modifier", "psf_political_power_modifier", True),
               setv("psf_stability_modifier", "psf_legitimacy"), subv("psf_stability_modifier", 60), divv("psf_stability_modifier", 500),
               clamp("psf_stability_modifier", -0.12, 0.08),
               setv("psf_political_power_modifier", "psf_legitimacy"), subv("psf_political_power_modifier", 60), divv("psf_political_power_modifier", 400),
               clamp("psf_political_power_modifier", -0.15, 0.10),
               conditional(["NOT = { has_dynamic_modifier = { modifier = psf_political_legitimacy } }"],
-                          "add_dynamic_modifier = { modifier = psf_political_legitimacy }")),
+                          "add_dynamic_modifier = { modifier = psf_political_legitimacy }"),
+              # Existing native dynamic modifiers otherwise retain yesterday's
+              # values while the PSF panel already shows the new legitimacy.
+              conditional([block("OR",
+                                 block("NOT", check("psf_stability_modifier", "psf_previous_stability_modifier")),
+                                 block("NOT", check("psf_political_power_modifier", "psf_previous_political_power_modifier")))],
+                          "force_update_dynamic_modifier = yes")),
         block("psf_prepare_change", conditional(["NOT = { has_country_flag = psf_batch_update }"], "psf_import_popularity = yes")),
         block("psf_begin_transaction", "psf_prepare_change = yes", "set_country_flag = psf_batch_update"),
         # Content compiler supplies psf_commit_transaction, which refreshes once.
@@ -361,7 +369,11 @@ def election_effect(manifest: dict, p: dict) -> list[Block]:
     for g in p["groups"]:
         cabinet_body.append(conditional([check("psf_winning_group", g["_index"]), legal(g)], setv(av(cabinet["id"], "g_" + g["id"]), 1)))
     cabinet_body += ["psf_govern_" + cabinet["id"] + " = yes"]
-    return [block("psf_hold_election_" + p["id"], conditional([flag(p), check("psf_elections_enabled", 1)], "psf_prepare_change = yes", body)),
+    # A caller can change support, sources or the regime inside a transaction.
+    # Eligibility and ballots must use the resulting values, not the cache from
+    # before the transaction began; the caller still owns the batch flag.
+    return [block("psf_hold_election_" + p["id"], conditional([flag(p)], "psf_prepare_change = yes", "psf_refresh = yes",
+                  conditional([check("psf_elections_enabled", 1)], body))),
             block("psf_form_cabinet_" + p["id"], conditional([flag(p)], "psf_prepare_change = yes", cabinet_body))]
 
 

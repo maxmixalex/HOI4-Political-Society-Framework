@@ -11,6 +11,7 @@ import unittest
 
 from psf.ui import ASSETS, generate_ui, gui_nodes, patch_native
 from psf import charts
+from hoi4_interpreter import Interpreter, State, entries, mapping, parse
 
 
 def fixture():
@@ -20,11 +21,11 @@ def fixture():
         "ideologies": [{"id": "liberal", "_index": 88412}],
         "regimes": [{"id": "republic", "_index": 3389}],
         "profiles": [{"id": "test", "tag": "GER", "groups": [
-            {"id": "alpha", "_index": 90117, "kind": "party", "positions": {"economy": 0}},
+            {"id": "alpha", "_index": 90117, "kind": "party", "color": "#1234AB", "positions": {"economy": 0}},
             {"id": "beta", "_index": 3074, "kind": "trade_union", "positions": {"economy": 0},
              "small_icon": "GFX_custom_beta_small", "large_icon": "GFX_custom_beta_large"}
         ], "alliances": [{"id": "cabinet", "_index": 9753, "members": ["alpha"]}]}],
-        "fallback_profiles": []
+        "fallback_profiles": [{"id": "other", "groups": [{"id": "gamma", "_index": 222, "kind": "party", "positions": {"economy": 10}}], "alliances": []}]
     }
 
 
@@ -107,8 +108,8 @@ class UIContractTests(unittest.TestCase):
         self.assertIn("var = psf_governing_alliance value = 9753 compare = equals", combined)
 
     def test_live_axes_and_colliding_positions_remain_clickable(self):
-        self.assertIn("x = psf_g_alpha_modified_position_economy", self.script)
-        self.assertIn("x = psf_g_beta_modified_position_economy", self.script)
+        self.assertIn("x = psf_g_alpha_ui_position_economy", self.script)
+        self.assertIn("x = psf_g_beta_ui_position_economy", self.script)
         nodes = {n.name: n for n in gui_nodes(self.gui) if n.name}
         first = nodes["psf_axis_marker_alpha_economy"]
         second = nodes["psf_axis_marker_beta_economy"]
@@ -150,25 +151,123 @@ class UIContractTests(unittest.TestCase):
             expected = b"guiTypes" if path.suffix == ".gui" else b"spriteTypes"
             self.assertTrue(data.lstrip().startswith(expected), path.name)
 
-    def test_scripted_contexts_own_distinct_windows_and_use_nested_mount_instances(self):
+    def test_scripted_contexts_use_native_tokens_and_independent_page_windows(self):
         windows = re.findall(r"^window_name = (\w+)$", self.script, re.M)
         self.assertEqual(len(windows), len(set(windows)))
+        self.assertNotIn("parent_window_name =", self.script)
+        self.assertIn("parent_window_token = politics_tab", self.script)
+        self.assertIn("parent_window_token = selected_country_view_diplomacy", self.script)
+        from tools.ui.audit_layout import script_bindings
+        bindings = script_bindings(self.root)
+        nodes = {n.name: n for n in gui_nodes(self.gui) if n.name and n.kind == "containerWindowType"}
         for mode in ("political", "diplomatic"):
-            for view in ("summary", "side"):
-                self.assertIn(f"parent_window_name = psf_{mode}_{view}_mount_instance", self.script)
+            for page in ("groups_test", "detail_alpha", "detail_beta", "spectrum_test", "alliances_test"):
+                name = f"psf_{mode}_{page}"
+                self.assertEqual(nodes[name].parent.kind, "guiTypes")
+                self.assertEqual(bindings[name].properties["parent_scripted_gui"][2], f"psf_{mode}_society_side_gui")
+                self.assertNotIn("dirty", bindings[name].properties)
+                self.assertTrue(any(n.kind == "visible" for n in bindings[name].children))
 
     def test_both_native_summaries_contain_two_complete_live_pies(self):
         nodes = gui_nodes(self.gui)
         for mode in ("political", "diplomatic"):
+            parent = next(n for n in nodes if n.name == f"psf_{mode}_summary")
             for metric in ("support", "influence"):
-                parent = f"psf_{mode}_{metric}_pie"
-                sectors = [n for n in nodes if parent in n.ancestry and n.name.startswith(f"psf_pie_{metric}_")]
+                sectors = [n for n in parent.children if n.name.startswith(f"psf_pie_{metric}_")]
                 self.assertEqual(len(sectors), charts.SECTORS)
-                hitbox = next(n for n in nodes if parent in n.ancestry and n.name == f"psf_open_{metric}")
+                hitbox = next(n for n in parent.children if n.name == f"psf_open_{metric}")
                 self.assertEqual(hitbox.properties["pdx_tooltip"][2], f'"psf_ui_{metric}_chart_tip"')
                 self.assertIn("GFX_pol_piechart_overlay_63x63", hitbox.properties["quadtexturesprite"][2])
         self.assertIn("frame = psf_pie_support_frames^179", self.script)
         self.assertIn("frame = psf_pie_influence_frames^179", self.script)
+
+    def test_rendered_page_visibility_is_exclusive_through_navigation_and_country_changes(self):
+        scripts = [entry for root in entries(parse(self.script)) for entry in entries(root.value)]
+        vm = Interpreter(State())
+        for node in entries(parse((self.root / "common/scripted_triggers/psf_ui.txt").read_text())):
+            vm.triggers[node.key] = node.value
+        vm.state.flags.update(("psf_initialized", "psf_profile_test"))
+        vm.state.variables.update(psf_ui_open=1, psf_ui_page=0, psf_ui_group=0)
+
+        def shown(mode):
+            return [node.key for node in scripts
+                    if node.key.startswith(f"psf_{mode}_")
+                    and "parent_scripted_gui" in mapping(node.value)
+                    and vm.condition(mapping(node.value)["visible"])]
+
+        for mode in ("political", "diplomatic"):
+            for page, group, expected in ((0, 0, "groups_test"), (1, 90117, "detail_alpha"),
+                                          (1, 3074, "detail_beta"), (2, 3074, "spectrum_test"),
+                                          (3, 3074, "alliances_test"), (1, 99999, "groups_test")):
+                vm.state.variables.update(psf_ui_page=page, psf_ui_group=group)
+                self.assertEqual(shown(mode), [f"psf_{mode}_{expected}_gui"])
+            vm.state.variables["psf_ui_open"] = 0
+            self.assertEqual(shown(mode), [])
+            vm.state.variables.update(psf_ui_open=1, psf_ui_page=1, psf_ui_group=90117)
+            vm.state.flags.remove("psf_profile_test")
+            vm.state.flags.add("psf_profile_other")
+            self.assertEqual(shown(mode), [f"psf_{mode}_groups_other_gui"])
+            vm.state.flags.remove("psf_profile_other")
+            vm.state.flags.add("psf_profile_test")
+
+    def test_localized_control_keys_have_real_translation_wrappers(self):
+        texts = [(self.root / f"localisation/{lang}/psf_ui_l_{lang}.yml").read_text(encoding="utf-8-sig")
+                 for lang in ("english", "simp_chinese")]
+        keys = [set(re.findall(r"^ (psf_ui_\w+):", text, re.M)) for text in texts]
+        for node in gui_nodes(self.gui):
+            for prop in ("text", "buttontext", "pdx_tooltip"):
+                value = node.properties.get(prop, (0, 0, ""))[2].strip('"')
+                if value.startswith("psf_ui_"):
+                    for language_keys in keys:
+                        self.assertIn(value, language_keys)
+                self.assertFalse(value.startswith("PSFUI"), "A scripted-localisation function is not a localisation key")
+        for text in texts:
+            self.assertRegex(text, r'psf_ui_regime_line:0 "\[PSFUIRegime\]"')
+            self.assertRegex(text, r'psf_ui_row_status_alpha:0 "\[PSFUIRowStatus_alpha\]"')
+
+    def test_dynamic_tooltips_contain_resolved_static_labels_and_live_values(self):
+        for language in ("english", "simp_chinese"):
+            text = (self.root / f"localisation/{language}/psf_ui_l_{language}.yml").read_text(encoding="utf-8-sig")
+            self.assertIsNone(re.search(r"\$psf_[A-Za-z0-9_]+\$", text))
+            tooltip = next(line for line in text.splitlines() if line.startswith(" psf_ui_group_tooltip_alpha:"))
+            self.assertIn("alpha", tooltip)
+            self.assertIn("[PSFUIStatus_alpha]", tooltip)
+            self.assertIn("[?psf_g_alpha_modified_support|1]", tooltip)
+            self.assertIn("[?psf_g_alpha_effective_influence|1]", tooltip)
+
+    def test_unknown_static_localization_reference_fails_the_build(self):
+        content = fixture()
+        content["profiles"][0]["groups"][0]["description"] = {"english": "$psf_missing_name$"}
+        with tempfile.TemporaryDirectory() as folder:
+            with self.assertRaisesRegex(ValueError, "Unknown UI localisation reference"):
+                generate_ui(content, Path(folder))
+
+    def test_authored_color_reaches_default_badge_and_custom_icon_swatch(self):
+        color = (0x12, 0x34, 0xAB)
+        payload = (self.root / "gfx/interface/psf/alpha_small.tga").read_bytes()[18:]
+        pixels = [tuple(payload[i:i+4]) for i in range(0, len(payload), 4)]
+        self.assertIn((color[2], color[1], color[0], 255), pixels)
+        for mode in ("political", "diplomatic"):
+            for view, label in (("groups_test", "row"), ("detail_beta", "detail")):
+                window = next(n for n in gui_nodes(self.gui) if n.name == f"psf_{mode}_{view}")
+                swatch = next(n for n in window.children if n.name == f"psf_{label}_color_beta")
+                self.assertEqual(swatch.properties["spritetype"][2], '"GFX_psf_color_beta"')
+
+    def test_row_text_cells_and_detail_blocks_do_not_overlap(self):
+        from tools.ui.audit_layout import point
+        for mode in ("political", "diplomatic"):
+            nodes = gui_nodes(self.gui)
+            window = next(n for n in nodes if n.name == f"psf_{mode}_groups_test")
+            children = {n.name: n for n in window.children if n.name}
+            title, values, status = (children[f"psf_row_{kind}_alpha"] for kind in ("name", "values", "status"))
+            self.assertLessEqual(point(title)[1] + int(title.properties["maxheight"][2]), point(values)[1])
+            self.assertLessEqual(point(values)[0] + int(values.properties["maxwidth"][2]), point(status)[0])
+            detail = next(n for n in nodes if n.name == f"psf_{mode}_detail_alpha")
+            texts = [n for n in detail.children if n.kind == "instantTextboxType"]
+            for first, second in zip(texts, texts[1:]):
+                self.assertLessEqual(point(first)[1] + int(first.properties["maxheight"][2]), point(second)[1])
+            description = next(n for n in texts if n.name == "psf_detail_description_alpha")
+            self.assertEqual(description.properties["scrollbartype"][2], '"standardtext_slider"')
 
     def test_pie_pixels_cover_the_disk_once_without_rotated_sector_seams(self):
         occupied = set()

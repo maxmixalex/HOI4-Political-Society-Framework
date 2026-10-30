@@ -8,6 +8,7 @@ import unittest
 from unittest.mock import patch
 
 from psf.model import ManifestError, load, normalize, stable_id, validate
+from psf.palette import color
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -35,6 +36,32 @@ class ManifestTests(unittest.TestCase):
             with self.subTest(value=value):
                 self.data["profiles"][0]["groups"][0]["support"] = value
                 with self.assertRaises(ManifestError):
+                    validate(self.data)
+
+    def test_organization_colors_accept_exact_rgb_and_normalize_equivalent_forms(self):
+        group = self.data["profiles"][0]["groups"][0]
+        for value in ("#00aFff", [0, 175, 255]):
+            with self.subTest(value=value):
+                group["color"] = value
+                validate(self.data)
+                normalized = normalize(self.data)
+                self.assertEqual(normalized["profiles"][0]["groups"][0]["color"], [0, 175, 255])
+                self.assertEqual(group["color"], value)
+        other = self.data["fallback_profiles"][0]["groups"][0]
+        other.pop("color", None)
+        normalized = normalize(self.data)
+        self.assertEqual(normalized["fallback_profiles"][0]["groups"][0]["color"], list(color(other["id"])))
+        self.assertNotIn("color", other)
+
+    def test_invalid_organization_colors_fail_before_any_artwork_is_written(self):
+        group = self.data["profiles"][0]["groups"][0]
+        for value in ("#abc", "123456", "#12345G", "#12345678", [], [1, 2],
+                      [1, 2, 3, 4], [256, 0, 0], [-1, 0, 0], [1.5, 2, 3],
+                      [True, 2, 3], ["1", 2, 3], [float("nan"), 0, 0],
+                      [float("inf"), 0, 0], None):
+            with self.subTest(value=value):
+                group["color"] = value
+                with self.assertRaisesRegex(ManifestError, "color"):
                     validate(self.data)
 
     def test_unknown_axis_is_an_error(self):
