@@ -94,7 +94,13 @@ def snapshot(manifest: dict, profile: dict, day: str | None) -> dict:
 
 def _limit_label(value: str, columns: int = 22) -> str:
     value = " ".join(value.split())
-    width = lambda char: 2 if unicodedata.east_asian_width(char) in {"W", "F"} else 1
+    def width(char: str) -> float:
+        # Native lobby fonts are proportional: a run of W/M must not pass the
+        # same budget as narrow lowercase letters and wrap the following pies.
+        # Keep a conservative advance budget without redistributing game fonts.
+        if unicodedata.east_asian_width(char) in {"W", "F"} or char in "MWmw@%&" or not char.isascii():
+            return 2
+        return 1.5 if char.isupper() else 1
     if sum(width(char) for char in value) <= columns:
         return value
     out, used = [], 0
@@ -225,25 +231,41 @@ def patch_native(pick, hide, move, changes: list) -> None:
         label = pick("party_label", parent)
         prop(label, "text", '"RULING_PARTY"')
         prop(label, "font", '"hoi_18mbs"')
+        prop(label, "maxHeight", "20")
+        prop(label, "fixedsize", "yes")
+        prop(label, "multiline", "no")
+        leader, leader_label = pick("leader", parent), pick("leader_label", parent)
+        for item in (leader, leader_label):
+            prop(item, "fixedsize", "yes")
+            prop(item, "multiline", "no")
         if parent == "gamesetup_country_details":
             move(panel, changes, 0, 0)
             prop(panel, "size", "{ width = 492 height = 301 }")
             move(label, changes, 110, 10)
             move(party, changes, 110, 34)
             prop(party, "maxWidth", "350")
-            move(pick("leader_label", parent), changes, 30, 204)
-            move(pick("leader", parent), changes, 120, 204)
+            prop(label, "maxWidth", "350")
+            move(leader_label, changes, 30, 204)
+            move(leader, changes, 120, 204)
+            prop(leader_label, "maxWidth", "80")
+            prop(leader, "maxWidth", "340")
+            prop(leader_label, "maxHeight", "22")
+            prop(leader, "maxHeight", "22")
             for name in ("spirit_grid", "spirit_grid_over_defined"):
                 move(pick(name, parent), changes, 30, 230)
         else:
             move(panel, changes, 35, 477)
-            prop(panel, "size", "{ width = 305 height = 225 }")
+            prop(panel, "size", "{ width = 305 height = 234 }")
             move(pick("info_title", parent), changes, 10, 445)
-            move(pick("leader_label", parent), changes, 0, 0)
-            move(pick("leader", parent), changes, 0, 17)
-            prop(pick("leader", parent), "maxWidth", "305")
-            move(label, changes, 0, 35)
-            move(party, changes, 0, 52)
+            move(leader_label, changes, 0, 0)
+            move(leader, changes, 0, 20)
+            prop(leader_label, "maxWidth", "305")
+            prop(leader, "maxWidth", "305")
+            prop(leader_label, "maxHeight", "18")
+            prop(leader, "maxHeight", "18")
+            move(label, changes, 0, 40)
+            move(party, changes, 0, 62)
+            prop(label, "maxWidth", "305")
             prop(party, "maxWidth", "305")
             # Two 64-pixel identities and the 140-pixel dual pie need their
             # own width. Reclaim the unused gap before the native focus grid;

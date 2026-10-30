@@ -71,12 +71,37 @@ def audit(mod: Path) -> dict:
         "diplomatic_summary_starts_at_native_party_region": point(dip_summary)[1] == point(named(diplomacy, "diplomacy_tab_top"))[1],
         "every_script_owns_one_top_level_window": set(bindings) == set(windows),
     }
+    frontend_nodes = gui_nodes((mod / "interface/frontendgamesetupview.gui").read_text(encoding="utf-8-sig"))
+    for parent in ("gamesetup_country_details", "gamesetup_interesting_countries_window"):
+        icon = named(frontend_nodes, "pol_faction_icon", parent)
+        if icon.properties.get("hide", (0, 0, ""))[2] != "yes":
+            continue  # Compat mode deliberately retains the native lobby.
+        panel, party, label = (named(frontend_nodes, name, parent) for name in ("info", "party", "party_label"))
+        pw, ph = size(panel)
+        checks[parent + "_native_ideology_icon_hidden"] = point(icon)[0] == -12000
+        checks[parent + "_politics_clipped_separately_from_history"] = panel.properties["clipping"][2] == "yes"
+        checks[parent + "_party_label_precedes_value"] = point(label)[1] + int(label.properties["maxheight"][2]) <= point(party)[1]
+        checks[parent + "_identity_and_dual_pie_width"] = int(party.properties["maxwidth"][2]) >= 286
+        for field in ("party_label", "party", "leader_label", "leader"):
+            child = named(frontend_nodes, field, parent)
+            x, y = point(child)
+            checks[parent + "/" + field + "_inside_info"] = (x >= 0 and y >= 0 and
+                x + int(child.properties["maxwidth"][2]) <= pw and y + int(child.properties["maxheight"][2]) <= ph)
+        if parent == "gamesetup_interesting_countries_window":
+            fields = [named(frontend_nodes, field, parent) for field in ("leader_label", "leader", "party_label", "party")]
+            checks[parent + "_text_rows_do_not_overlap"] = all(point(a)[1] + int(a.properties["maxheight"][2]) <= point(b)[1]
+                                                                  for a, b in zip(fields, fields[1:]))
+            checks[parent + "_politics_before_portrait"] = point(panel)[0] + pw <= point(named(frontend_nodes, "minor_portrait_overlay", parent))[0]
+            checks[parent + "_politics_inside_native_window"] = point(panel)[1] + ph <= size(named(frontend_nodes, parent))[1]
     for mode, token in (("political", "politics_tab"), ("diplomatic", "selected_country_view_diplomacy")):
         sidebar = windows[f"psf_{mode}_society_side"]
         sw, sh = size(sidebar)
         checks[mode + "_sidebar_outside_native_panel"] = point(sidebar)[0] >= 550
         token_y = 0 if mode == "political" else diplomacy_token_y
         checks[mode + "_sidebar_header_aligned_to_native_top"] = point(sidebar)[1] + token_y == 0
+        fixed = {n.name for n in sidebar.children if n.name}
+        checks[mode + "_header_close_and_tabs_do_not_scroll"] = {"psf_header_chrome", "psf_side_title", "psf_close",
+            "psf_tab_groups", "psf_tab_spectrum", "psf_tab_alliances"}.issubset(fixed) and "verticalscrollbar" not in sidebar.properties
         native_views = ("summary", "society_side", "government_party") if mode == "diplomatic" else ("summary", "society_side")
         for view in native_views:
             binding = bindings[f"psf_{mode}_{view}"]
@@ -110,6 +135,7 @@ def audit(mod: Path) -> dict:
             checks[name + "_explicit_parent"] = binding.properties.get("parent_scripted_gui", (0, 0, ""))[2] == f"psf_{mode}_society_side_gui"
             checks[name + "_own_visibility"] = any(n.kind == "visible" for n in binding.children)
             checks[name + "_reacts_to_ui_state"] = "dirty" not in binding.properties
+            checks[name + "_scrolling_begins_below_fixed_tabs"] = y >= 49 + 34
             content_width = w - int(margin.get("right", "0"))
             for child in node.children:
                 if child.kind.lower() == "instanttextboxtype":
@@ -165,9 +191,9 @@ def audit(mod: Path) -> dict:
 
 def projection(mod: Path, destination: Path) -> None:
     society = society_nodes(mod)
-    parts = ['<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="1410" viewBox="0 0 1040 1410">',
+    parts = ['<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="2160" viewBox="0 0 1280 2160">',
              '<style>text{font-family:Arial,sans-serif;font-size:14px;fill:#e8e8e0}.small{font-size:11px;fill:#b8c5c5}.title{font-size:20px;font-weight:bold}</style>',
-             '<rect width="1040" height="1410" fill="#171e22"/>',
+             '<rect width="1280" height="2160" fill="#171e22"/>',
              '<text class="title" x="24" y="30">PSF: audit of generated GUI coordinates</text>',
              '<text class="small" x="24" y="52">Geometric projection, not an HOI4 screenshot. All colored PSF rectangles use emitted .gui coordinates.</text>']
 
@@ -218,17 +244,53 @@ def projection(mod: Path, destination: Path) -> None:
             my += point(named(native, "country_info"))[1]
         side = named(society, side_name)
         sw, sh = size(side)
-        rect(ox+mx, oy+my, sw, sh, "#273331", "Optional sidebar; opens on request")
+        rect(ox+mx, oy+my, sw, sh, "#273331", "")
+        header=named(society,"psf_header_chrome",side_name);hx,hy=point(header);hw,hh=size(header)
+        rect(ox+mx+hx,oy+my+hy,hw,hh,"#3a4743","Country title and close button — fixed")
         for name in ("psf_tab_groups", "psf_tab_spectrum", "psf_tab_alliances"):
             n=named(society,name,side_name);x,y=point(n)
             rect(ox+mx+x,oy+my+y,123,34,"#5b5b43",name.removeprefix("psf_tab_").title())
         page=next(n for n in society if n.name.startswith(f"psf_{mode}_groups_") and n.kind == "containerWindowType");px,py=point(page);pw,ph=size(page)
-        rect(ox+mx+px,oy+my+py,pw,ph,"#202b29","Native scroll viewport; one page visible")
+        rect(ox+mx+px,oy+my+py,pw,ph,"#202b29","")
         rect(ox+mx+px+pw-15,oy+my+py+24,10,ph-30,"#44524a","")
         rect(ox+mx+px+pw-15,oy+my+py+24,10,115,"#b4b29a","")
-        for idx in range(9):
-            y=oy+my+py+28+idx*46
-            rect(ox+mx+px+8,y,370,44,"#354138",f"Group {idx+1}: name, support / influence / satisfaction")
+        children={n.name:n for n in page.children if n.name}
+        for metric in ("support","influence","satisfaction"):
+            heading=children[f"psf_list_{metric}"];x,y=point(heading)
+            parts.append(f'<text class="small" x="{ox+mx+px+x+5}" y="{oy+my+py+y+16}">{metric.title()}</text>')
+        for row_control in (n for n in page.children if n.name.startswith("psf_select_")):
+            x,y=point(row_control);rw,rh=size(row_control)
+            if y+rh > ph:
+                continue
+            gid=row_control.name.removeprefix("psf_select_")
+            rect(ox+mx+px+x,oy+my+py+y,rw,rh,"#354138","")
+            for field,label in (("name",gid),("status","Status")):
+                child=children[f"psf_row_{field}_{gid}"];cx,cy=point(child)
+                parts.append(f'<text class="small" x="{ox+mx+px+cx+2}" y="{oy+my+py+cy+15}">{html.escape(label[:27])}</text>')
+            for metric,label in (("support","Support value"),("influence","Influence value"),("satisfaction","Satisfaction")):
+                child=children[f"psf_row_{metric}_{gid}"];cx,cy=point(child);cw,ch=size(child)
+                rect(ox+mx+px+cx,oy+my+py+cy,cw,ch,"#304a3b",label,"#456250")
+    frontend=gui_nodes((mod / "interface/frontendgamesetupview.gui").read_text(encoding="utf-8-sig"))
+    for parent,ox,oy,crop_y in (("gamesetup_interesting_countries_window",24,1450,433),
+                                ("gamesetup_country_details",24,1830,0)):
+        parts.append(f'<text class="title" x="{ox}" y="{oy-20}">{"Interesting countries: lower information area" if crop_y else "Map selection: selected country"}</text>')
+        native=named(frontend,parent);width,height=size(native)
+        rect(ox,oy,width,height-crop_y,"#273331","")
+        panel=named(frontend,"info",parent);px,py=point(panel);pw,ph=size(panel)
+        rect(ox+px,oy+py-crop_y,pw,ph,"#202b29","")
+        for field,label in (("leader_label","Leader"),("leader","Selected leader"),
+                            ("party_label","Ruling party"),("party","Party / regime / identity art / two pies")):
+            child=named(frontend,field,parent);x,y=point(child)
+            w=int(child.properties["maxwidth"][2]);h=int(child.properties.get("maxheight",(0,0,"20"))[2])
+            rect(ox+px+x,oy+py-crop_y+y,w,h,"#304e40",label)
+        if crop_y:
+            history=named(frontend,"history",parent);x,y=point(history)
+            rect(ox+x,oy+y-crop_y,int(history.properties["maxwidth"][2]),int(history.properties["maxheight"][2]),"#564b32","Original history; separate text and scrollbar")
+            portrait=named(frontend,"minor_portrait_overlay",parent);x,y=point(portrait)
+            parts.append(f'<text class="small" x="{ox+x}" y="{oy+y-crop_y+16}">Native portrait starts here</text>')
+    parts.append('<text class="small" x="550" y="1840">Native textures and font baselines are not reproduced.</text>')
+    parts.append('<text class="small" x="550" y="1860">Lobby values share the engine party binding, with separate visual rows.</text>')
+    parts.append('<text class="small" x="550" y="1880">Lobby labels use a conservative CJK and wide-Latin width budget.</text>')
     parts.append('</svg>')
     destination.parent.mkdir(parents=True, exist_ok=True)
     destination.write_text("\n".join(parts), encoding="utf-8")

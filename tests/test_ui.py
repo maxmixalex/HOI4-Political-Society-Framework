@@ -549,8 +549,16 @@ class UIContractTests(unittest.TestCase):
         content = fixture()
         content["profiles"][0]["alliances"].append({"id": "pact", "_index": 234,
                                                    "members": ["alpha", "beta"]})
+        content["profiles"][0]["alliances"].append({"id": "front", "_index": 888,
+                                                   "members": ["alpha"]})
         with tempfile.TemporaryDirectory() as folder:
             generate_ui(content, Path(folder))
+            generated = "\n".join(p.read_text() for p in (Path(folder) / "interface").glob("psf_society*.gui"))
+            for mode in ("political", "diplomatic"):
+                detail = next(n for n in gui_nodes(generated) if n.name == f"psf_{mode}_detail_alpha")
+                affiliations = next(n for n in detail.children if n.name == "psf_detail_affiliations_alpha")
+                self.assertEqual(affiliations.properties["scrollbartype"][2], '"standardtext_slider"')
+                self.assertGreaterEqual(int(affiliations.properties["maxheight"][2]), 60)
             definitions = {mapping(node.value).get("name"): node for path in
                            (Path(folder) / "common/scripted_localisation").glob("psf_ui*.txt")
                            for node in entries(parse(path.read_text()))}
@@ -564,9 +572,11 @@ class UIContractTests(unittest.TestCase):
             self.assertEqual(evaluate("PSFUIAffiliations_alpha"), "psf_ui_none")
             vm.state.variables.update(psf_g_alpha_status=1, psf_g_alpha_governing=1,
                                       psf_a_cabinet_active=1, psf_a_cabinet_g_alpha=1,
-                                      psf_a_pact_active=1, psf_a_pact_g_alpha=1)
+                                      psf_a_pact_active=1, psf_a_pact_g_alpha=1,
+                                      psf_a_front_active=1, psf_a_front_g_alpha=1)
             self.assertEqual(evaluate("PSFUIAffiliation_alpha_cabinet"), "psf_ui_affiliation_alpha_cabinet")
             self.assertEqual(evaluate("PSFUIAffiliation_alpha_pact"), "psf_ui_affiliation_alpha_pact")
+            self.assertEqual(evaluate("PSFUIAffiliation_alpha_front"), "psf_ui_affiliation_alpha_front")
             self.assertEqual(evaluate("PSFUIAffiliations_alpha"), "psf_ui_affiliations_alpha")
             self.assertEqual(evaluate("PSFUIRole_alpha"), "psf_ui_government")
             self.assertEqual(evaluate("PSFUIRowStatus_alpha"), "psf_ui_government")
@@ -575,7 +585,7 @@ class UIContractTests(unittest.TestCase):
             self.assertEqual(evaluate("PSFUIAffiliation_alpha_pact"), "psf_ui_affiliation_alpha_pact")
             self.assertEqual(evaluate("PSFUIRole_alpha"), "psf_ui_outside_government")
             self.assertEqual(evaluate("PSFUIRowStatus_alpha"), "psf_ui_legal")
-            vm.state.variables["psf_a_pact_g_alpha"] = 0
+            vm.state.variables.update(psf_a_pact_g_alpha=0, psf_a_front_g_alpha=0)
             self.assertEqual(evaluate("PSFUIAffiliations_alpha"), "psf_ui_none")
 
     def test_spectrum_reference_lanes_read_current_country_and_hide_missing_values(self):

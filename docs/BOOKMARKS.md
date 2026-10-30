@@ -65,8 +65,10 @@ government and election text fields. The `party_label` uses the native
 `RULING_PARTY` localisation, with the native leader fields retained. No visible
 “PSF” banner or implementation explanation replaces the country's politics.
 
-The interesting-country political region is 305×225 pixels at `(35,477)`;
-its 305×170 party field starts at `(0,52)`. The neighboring native portrait and
+The interesting-country political region is 305×234 pixels at `(35,477)`;
+its 305×170 party field starts at `(0,62)`, after explicitly bounded leader
+and ruling-party label/value rows. Its bottom remains inside the native
+717-pixel window. The neighboring native portrait and
 its frame move right by 60 pixels to x=349 and x=340. The country title starts
 at x=477 with a 305-pixel width, retaining its original right edge. The native
 focus and spirit anchors, historical description and country-selection
@@ -77,7 +79,9 @@ clipping contains the presentation within these political regions. Text rows
 use a native 18-point font and compact labels; the artwork row has its own
 reserved space below them. Two author-supplied 64-pixel identity sprites and
 the dual pies have 37 pixels of combined spacing budget in the narrower
-305-pixel column. Original default-artwork dimensions remain an external game
+305-pixel column. Wide Latin glyphs (including W/M), uppercase text and CJK
+use a conservative proportional-width budget, so an all-uppercase party name
+cannot move later presentation rows by wrapping. Original default-artwork dimensions remain an external game
 asset dependency; they are not inferred from an absent DDS payload.
 
 This is distinct from the earlier history-inline implementation. PSF no longer

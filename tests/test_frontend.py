@@ -163,8 +163,20 @@ class FrontendPoliticsTests(unittest.TestCase):
             self.assertEqual(node("party_label", parent).properties["text"][2].strip('"'), "RULING_PARTY")
             native_icon = node("pol_faction_icon", parent)
             self.assertEqual(native_icon.properties["hide"][2], "yes")
+            label = node("party_label", parent)
+            self.assertLessEqual(coordinate(label, "position", "y") + int(label.properties["maxheight"][2]),
+                                 coordinate(party, "position", "y"))
+            self.assertEqual(label.properties["multiline"][2], "no")
+            self.assertEqual(node("leader", parent).properties["multiline"][2], "no")
         parent = "gamesetup_interesting_countries_window"
         info = node("info", parent)
+        panel = next(item for item in nodes if item.name == parent)
+        self.assertLessEqual(coordinate(info, "position", "y") + coordinate(info, "size", "height"),
+                             coordinate(panel, "size", "height"))
+        fields = [node(name, parent) for name in ("leader_label", "leader", "party_label", "party")]
+        for previous, following in zip(fields, fields[1:]):
+            self.assertLessEqual(coordinate(previous, "position", "y") + int(previous.properties["maxheight"][2]),
+                                 coordinate(following, "position", "y"))
         right = coordinate(info, "position", "x") + coordinate(info, "size", "width")
         self.assertLessEqual(right, coordinate(node("minor_portrait_overlay", parent), "position", "x"))
         self.assertLess(coordinate(node("minor_country_leader", parent), "position", "x"),
@@ -177,12 +189,15 @@ class FrontendPoliticsTests(unittest.TestCase):
         self.assertEqual(coordinate(node("spirit", parent), "position", "x"), 451)
 
     def test_extreme_names_cannot_grow_the_native_text_rows(self):
-        for label in ("Very long organization " * 20, "政治团体名称" * 20, "A\nB\tC"):
+        for label in ("Very long organization " * 20, "政治团体名称" * 20, "WWMW" * 20, "A\nB\tC"):
             short = frontend._limit_label(label)
             columns = sum(2 if unicodedata.east_asian_width(char) in {"W", "F"} else 1 for char in short)
             self.assertLessEqual(columns, 22)
             self.assertNotIn("\n", short)
             self.assertNotIn("\t", short)
+        # Proportional fonts give W/M much more width than a typical letter.
+        # Their shortened line must reserve the same room as double-width CJK.
+        self.assertLessEqual(len(frontend._limit_label("W" * 80)), 11)
 
     def test_all_frontend_files_are_reproducible(self):
         manifest = model.load(ROOT / "examples/minimal/manifest.json")
