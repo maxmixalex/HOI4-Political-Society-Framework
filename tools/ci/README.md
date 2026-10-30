@@ -5,7 +5,13 @@ Run from the repository root on Linux x86-64 or WSL2:
 ```sh
 python -m psf compile examples/vanilla/manifest.json --output dist
 python tools/ci/validate.py --root dist --self-test
+python tools/ci/verify_distributions.py
 ```
+
+The distribution gate reads the compiler version and selects the primary and
+coalition-workshop ZIPs by their exact names. It does not assume a single ZIP or
+select a glob result. It rebuilds and validates the workshop separately, checks
+both archive CRCs and requires byte-identical source/distribution pairs.
 
 The workflow builds both mods, runs the Python tests, checks that compiling a
 second time gives byte-identical mod directories, and executes the actual Rust

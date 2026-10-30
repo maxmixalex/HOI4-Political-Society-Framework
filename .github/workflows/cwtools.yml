@@ -44,10 +44,8 @@ jobs:
       - name: HOI4 loader safety and real semantic CWTools validation
         run: python tools/ci/validate.py --root dist --self-test
 
-      - name: Verify downloadable package matches this source
-        run: |
-          python -m psf pack --root dist --output build/psf-0.4.1.zip
-          cmp distributions/psf-0.4.1.zip build/psf-0.4.1.zip
+      - name: Verify both downloadable packages match this source
+        run: python tools/ci/verify_distributions.py
 
       - name: Validate custom pack and equivalent JSON, TOML and YAML inputs
         run: |

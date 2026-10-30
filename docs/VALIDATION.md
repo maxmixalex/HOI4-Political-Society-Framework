@@ -30,6 +30,7 @@ and mouse input remain outside these source and execution-model checks.
 | Native GUI geometry and bindings | 34,372 checks, 339 windows, 0 failures |
 | Vanilla ZIP CRC | All 803 entries passed |
 | Workshop ZIP CRC | All 614 entries passed |
+| Version-based CI distribution entrypoint | Explicitly selects both current-version installers; builds/validates workshop and checks both CRCs/source equality |
 | Installed-wheel reproduction | Vanilla 803 / workshop 614 files matched; 0 missing, extra or changed; both ZIPs byte-identical |
 | HOI4 launch/gameplay | Not performed |
 
@@ -163,6 +164,7 @@ python examples/coalitions/build.py --output build/coalitions
 python tools/ci/validate.py --root build/coalitions --reports build/validation-coalitions-0.4.2
 python -m psf pack --root build/coalitions --output build/psf-coalition-workshop-0.4.2.zip
 cmp distributions/psf-coalition-workshop-0.4.2.zip build/psf-coalition-workshop-0.4.2.zip
+python tools/ci/verify_distributions.py
 ```
 
 Original story conditions, country-specific peace logic and hardcoded branches
