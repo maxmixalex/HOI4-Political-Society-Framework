@@ -11,6 +11,17 @@ mechanics. It is not a claim that every vanilla focus, event, decision, peace
 conference or espionage condition has been rewritten. The exact boundary is
 described below, including what still depends on a native compatibility slot.
 
+## Selecting the integration mode
+
+`mechanics_mode` is a build-time integration choice, not a reversible campaign
+switch. A new `compat` build emits no strict overrides or cancellation modifier.
+It does not reconstruct rules or election settings already changed in a save by
+a previous strict build. In particular, `set_rule` and `set_politics` effects
+change country state rather than merely the generated files. Select the mode
+before starting a campaign; changing an existing campaign requires an explicit
+host-mod migration that restores its intended native rules and election setup.
+Removing the strict files alone is not a verified restoration procedure.
+
 ## What strict mode changes
 
 ### Native popularity no longer supplies the normal stability bonus

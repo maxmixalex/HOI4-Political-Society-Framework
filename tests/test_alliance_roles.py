@@ -120,6 +120,42 @@ class AllianceRoleTests(unittest.TestCase):
         vm.execute(choice["complete_effect"])
         self.assertEqual(vm.state.variables[runtime.av("ws_labor_front", "electoral")], 1)
 
+    def test_role_decision_availability_tracks_current_cabinet_and_legal_members(self):
+        choices = {}
+        content = self.root / self.manifest["id"]
+        for path in (content / "common/decisions").glob("*.txt"):
+            for category in entries(parse(path.read_text())):
+                choices.update({entry.key: mapping(entry.value) for entry in entries(category.value)})
+        electoral = choices["psf_policy_ws_labor_front_role_electoral"]
+        opposition = choices["psf_policy_ws_labor_front_role_opposition"]
+        vm = self.vm()
+        for choice in (electoral, opposition):
+            self.assertEqual(choice["cost"], "30")
+            self.assertEqual(choice["days_re_enable"], "30")
+            self.assertTrue(vm.condition(choice["visible"]))
+        self.assertTrue(vm.condition(electoral["available"]))
+        self.assertFalse(vm.condition(opposition["available"]))
+
+        vm.execute(electoral["complete_effect"])
+        self.assertFalse(vm.condition(electoral["available"]))
+        self.assertTrue(vm.condition(opposition["available"]))
+        vm.run_effect("psf_govern_ws_labor_front")
+        self.assertFalse(vm.condition(electoral["available"]))
+        self.assertFalse(vm.condition(opposition["available"]))
+        vm.run_effect("psf_govern_group_ws_civic")
+        vm.run_effect("psf_set_ws_labor_front_role_opposition")
+
+        # A surviving non-electoral association is insufficient to form a
+        # ballot pact. The public API must reject the same case as the UI.
+        for group in self.profile["groups"]:
+            if group["electoral"]:
+                vm.run_effect("psf_leave_ws_labor_front_" + group["id"])
+        self.assertFalse(vm.condition(electoral["available"]))
+        vm.execute(electoral["complete_effect"])
+        self.assertEqual(vm.state.variables[runtime.av("ws_labor_front", "electoral")], 0)
+        vm.state.flags.remove("psf_profile_workshop")
+        self.assertFalse(vm.condition(electoral["visible"]))
+
 
 if __name__ == "__main__":
     unittest.main()
