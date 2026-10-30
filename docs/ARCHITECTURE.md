@@ -50,7 +50,7 @@ The support pie normalizes the modified support of active electoral organization
 
 Readable IDs determine generated variable and API names. Numeric IDs default to the first four bytes of SHA-256 reduced modulo 900,000, plus one; authors can set `numeric_id` explicitly. Numeric IDs are used for selections and identity comparisons. File order is not organization identity.
 
-Save state still depends on readable IDs and declared axes. A rename creates a new set of variable names. Adding a group does not retroactively initialize that group's data in a country already marked initialized. Preserve IDs and provide an explicit migration when changing a deployed registry; otherwise start a new campaign. The compiler does not create synthetic cabinet alliances. A profile may contain zero alliances and an independent governing organization.
+Save state still depends on readable IDs and declared axes. The bootstrap recognizes added organizations, alliances and group coordinates and initializes only their missing records at the current campaign date. Existing zero values, membership choices, dissolved alliances and modifier timers are preserved. A rename creates a new set of variable names; removals, renames, changed numeric IDs and transfers of existing state require an author's explicit migration or a new campaign. The compiler does not create synthetic cabinet alliances. A profile may contain zero alliances and an independent governing organization.
 
 ## Political spectrum and classification
 

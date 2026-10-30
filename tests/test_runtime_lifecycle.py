@@ -141,6 +141,73 @@ class RuntimeLifecycleTests(unittest.TestCase):
         vm.run_effect("psf_initialize")
         self.assertEqual(vm.state.variables, before)
 
+    def test_loaded_campaign_upgrades_from_old_definitions_without_resetting_saved_choices(self):
+        # Use a real definition upgrade, not a fabricated save with deleted
+        # fields: the old executable has never seen the new group or axis.
+        vm = self.vm(date=(1939, 8, 14))
+        other = self.vm("ger")
+        foreign_before = copy.deepcopy(other.state)
+        vm.run_effect("psf_set_eng_labour_support", {"psf_amount": 0})
+        vm.run_effect("psf_deactivate_eng_labour")
+        vm.run_effect("psf_dissolve_eng_labour_movement")
+        vm.state.variables["psf_legitimacy"] = 43
+        vm.state.variables["psf_election_clock"] = 13
+        vm.state.variables["psf_election_count"] = 7
+        vm.state.variables["psf_m_eng_labour_existing_campaign_days"] = 19
+        government = (vm.state.variables["psf_governing_group"], vm.state.variables["psf_governing_alliance"])
+        memberships = {key: value for key, value in vm.state.variables.items()
+                       if key.startswith("psf_a_") and "_g_" in key}
+
+        expanded = copy.deepcopy(self.manifest)
+        new_axis = copy.deepcopy(expanded["axes"][0])
+        new_axis["id"] = "upgrade_review_axis"
+        expanded["axes"].append(new_axis)
+        for profile in model.profiles(expanded):
+            for group in profile["groups"]:
+                group["positions"][new_axis["id"]] = 17
+        for item in expanded["ideologies"] + expanded["regimes"]:
+            item["positions"][new_axis["id"]] = 17
+        profile = next(profile for profile in model.profiles(expanded) if profile["id"] == "eng")
+        group = copy.deepcopy(profile["groups"][0])
+        group.update(id="upgrade_review_group", _index=model.stable_id("upgrade_review_group"),
+                     support=11, influence=12, satisfaction=64, status="legal")
+        profile["groups"].append(group)
+        alliance = copy.deepcopy(profile["alliances"][0])
+        alliance.update(id="upgrade_review_alliance", _index=model.stable_id("upgrade_review_alliance"),
+                        kind="opposition", members=[group["id"]], cohesion=73)
+        profile["alliances"].append(alliance)
+        self.assertNotIn(runtime.records_marker(profile), vm.state.flags)
+        self.assertNotIn(runtime.gv(group["id"], "status"), vm.state.variables)
+
+        vm.effects = {node.key: node.value for text in (runtime.core_effects(), runtime.effects(expanded))
+                      for node in entries(parse(text))}
+        vm.triggers = {node.key: node.value for text in (runtime.core_triggers(), runtime.triggers(expanded))
+                       for node in entries(parse(text))}
+        vm.run_effect("psf_initialize")
+        self.assertEqual(vm.state.variables[runtime.gv(group["id"], "support")], 11)
+        self.assertEqual(vm.state.variables[runtime.gv(group["id"], "position_" + new_axis["id"])], 17)
+        self.assertEqual(vm.state.variables[runtime.gv("eng_labour", "position_" + new_axis["id"])], 17)
+        self.assertEqual(vm.state.variables[runtime.av(alliance["id"], "cohesion")], 73)
+        self.assertEqual(vm.state.variables[runtime.av(alliance["id"], "g_" + group["id"])], 1)
+        self.assertEqual(vm.state.variables[runtime.gv("eng_labour", "support")], 0)
+        self.assertEqual(vm.state.variables[runtime.gv("eng_labour", "status")], 0)
+        self.assertEqual(vm.state.variables[runtime.av("eng_labour_movement", "active")], 0)
+        self.assertEqual(vm.state.variables["psf_legitimacy"], 43)
+        self.assertEqual(vm.state.variables["psf_election_clock"], 13)
+        self.assertEqual(vm.state.variables["psf_election_count"], 7)
+        self.assertEqual(vm.state.variables["psf_m_eng_labour_existing_campaign_days"], 19)
+        self.assertEqual((vm.state.variables["psf_governing_group"], vm.state.variables["psf_governing_alliance"]), government)
+        self.assertEqual({key: vm.state.variables[key] for key in memberships}, memberships)
+        self.assertEqual(other.state, foreign_before)
+        self.assertIn(runtime.records_marker(profile), vm.state.flags)
+        # Temporary scratch variables intentionally reset on an entrypoint;
+        # only persisted state and public projections must be unchanged.
+        saved_fields = ("variables", "flags", "arrays", "popularities", "engine", "dynamic_modifiers", "applied_dynamic_values")
+        after = {field: copy.deepcopy(getattr(vm.state, field)) for field in saved_fields}
+        vm.run_effect("psf_initialize")
+        self.assertEqual({field: getattr(vm.state, field) for field in saved_fields}, after,
+                         "A completed structure upgrade must preserve all saved state and projections")
+
 
 if __name__ == "__main__":
     unittest.main()
